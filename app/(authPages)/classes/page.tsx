@@ -3,6 +3,9 @@
 import { TClasses } from "@/app/api/classes/[id]/route";
 import { readClasses } from "@/app/api/classes/controller";
 import { readEnrollmentsByUser } from "@/app/api/enrollments/service";
+import { classesAtom, sortedClassesSelector } from "@/atoms/classesAtom";
+import { enrollmentsAtom } from "@/atoms/enrollmentsAtom";
+import { usersAtom } from "@/atoms/usersAtom";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import Link from "next/link";
@@ -10,9 +13,6 @@ import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import ButtonEnrollment from "./components/ButtonEnrollment";
 import ButtonOptions from "./components/ButtonOptions";
-import { usersAtom } from "@/atoms/usersAtom";
-import { classesAtom, sortedClassesSelector } from "@/atoms/classesAtom";
-import { enrollmentsAtom } from "@/atoms/enrollmentsAtom";
 import { weekDaysOptions, weekDaysOrder } from "./components/ModalClasses";
 
 export default function ClassesPage() {
@@ -21,6 +21,7 @@ export default function ClassesPage() {
   const setEnrollmentIds = useSetRecoilState(enrollmentsAtom);
   const setClasses = useSetRecoilState(classesAtom);
   const sortedClasses = useRecoilValue(sortedClassesSelector);
+
   const columnDefsNonAdmin: ColDef<TClasses>[] = [
     {
       headerName: "Nome",
@@ -53,6 +54,13 @@ export default function ClassesPage() {
     },
   ];
   const columnDefs: ColDef<TClasses>[] = [
+    {
+      headerName: "Ativa",
+      field: "isActive",
+      maxWidth: 88,
+      sortIndex: 0,
+      sort: "desc",
+    },
     ...columnDefsNonAdmin,
     {
       headerName: "Ações",
@@ -61,14 +69,21 @@ export default function ClassesPage() {
     },
   ];
 
+  async function handleSetClasses() {
+    const classes = await readClasses();
+    if (user?.userRole === "admin") setClasses(classes);
+    else setClasses(classes.filter((c) => c.isActive));
+  }
+
+  async function handleUpdateGlobalStates() {
+    handleSetClasses();
+    setEnrollmentIds(await readEnrollmentsByUser());
+    setShouldUpdate(false);
+  }
+
   useEffect(() => {
-    async function handleUpdateGlobalStates() {
-      setClasses(await readClasses());
-      setEnrollmentIds(await readEnrollmentsByUser());
-      setShouldUpdate(false);
-    }
     handleUpdateGlobalStates();
-  }, [shouldUpdate]);
+  }, [shouldUpdate, user]);
 
   return (
     <AgGridReact
