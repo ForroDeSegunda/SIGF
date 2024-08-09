@@ -6,7 +6,7 @@ export type TUser = Database["public"]["Tables"]["user"]["Insert"];
 export type TUserViewPlusRole = {
   email: string;
   id: string;
-  name: string;
+  full_name: string;
 } & {
   user: TUser;
 };
