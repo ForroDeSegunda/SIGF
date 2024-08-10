@@ -27,8 +27,15 @@ export async function POST(request: Request) {
   });
 
   if (error) {
-    if (error.status === 422)
-      return NextResponse.json({ ...error, message: "Usuário já cadastrado." });
+    if (error.status === 422) {
+      if (error.code === "weak_password")
+        return NextResponse.json({ ...error, message: "Senha fraca." });
+      else if (error.code === "user_already_exists")
+        return NextResponse.json({
+          ...error,
+          message: "Usuário já cadastrado.",
+        });
+    }
     if (error.status === 400)
       return NextResponse.json({ ...error, message: "Email inválido." });
     return NextResponse.json({
