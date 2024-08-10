@@ -52,7 +52,7 @@ export default function NavbarButtonIndex() {
   } else if (pathName.match(classesIdRegex)) {
     return (
       <div className="flex gap-4">
-        {userRole === "admin" && (
+        {(userRole === "admin" || userRole === "teacher") && (
           <div
             className={
               enrollmentCount.leader >= enrollmentCount.half
@@ -71,7 +71,7 @@ export default function NavbarButtonIndex() {
             Minhas presenças
           </Link>
         )}
-        {userRole === "admin" && (
+        {(userRole === "admin" || userRole === "teacher") && (
           <>
             <Link
               className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"

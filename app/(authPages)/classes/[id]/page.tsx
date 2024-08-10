@@ -82,7 +82,7 @@ export default function ClassesIdPage() {
       field: "status",
       headerName: "Inscrição",
       flex: 2,
-      valueFormatter: ({ value }) => enrollmentStatusOptions[value],
+      cellRenderer: statusRenderer,
     },
   ];
 
@@ -95,6 +95,22 @@ export default function ClassesIdPage() {
       cellRenderer: actionButtonRenderer,
     },
   ];
+
+  function statusRenderer({
+    value,
+  }: {
+    value: Database["public"]["Enums"]["enrollmentStatus"];
+  }) {
+    switch (value) {
+      case "approved":
+        return <span className="text-green-500 font-bold">Aprovado</span>;
+      case "pending":
+        return <span className="text-blue-500 font-bold">Pendente</span>;
+      case "rejected":
+        return <span className="text-orange-500 font-bold">Rejeitado</span>;
+    }
+  }
+
   function actionButtonRenderer(params: { data: IRow }) {
     const { userId, status } = params.data;
 
