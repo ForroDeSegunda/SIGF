@@ -56,11 +56,14 @@ export default function NavbarButtonIndex() {
           <div
             className={
               enrollmentCount.leader >= enrollmentCount.half
-                ? "bg-blue-300  text-white font-bold py-2 px-4 rounded"
-                : "bg-blue-500  text-white font-bold py-2 px-4 rounded"
+                ? "bg-blue-300  text-white py-2 px-4 rounded"
+                : "bg-blue-500  text-white py-2 px-4 rounded"
             }
           >
-            Condutores(as): {enrollmentCount.leader} / {enrollmentCount.half}
+            <span>Condutores(as): </span>
+            <span className="font-bold">
+              {enrollmentCount.leader} / {enrollmentCount.half}
+            </span>
           </div>
         )}
         {attendances.length > 0 && (
@@ -82,11 +85,14 @@ export default function NavbarButtonIndex() {
             <div
               className={
                 enrollmentCount.led >= enrollmentCount.half
-                  ? "bg-orange-300  text-white font-bold py-2 px-4 rounded"
-                  : "bg-orange-500  text-white font-bold py-2 px-4 rounded"
+                  ? "bg-orange-300  text-white py-2 px-4 rounded"
+                  : "bg-orange-500  text-white py-2 px-4 rounded"
               }
             >
-              Conduzidos(as): {enrollmentCount.led} / {enrollmentCount.half}
+              <span>Conduzidos(as): </span>
+              <span className="font-bold">
+                {enrollmentCount.led} / {enrollmentCount.half}
+              </span>
             </div>
           </>
         )}

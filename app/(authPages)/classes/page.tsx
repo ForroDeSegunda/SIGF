@@ -25,6 +25,7 @@ export default function ClassesPage() {
   const columnDefsNonAdmin: ColDef<TClasses>[] = [
     {
       headerName: "Nome",
+      filter: true,
       flex: 1,
       sortIndex: 0,
       cellRenderer: (p: any) => (

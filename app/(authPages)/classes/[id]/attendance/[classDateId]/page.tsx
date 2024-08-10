@@ -38,7 +38,12 @@ export default function AttendancePage() {
 
   const [rowData, setRowData] = useState<IClassDatesRow[]>([]);
   const columnDefs: ColDef<IClassDatesRow>[] = [
-    { field: "users_view.full_name", headerName: "Nome", flex: 1 },
+    {
+      field: "users_view.full_name",
+      headerName: "Nome",
+      flex: 1,
+      filter: true,
+    },
     { field: "users_view.email", headerName: "Email", flex: 1 },
     {
       field: "presence",

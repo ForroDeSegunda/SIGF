@@ -43,12 +43,6 @@ const danceRoleOptions = {
   indifferent: "Indiferente",
 };
 
-const enrollmentStatusOptions = {
-  approved: "Aprovado",
-  pending: "Pendente",
-  rejected: "Rejeitado",
-};
-
 export default function ClassesIdPage() {
   const user = useRecoilValue(usersAtom);
   const classId = useParams().id;
@@ -58,7 +52,12 @@ export default function ClassesIdPage() {
     useRecoilState(enrollmentCountAtom);
 
   const columnDefsNonAdmin: ColDef<IRow>[] = [
-    { field: "users_view.full_name", headerName: "Nome", flex: 3 },
+    {
+      field: "users_view.full_name",
+      headerName: "Nome",
+      flex: 3,
+      filter: true,
+    },
     {
       field: "createdAt",
       headerName: "Data da inscrição",
