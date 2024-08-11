@@ -5,7 +5,7 @@ import { useModal } from "@/app/components/MainModal";
 import { classDatesAtom } from "@/atoms/classDatesAtom";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useRecoilState } from "recoil";
 import { toast } from "sonner";
@@ -19,11 +19,13 @@ export interface IClassDatesRow {
 export default function AttendancePage() {
   const pathname = usePathname();
   const classId = useParams().id;
+  const router = useRouter();
   const openModal = useModal();
   // TODO: Fix this any, using classDatesAtom but types are incorrect
   const [rowData, setRowData] = useRecoilState<IClassDatesRow[]>(
     classDatesAtom as any,
   );
+
   const columnDefs: ColDef<IClassDatesRow>[] = [
     { field: "day", headerName: "Dia", flex: 1 },
     {
@@ -40,12 +42,12 @@ export default function AttendancePage() {
     const classDateData: IClassDatesRow = params.data;
     return (
       <div className="flex gap-4">
-        <a
+        <button
           className="text-green-500 hover:text-green-600 font-bold"
-          href={`${pathname}/${classDateData.id}`}
+          onClick={() => router.push(`${pathname}/${classDateData.id}`)}
         >
           Registrar
-        </a>
+        </button>
         <button
           className="text-orange-500 hover:text-orange-600 font-bold"
           onClick={() =>
