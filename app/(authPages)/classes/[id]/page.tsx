@@ -61,9 +61,8 @@ export default function ClassesIdPage() {
     {
       field: "createdAt",
       headerName: "Data da inscrição",
-      flex: 2,
-      valueFormatter: ({ value }) =>
-        new Date(value).toLocaleDateString("pt-BR"),
+      flex: 3,
+      valueFormatter: ({ value }) => new Date(value).toLocaleString("pt-BR"),
     },
     {
       field: "danceRole",
