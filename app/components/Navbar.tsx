@@ -4,12 +4,15 @@ import profilePicture from "@/assets/profile.png";
 import { sidebarMainAtom } from "@/atoms/sidebarsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaBars } from "react-icons/fa";
+import { FaChevronLeft } from "react-icons/fa6";
 import { useRecoilState, useRecoilValue } from "recoil";
+import tw from "tailwind-styled-components";
 import LogoutButton from "./LogoutButton";
-import NavbarButtonIndex from "./NavbarButtonIndex";
 import { useModal } from "./MainModal";
+import NavbarButtonIndex from "./NavbarButtonIndex";
 
 export default function Navbar() {
   const openModal = useModal();
@@ -17,10 +20,15 @@ export default function Navbar() {
   const user = useRecoilValue(usersAtom);
   const [sidebarIsOpen, setSidebarIsOpen] = useRecoilState(sidebarMainAtom);
   const [isProfileMenuVisible, setProfileMenuVisible] = useState(false);
+  const router = useRouter();
+  const splitedPath = usePathname()
+    .split("/")
+    .filter((path) => path);
 
   function toggleMenu() {
     setProfileMenuVisible(!isProfileMenuVisible);
   }
+
   function handleClickOutside(event: MouseEvent) {
     if (
       profileRef.current &&
@@ -29,54 +37,119 @@ export default function Navbar() {
       setProfileMenuVisible(false);
     }
   }
-  function addRemoveEventListeners() {
+
+  useEffect(() => {
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
-  }
-
-  useEffect(addRemoveEventListeners, []);
+  }, []);
 
   return (
-    <nav className="border-b-[1px] border-gray-300 h-16 w-full flex items-center flex-row justify-between">
-      <div className="flex flex-row items-center pl-4 gap-4">
+    <Nav>
+      <LeftSection>
         <FaBars
           className="cursor-pointer"
           onClick={() => setSidebarIsOpen(!sidebarIsOpen)}
         />
-        <Link className="font-bold" href="/classes">
-          SIGF
-        </Link>
-      </div>
+        <LogoLink href="/classes">SIGF</LogoLink>
+      </LeftSection>
 
       <NavbarButtonIndex />
 
-      <div className="pr-4 relative">
-        <img
+      <ProfileContainer>
+        {splitedPath.length > 1 && (
+          <button onClick={router.back}>
+            <FaChevronLeft className="h-4" />
+          </button>
+        )}
+        <ProfileImage
           src={user?.user_metadata?.avatar_url || profilePicture.src}
           alt="Foto de Perfil"
           ref={profileRef}
           onClick={toggleMenu}
-          className="cursor-pointer rounded-full h-10 w-10"
         />
 
         {isProfileMenuVisible && (
-          <ul className="absolute right-4 bg-white border rounded-[10px] p-4 flex flex-col items-center z-50 gap-4">
-            <li className="font-bold">{user?.user_metadata?.full_name}</li>
-            <li>{user?.email}</li>
-            <li className="flex flex-row w-full justify-between gap-2">
-              <button
-                className="py-2 px-4 rounded-md no-underline bg-blue-500 hover:bg-blue-600 text-white"
-                onClick={() => openModal("profile", "")}
-              >
+          <ProfileMenu>
+            <ProfileMenuItem>{user?.user_metadata?.full_name}</ProfileMenuItem>
+            <ProfileMenuItem>{user?.email}</ProfileMenuItem>
+            <ProfileButtonGroup>
+              <EditButton onClick={() => openModal("profile", "")}>
                 Editar
-              </button>
+              </EditButton>
               <LogoutButton />
-            </li>
-          </ul>
+            </ProfileButtonGroup>
+          </ProfileMenu>
         )}
-      </div>
-    </nav>
+      </ProfileContainer>
+    </Nav>
   );
 }
+
+const Nav = tw.nav`
+  border-b-[1px] 
+  border-gray-300 
+  h-16 
+  w-full 
+  flex 
+  items-center 
+  justify-between
+`;
+
+const LeftSection = tw.div`
+  flex 
+  items-center 
+  pl-4 
+  gap-4
+`;
+
+const LogoLink = tw(Link)`
+  font-bold
+`;
+
+const ProfileContainer = tw.div`
+  flex
+  gap-4
+  pr-4 
+  relative
+`;
+
+const ProfileImage = tw.img`
+  cursor-pointer 
+  rounded-full 
+  h-10 
+  w-10
+`;
+
+const ProfileMenu = tw.ul`
+  absolute 
+  right-4 
+  bg-white 
+  border 
+  rounded-[10px] 
+  p-4 
+  flex 
+  flex-col 
+  items-center 
+  z-50 
+  gap-4
+`;
+
+const ProfileMenuItem = tw.li``;
+
+const ProfileButtonGroup = tw.li`
+  flex 
+  w-full 
+  justify-between 
+  gap-2
+`;
+
+const EditButton = tw.button`
+  py-2 
+  px-4 
+  rounded-md 
+  bg-blue-500 
+  hover:bg-blue-600 
+  text-white
+`;
