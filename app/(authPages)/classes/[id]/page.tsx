@@ -21,7 +21,14 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
+import { CSVLink, CSVDownload } from "react-csv";
 
+const csvData = [
+  ["firstname", "lastname", "email"],
+  ["Ahmed", "Tomi", "ah@smthing.co.com"],
+  ["Raed", "Labes", "rl@smthing.co.com"],
+  ["Yezzi", "Min l3b", "ymin@cocococo.com"],
+];
 interface IRow {
   classId: "";
   userId: "";
@@ -68,26 +75,7 @@ export default function ClassesIdPage() {
       field: "danceRole",
       headerName: "Papel",
       flex: 2,
-      cellRenderer: (p: any) => {
-        let className = "";
-
-        switch (p.data.danceRole) {
-          case "led":
-            className = "text-orange-500 font-bold";
-            break;
-          case "leader":
-            className = "text-green-500 font-bold";
-            break;
-          default:
-            className = "text-blue-500 font-bold";
-        }
-
-        return (
-          <span className={className}>
-            {danceRoleOptions[p.data.danceRole]}
-          </span>
-        );
-      },
+      valueFormatter: ({ value }) => danceRoleOptions[value],
     },
     {
       field: "danceRolePreference",
@@ -98,7 +86,7 @@ export default function ClassesIdPage() {
           className={
             p.data.danceRolePreference === "led"
               ? "text-orange-500 font-bold"
-              : "text-green-500 font-bold"
+              : "text-blue-500 font-bold"
           }
         >
           {danceRoleOptions[p.data.danceRolePreference]}
@@ -211,7 +199,12 @@ export default function ClassesIdPage() {
       }
     };
 
-    return <div className="flex gap-2">{getButtonsForStatus(status)}</div>;
+    return (
+      <div className="flex gap-2">
+        {getButtonsForStatus(status)}
+        {<CSVLink data={csvData}>Download me</CSVLink>}
+      </div>
+    );
   }
 
   function updateRowData(rowData: IRow[], enrollment: TEnrollmentRow): IRow[] {
