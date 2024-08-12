@@ -68,13 +68,42 @@ export default function ClassesIdPage() {
       field: "danceRole",
       headerName: "Papel",
       flex: 2,
-      valueFormatter: ({ value }) => danceRoleOptions[value],
+      cellRenderer: (p: any) => {
+        let className = "";
+
+        switch (p.data.danceRole) {
+          case "led":
+            className = "text-orange-500 font-bold";
+            break;
+          case "leader":
+            className = "text-green-500 font-bold";
+            break;
+          default:
+            className = "text-blue-500 font-bold";
+        }
+
+        return (
+          <span className={className}>
+            {danceRoleOptions[p.data.danceRole]}
+          </span>
+        );
+      },
     },
     {
       field: "danceRolePreference",
       headerName: "Preferência",
       flex: 2,
-      valueFormatter: ({ value }) => danceRoleOptions[value],
+      cellRenderer: (p: any) => (
+        <span
+          className={
+            p.data.danceRolePreference === "led"
+              ? "text-orange-500 font-bold"
+              : "text-green-500 font-bold"
+          }
+        >
+          {danceRoleOptions[p.data.danceRolePreference]}
+        </span>
+      ),
     },
     {
       field: "status",
