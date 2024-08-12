@@ -10,6 +10,7 @@ import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { FaCheck, FaXmark } from "react-icons/fa6";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import ButtonEnrollment from "./components/ButtonEnrollment";
 import ButtonOptions from "./components/ButtonOptions";
@@ -22,18 +23,7 @@ export default function ClassesPage() {
   const setClasses = useSetRecoilState(classesAtom);
   const sortedClasses = useRecoilValue(sortedClassesSelector);
 
-  const columnDefsNonAdmin: ColDef<TClasses>[] = [
-    {
-      headerName: "Nome",
-      filter: true,
-      flex: 1,
-      sortIndex: 0,
-      cellRenderer: (p: any) => (
-        <Link className="font-bold" href={`/classes/${p.data.id}`}>
-          {p.data.name}
-        </Link>
-      ),
-    },
+  const columnDefsBase: ColDef<TClasses>[] = [
     {
       headerName: "Dias de Aula",
       field: "weekDays",
@@ -54,20 +44,44 @@ export default function ClassesPage() {
       cellRenderer: (p: any) => <ButtonEnrollment id={p.data.id} />,
     },
   ];
-  const columnDefs: ColDef<TClasses>[] = [
+  const columnDefsAdmin: ColDef<TClasses>[] = [
     {
-      headerName: "Ativa",
+      headerName: "Ativa | Nome",
       field: "isActive",
-      maxWidth: 88,
-      sortIndex: 0,
       sort: "desc",
+      cellRenderer: (p: any) => (
+        <Link
+          className="font-bold flex items-center gap-2"
+          href={`/classes/${p.data.id}`}
+        >
+          {p.data.isActive ? (
+            <FaCheck className="fill-green-500" />
+          ) : (
+            <FaXmark className="fill-orange-500" />
+          )}
+          {p.data.name}
+        </Link>
+      ),
     },
-    ...columnDefsNonAdmin,
+    ...columnDefsBase,
     {
       headerName: "Ações",
       flex: 1,
       cellRenderer: (p: any) => <ButtonOptions id={p.data.id} />,
     },
+  ];
+  const columnDefs: ColDef<TClasses>[] = [
+    {
+      headerName: "Nome",
+      field: "name",
+      flex: 1,
+      cellRenderer: (p: any) => (
+        <Link className="font-bold" href={`/classes/${p.data.id}`}>
+          {p.data.name}
+        </Link>
+      ),
+    },
+    ...columnDefsBase,
   ];
 
   async function handleSetClasses() {
@@ -90,7 +104,7 @@ export default function ClassesPage() {
     <AgGridReact
       className="w-full p-4"
       rowData={sortedClasses}
-      columnDefs={user?.userRole === "admin" ? columnDefs : columnDefsNonAdmin}
+      columnDefs={user?.userRole === "admin" ? columnDefsAdmin : columnDefs}
       overlayNoRowsTemplate="ㅤ"
     />
   );

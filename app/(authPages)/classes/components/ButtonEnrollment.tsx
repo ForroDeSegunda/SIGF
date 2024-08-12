@@ -14,12 +14,12 @@ export default function ButtonEnrollment(props: { id: string }) {
     <button
       className={
         isEnrolled
-          ? "text-green-500 hover:text-green-600 font-bold"
-          : "text-blue-500 hover:text-blue-600 font-bold"
+          ? "text-blue-500 hover:text-blue-600 font-bold"
+          : "text-green-500 hover:text-green-600 font-bold"
       }
       onClick={() => openModal("classEnrollment", classId)}
     >
-      {isEnrolled ? "Inscrito" : "Inscrever"}
+      {isEnrolled ? "Atualizar Inscrição" : "Fazer Inscrição"}
     </button>
   );
 }
