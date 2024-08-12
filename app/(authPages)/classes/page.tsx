@@ -48,6 +48,7 @@ export default function ClassesPage() {
     {
       headerName: "Ativa | Nome",
       field: "isActive",
+      flex: 1,
       sort: "desc",
       cellRenderer: (p: any) => (
         <Link
