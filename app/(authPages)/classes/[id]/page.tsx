@@ -21,14 +21,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
-import { CSVLink, CSVDownload } from "react-csv";
 
-const csvData = [
-  ["firstname", "lastname", "email"],
-  ["Ahmed", "Tomi", "ah@smthing.co.com"],
-  ["Raed", "Labes", "rl@smthing.co.com"],
-  ["Yezzi", "Min l3b", "ymin@cocococo.com"],
-];
 interface IRow {
   classId: "";
   userId: "";
@@ -48,6 +41,12 @@ const danceRoleOptions = {
   led: "Conduzido(a)",
   leader: "Condutor(a)",
   indifferent: "Indiferente",
+};
+
+const enrollmentStatusOptions = {
+  approved: "Aprovado",
+  pending: "Pendente",
+  rejected: "Rejeitado",
 };
 
 export default function ClassesIdPage() {
@@ -81,6 +80,7 @@ export default function ClassesIdPage() {
       field: "danceRolePreference",
       headerName: "Preferência",
       flex: 2,
+      valueFormatter: ({ value }) => danceRoleOptions[value],
       cellRenderer: (p: any) => (
         <span
           className={
@@ -97,6 +97,7 @@ export default function ClassesIdPage() {
       field: "status",
       headerName: "Inscrição",
       flex: 2,
+      valueFormatter: ({ value }) => enrollmentStatusOptions[value],
       cellRenderer: statusRenderer,
     },
   ];
@@ -126,7 +127,7 @@ export default function ClassesIdPage() {
     }
   }
 
-  function actionButtonRenderer(params: { data: IRow }) {
+  function actionButtonRenderer(params: { data: IRow; api: any }) {
     const { userId, status } = params.data;
 
     const renderButton = (
@@ -199,10 +200,18 @@ export default function ClassesIdPage() {
       }
     };
 
+    function handleDownload() {
+      params.api.exportDataAsCsv();
+    }
+
     return (
       <div className="flex gap-2">
         {getButtonsForStatus(status)}
-        {<CSVLink data={csvData}>Download me</CSVLink>}
+        {
+          <button className="text-gray-500" onClick={handleDownload}>
+            Download CSV
+          </button>
+        }
       </div>
     );
   }
