@@ -18,7 +18,7 @@ import useUser from "@/hooks/useUser";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 
@@ -43,10 +43,17 @@ const danceRoleOptions = {
   indifferent: "Indiferente",
 };
 
+const enrollmentStatusOptions = {
+  approved: "Aprovado",
+  pending: "Pendente",
+  rejected: "Rejeitado",
+};
+
 export default function ClassesIdPage() {
   const user = useRecoilValue(usersAtom);
   const classId = useParams().id;
   const [rowData, setRowData] = useState<IRow[]>([]);
+  const gridRef = useRef<AgGridReact>(null);
   const setAttendances = useSetRecoilState(attendancesAtom);
   const [enrollmentsCount, setEnrollmentsCount] =
     useRecoilState(enrollmentCountAtom);
@@ -68,37 +75,19 @@ export default function ClassesIdPage() {
       field: "danceRole",
       headerName: "Papel",
       flex: 2,
-      cellRenderer: (p: any) => {
-        let className = "";
-
-        switch (p.data.danceRole) {
-          case "led":
-            className = "text-orange-500 font-bold";
-            break;
-          case "leader":
-            className = "text-green-500 font-bold";
-            break;
-          default:
-            className = "text-blue-500 font-bold";
-        }
-
-        return (
-          <span className={className}>
-            {danceRoleOptions[p.data.danceRole]}
-          </span>
-        );
-      },
+      valueFormatter: ({ value }) => danceRoleOptions[value],
     },
     {
       field: "danceRolePreference",
       headerName: "Preferência",
       flex: 2,
+      valueFormatter: ({ value }) => danceRoleOptions[value],
       cellRenderer: (p: any) => (
         <span
           className={
             p.data.danceRolePreference === "led"
               ? "text-orange-500 font-bold"
-              : "text-green-500 font-bold"
+              : "text-blue-500 font-bold"
           }
         >
           {danceRoleOptions[p.data.danceRolePreference]}
@@ -109,6 +98,7 @@ export default function ClassesIdPage() {
       field: "status",
       headerName: "Inscrição",
       flex: 2,
+      valueFormatter: ({ value }) => enrollmentStatusOptions[value],
       cellRenderer: statusRenderer,
     },
   ];
@@ -138,7 +128,7 @@ export default function ClassesIdPage() {
     }
   }
 
-  function actionButtonRenderer(params: { data: IRow }) {
+  function actionButtonRenderer(params: { data: IRow; api: any }) {
     const { userId, status } = params.data;
 
     const renderButton = (
@@ -354,11 +344,27 @@ export default function ClassesIdPage() {
   }, []);
 
   return (
-    <AgGridReact
-      className="w-full p-4"
-      rowData={rowData}
-      columnDefs={user?.userRole === "admin" ? columnDefs : columnDefsNonAdmin}
-      overlayNoRowsTemplate="ㅤ"
-    />
+    <div className="flex flex-col w-full">
+      <AgGridReact
+        ref={gridRef}
+        className={
+          user?.userRole === "admin" ? "w-full px-4 pt-4" : "w-full p-4"
+        }
+        rowData={rowData}
+        columnDefs={
+          user?.userRole === "admin" ? columnDefs : columnDefsNonAdmin
+        }
+        overlayNoRowsTemplate="ㅤ"
+      />
+
+      {user?.userRole === "admin" && (
+        <button
+          className="text-blue-500"
+          onClick={() => gridRef.current?.api.exportDataAsCsv()}
+        >
+          Baixar CSV
+        </button>
+      )}
+    </div>
   );
 }

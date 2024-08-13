@@ -1,10 +1,12 @@
 "use client";
 
+import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRecoilValue } from "recoil";
 
 export interface IClassDatesRow {
   id: string;
@@ -34,6 +36,7 @@ const presenceOptions = {
 
 export default function AttendancePage() {
   const params = useParams();
+  const gridRef = useRef<AgGridReact>(null);
   const classDateId = params.classDateId;
 
   const [rowData, setRowData] = useState<IClassDatesRow[]>([]);
@@ -164,11 +167,21 @@ export default function AttendancePage() {
   }, []);
 
   return (
-    <AgGridReact
-      className="w-full p-4"
-      rowData={rowData}
-      columnDefs={columnDefs}
-      overlayNoRowsTemplate="ㅤ"
-    />
+    <div className="flex flex-col w-full">
+      <AgGridReact
+        ref={gridRef}
+        className="w-full px-4 pt-4"
+        rowData={rowData}
+        columnDefs={columnDefs}
+        overlayNoRowsTemplate="ㅤ"
+      />
+
+      <button
+        className="text-blue-500"
+        onClick={() => gridRef.current?.api.exportDataAsCsv()}
+      >
+        Baixar CSV
+      </button>
+    </div>
   );
 }

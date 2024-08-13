@@ -56,8 +56,8 @@ export default function NavbarButtonIndex() {
           <div
             className={
               enrollmentCount.leader >= enrollmentCount.half
-                ? "bg-green-300  text-white py-2 px-4 rounded"
-                : "bg-green-500  text-white py-2 px-4 rounded"
+                ? "bg-blue-300  text-white py-2 px-4 rounded"
+                : "bg-blue-500  text-white py-2 px-4 rounded"
             }
           >
             <span>Condutores(as): </span>
@@ -68,7 +68,7 @@ export default function NavbarButtonIndex() {
         )}
         {attendances.length > 0 && (
           <Link
-            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
             href={`${pathName}/userAttendance`}
           >
             Minhas presenças
@@ -77,7 +77,7 @@ export default function NavbarButtonIndex() {
         {(userRole === "admin" || userRole === "teacher") && (
           <>
             <Link
-              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
               href={`${pathName}/attendance`}
             >
               Presenças da turma
