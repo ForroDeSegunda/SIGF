@@ -18,7 +18,7 @@ import useUser from "@/hooks/useUser";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 
@@ -53,6 +53,7 @@ export default function ClassesIdPage() {
   const user = useRecoilValue(usersAtom);
   const classId = useParams().id;
   const [rowData, setRowData] = useState<IRow[]>([]);
+  const gridRef = useRef<AgGridReact>(null);
   const setAttendances = useSetRecoilState(attendancesAtom);
   const [enrollmentsCount, setEnrollmentsCount] =
     useRecoilState(enrollmentCountAtom);
@@ -200,20 +201,7 @@ export default function ClassesIdPage() {
       }
     };
 
-    function handleDownload() {
-      params.api.exportDataAsCsv();
-    }
-
-    return (
-      <div className="flex gap-2">
-        {getButtonsForStatus(status)}
-        {
-          <button className="text-gray-500" onClick={handleDownload}>
-            Download CSV
-          </button>
-        }
-      </div>
-    );
+    return <div className="flex gap-2">{getButtonsForStatus(status)}</div>;
   }
 
   function updateRowData(rowData: IRow[], enrollment: TEnrollmentRow): IRow[] {
@@ -356,11 +344,27 @@ export default function ClassesIdPage() {
   }, []);
 
   return (
-    <AgGridReact
-      className="w-full p-4"
-      rowData={rowData}
-      columnDefs={user?.userRole === "admin" ? columnDefs : columnDefsNonAdmin}
-      overlayNoRowsTemplate="ㅤ"
-    />
+    <div className="flex flex-col w-full">
+      <AgGridReact
+        ref={gridRef}
+        className={
+          user?.userRole === "admin" ? "w-full px-4 pt-4" : "w-full p-4"
+        }
+        rowData={rowData}
+        columnDefs={
+          user?.userRole === "admin" ? columnDefs : columnDefsNonAdmin
+        }
+        overlayNoRowsTemplate="ㅤ"
+      />
+
+      {user?.userRole === "admin" && (
+        <button
+          className="text-blue-500"
+          onClick={() => gridRef.current?.api.exportDataAsCsv()}
+        >
+          Baixar CSV
+        </button>
+      )}
+    </div>
   );
 }
