@@ -50,6 +50,7 @@ export default function PeriodsPage() {
     {
       field: "semester",
       headerName: "Semestre | Ano | Ações",
+      flex: 1,
       cellRenderer: renderRowMobile,
     },
   ];
