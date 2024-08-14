@@ -2,16 +2,18 @@
 
 import { TPeriod } from "@/app/api/periods/route";
 import { deletePeriod } from "@/app/api/periods/service";
+import { useModal } from "@/app/components/MainModal";
 import { periodsAtom } from "@/atoms/periodsAtom";
-import { ColDef } from "ag-grid-community";
+import { useWindowWidth } from "@react-hook/window-size";
+import { ColDef, GridApi } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useRecoilState } from "recoil";
 import { toast } from "sonner";
 import { periodsOptions } from "../classes/components/ModalClasses";
-import { useModal } from "@/app/components/MainModal";
 
 export default function PeriodsPage() {
   const [periods, setPeriods] = useRecoilState<TPeriod[]>(periodsAtom);
+  const windowWidth = useWindowWidth();
   const openModal = useModal();
 
   const columnDefs: ColDef<TPeriod>[] = [
@@ -36,8 +38,41 @@ export default function PeriodsPage() {
       valueFormatter: ({ value }) =>
         new Date(value + "EDT").toLocaleDateString("pt-BR"),
     },
-    { headerName: "Ações", minWidth: 150, cellRenderer: actionCellRenderer },
+    {
+      headerName: "Ações",
+      minWidth: 150,
+      flex: 2,
+      cellRenderer: actionCellRenderer,
+    },
   ];
+
+  const columnDefsMobile: ColDef<TPeriod>[] = [
+    {
+      field: "semester",
+      headerName: "Semestre | Ano | Ações",
+      cellRenderer: renderRowMobile,
+    },
+  ];
+
+  function renderRowMobile(props: { data: TPeriod; api: GridApi; node: any }) {
+    const { data } = props;
+    return (
+      <div className="flex flex-col w-full h-full justify-start">
+        <div className="flex w-full justify-between">
+          <span>{`${periodsOptions[data?.semester]} - ${data?.year}`}</span>
+          <span>{actionCellRenderer({ data })}</span>
+        </div>
+        <div className="w-full flex gap-2">
+          <span className="font-bold">Período:</span>
+          <span>
+            {new Date(data.startDate + "EDT").toLocaleDateString("pt-BR") +
+              " - " +
+              new Date(data.endDate + "EDT").toLocaleDateString("pt-BR")}
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   async function handleDeletePeriod(periodId: string) {
     toast.info("Excluindo período...");
@@ -79,8 +114,9 @@ export default function PeriodsPage() {
   return (
     <AgGridReact
       className="w-full p-4"
+      rowHeight={windowWidth < 768 ? 84 : 42}
       rowData={periods}
-      columnDefs={columnDefs}
+      columnDefs={windowWidth < 768 ? columnDefsMobile : columnDefs}
       overlayNoRowsTemplate="ㅤ"
     />
   );
