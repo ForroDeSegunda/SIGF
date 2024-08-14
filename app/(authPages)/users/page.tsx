@@ -2,8 +2,10 @@
 
 import { createUser, readUsers, updateUser } from "@/app/api/users/controller";
 import { TUser, TUserViewPlusRole } from "@/app/api/users/route";
+import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
+import { GridApi } from "ag-grid-community";
 import { useEffect, useState } from "react";
 
 const studentRoleOptions = {
@@ -14,10 +16,11 @@ const studentRoleOptions = {
 
 export default function UsersPage() {
   const [users, setUsers] = useState<TUserViewPlusRole[]>([]);
+  const windowWidth = useWindowWidth();
 
   const columnDefs: ColDef<TUserViewPlusRole>[] = [
     { field: "full_name", headerName: "Nome", flex: 1, filter: true },
-    { field: "email", headerName: "Ativo", flex: 1 },
+    { field: "email", headerName: "Email", flex: 1 },
     {
       field: "user.role",
       headerName: "Cargo",
@@ -31,6 +34,49 @@ export default function UsersPage() {
       flex: 1,
     },
   ];
+
+  const columnDefsMobile: ColDef<TUserViewPlusRole>[] = [
+    {
+      field: "full_name",
+      headerName: "Nome",
+      flex: 1,
+      filter: true,
+      cellRenderer: renderRowMobile,
+    },
+  ];
+
+  function renderRowMobile(props: {
+    data: TUserViewPlusRole;
+    api: GridApi;
+    node: any;
+  }) {
+    const { data, api, node } = props;
+    function resizeRow() {
+      if (node.rowHeight !== 42) node.setRowHeight(42);
+      else node.setRowHeight(42 * 4 + 16);
+      api.onRowHeightChanged();
+    }
+
+    return (
+      <div className="flex flex-col w-full h-full justify-start">
+        <button className="flex w-full" onClick={resizeRow}>
+          {data.full_name}
+        </button>
+        <div className="border-t border-x rounded-t w-full flex gap-2 bg-gray-100 px-2">
+          <span className="font-bold">Email:</span>
+          <span>{data.email}</span>
+        </div>
+        <div className="border-x w-full flex gap-2 bg-gray-100 px-2">
+          <span className="font-bold">Cargo:</span>
+          <span>{studentRoleOptions[data.user.role as never]}</span>
+        </div>
+        <div className="border-b border-x rounded-b w-full flex gap-2 bg-gray-100 px-2">
+          <span className="font-bold">Mudar Cargo:</span>
+          {actionCellRenderer({ data })}
+        </div>
+      </div>
+    );
+  }
 
   async function handleChangeRole(
     userData: TUserViewPlusRole,
@@ -129,23 +175,24 @@ export default function UsersPage() {
     );
   }
 
+  async function handleReadUsers() {
+    const users = await readUsers();
+
+    users.map((user) => {
+      if (!user.user) {
+        user.user = {
+          role: "student",
+          created_at: "never",
+          id: user.id ?? "",
+        };
+      }
+      return users;
+    });
+
+    setUsers(users);
+  }
+
   useEffect(() => {
-    async function handleReadUsers() {
-      const users = await readUsers();
-
-      users.map((user) => {
-        if (!user.user) {
-          user.user = {
-            role: "student",
-            created_at: "never",
-            id: user.id ?? "",
-          };
-        }
-        return users;
-      });
-
-      setUsers(users);
-    }
     handleReadUsers();
   }, []);
 
@@ -153,7 +200,7 @@ export default function UsersPage() {
     <AgGridReact
       className="w-full p-4"
       rowData={users}
-      columnDefs={columnDefs}
+      columnDefs={windowWidth < 768 ? columnDefsMobile : columnDefs}
       overlayNoRowsTemplate="ㅤ"
     />
   );
