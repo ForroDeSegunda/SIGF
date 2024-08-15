@@ -11,8 +11,10 @@ import Sidebar from "./components/Sidebar";
 import ButtonCalendar from "./components/ButtonCalendar";
 import { calendarsAtom } from "@/atoms/calendarAtom";
 import { useRecoilState } from "recoil";
+import { useWindowWidth } from "@react-hook/window-size";
 
 export default function Calendar() {
+  const windowWidth = useWindowWidth();
   const [calendars, setCalendars] = useRecoilState(calendarsAtom);
   const [mainCalendar, setMainCalendar] = useState<TCalendar>();
   const [currentCalendar, setCurrentCalendar] = useState<TCalendar>(
@@ -38,7 +40,11 @@ export default function Calendar() {
   }, []);
 
   return (
-    <>
+    <div
+      className={
+        windowWidth < 768 ? "flex flex-col w-full h-full" : "flex w-full h-full"
+      }
+    >
       <CalendarFrame src={currentCalendar ? currentCalendar.url : ""} />
       <Sidebar>
         <ButtonCalendar
@@ -67,6 +73,6 @@ export default function Calendar() {
             />
           ))}
       </Sidebar>
-    </>
+    </div>
   );
 }
