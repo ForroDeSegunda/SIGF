@@ -8,6 +8,7 @@ import {
 import { classesAtom } from "@/atoms/classesAtom";
 import { modalIsOpenAtom, modalIdAtom } from "@/atoms/modalAtom";
 import { periodsAtom } from "@/atoms/periodsAtom";
+import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import { useEffect, useState } from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
@@ -38,6 +39,7 @@ export default function ModalClasses() {
   const [size, setSize] = useState(30);
   const [name, setName] = useState("");
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
+  const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
   const setClasses = useSetRecoilState(classesAtom);
   const classId = useRecoilValue(modalIdAtom);
   const periods = useRecoilValue(periodsAtom);
@@ -186,7 +188,13 @@ export default function ModalClasses() {
         )}
       </FlexContainer>
       <ButtonContainer>
-        <CloseButton type="button" onClick={() => setIsModalOpen(false)}>
+        <CloseButton
+          type="button"
+          onClick={() => {
+            setIsModalOpen(false);
+            setShowMobileOptions(false);
+          }}
+        >
           Fechar
         </CloseButton>
         <SubmitButton type="submit">

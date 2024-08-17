@@ -7,6 +7,7 @@ import {
   modalIsOpenAtom,
   modalOptionsAtom,
 } from "@/atoms/modalAtom";
+import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import Modal from "react-modal";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import ModalCalendar from "../(authPages)/calendar/components/ModalCalendar";
@@ -22,7 +23,7 @@ Modal.setAppElement("#__modal");
 export function useModal() {
   const setModalOption = useSetRecoilState(modalOptionsAtom);
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
-  const setPeriodId = useSetRecoilState(modalIdAtom);
+  const setModalId = useSetRecoilState(modalIdAtom);
   const setModalFunction = useSetRecoilState(modalFunctionAtom);
 
   function openModal(
@@ -32,7 +33,7 @@ export function useModal() {
   ) {
     setIsModalOpen(true);
     setModalOption(modalOption);
-    setPeriodId(id);
+    setModalId(id);
     setModalFunction(() => modalFunction);
   }
   return openModal;
@@ -41,11 +42,15 @@ export function useModal() {
 export default function MainModal() {
   const [isModalOpen, setIsModalOpen] = useRecoilState(modalIsOpenAtom);
   const modalOption = useRecoilValue(modalOptionsAtom);
+  const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
 
   return (
     <Modal
       isOpen={isModalOpen}
-      onRequestClose={() => setIsModalOpen(false)}
+      onRequestClose={() => {
+        setShowMobileOptions(false);
+        setIsModalOpen(false);
+      }}
       style={{
         content: {
           width: "fit-content",

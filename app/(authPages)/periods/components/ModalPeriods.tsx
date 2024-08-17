@@ -7,6 +7,7 @@ import {
 } from "@/app/api/periods/service";
 import { modalIdAtom, modalIsOpenAtom } from "@/atoms/modalAtom";
 import { periodsAtom } from "@/atoms/periodsAtom";
+import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import { Database } from "@/database.types";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
@@ -17,6 +18,7 @@ import tw from "tailwind-styled-components";
 export default function ModalPeriods() {
   const setPeriods = useSetRecoilState(periodsAtom);
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
+  const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
   const periodId = useRecoilValue(modalIdAtom);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -106,7 +108,14 @@ export default function ModalPeriods() {
       />
       <FlexRowReverse>
         <Button type="submit">{periodId ? "Salvar" : "Criar"}</Button>
-        <CloseButton onClick={() => setIsModalOpen(false)}>Fechar</CloseButton>
+        <CloseButton
+          onClick={() => {
+            setShowMobileOptions(false);
+            setIsModalOpen(false);
+          }}
+        >
+          Fechar
+        </CloseButton>
       </FlexRowReverse>
     </Form>
   );
