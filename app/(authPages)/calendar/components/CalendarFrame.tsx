@@ -1,3 +1,3 @@
 export default function CalendarFrame(props: { src: string }) {
-  return <iframe className="flex p-4 flex-grow w-52" src={props.src} />;
+  return <iframe className="w-full h-full p-4 flex-1" src={props.src} />;
 }

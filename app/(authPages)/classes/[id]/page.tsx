@@ -12,9 +12,11 @@ import {
   IEnrollmentCounts,
   enrollmentCountAtom,
 } from "@/atoms/enrollmentsAtom";
+import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
 import useUser from "@/hooks/useUser";
+import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useParams } from "next/navigation";
@@ -54,11 +56,12 @@ export default function ClassesIdPage() {
   const classId = useParams().id;
   const [rowData, setRowData] = useState<IRow[]>([]);
   const gridRef = useRef<AgGridReact>(null);
+  const windowWidth = useWindowWidth();
   const setAttendances = useSetRecoilState(attendancesAtom);
   const [enrollmentsCount, setEnrollmentsCount] =
     useRecoilState(enrollmentCountAtom);
 
-  const columnDefsNonAdmin: ColDef<IRow>[] = [
+  const columnDefs: ColDef<IRow>[] = [
     {
       field: "users_view.full_name",
       headerName: "Nome",
@@ -103,8 +106,8 @@ export default function ClassesIdPage() {
     },
   ];
 
-  const columnDefs: ColDef<IRow>[] = [
-    ...columnDefsNonAdmin,
+  const columnDefsAdmin: ColDef<IRow>[] = [
+    ...columnDefs,
     {
       field: "actionButton",
       headerName: "Ações",
@@ -112,6 +115,92 @@ export default function ClassesIdPage() {
       cellRenderer: actionButtonRenderer,
     },
   ];
+
+  const columnDefsMobile: ColDef<IRow>[] = [
+    {
+      headerName: "Nome | Data da inscrição",
+      field: "createdAt",
+      flex: 1,
+      filter: true,
+      cellRenderer: renderRowMobile,
+    },
+  ];
+
+  const columnDefsAdminMobile: ColDef<IRow>[] = [
+    {
+      headerName: "Nome | Data da inscrição",
+      field: "createdAt",
+      flex: 1,
+      filter: true,
+      cellRenderer: renderRowAdminMobile,
+    },
+  ];
+
+  function renderRowMobile(p: any) {
+    const { api, node } = p;
+
+    function resizeRow() {
+      if (node.rowHeight !== 42) node.setRowHeight(42);
+      else node.setRowHeight(42 * 3 + 16);
+      api.onRowHeightChanged();
+    }
+
+    return (
+      <div className="flex flex-col w-full">
+        <button className="flex justify-between w-full" onClick={resizeRow}>
+          <span className="font-bold">{p.data.users_view.full_name}</span>
+          <span>{new Date(p.data.createdAt).toLocaleString("pt-BR")}</span>
+        </button>
+
+        <div className="border-t border-x rounded-t w-full flex gap-2 bg-gray-100 px-2">
+          <span className="font-bold">Papel:</span>
+          <span>
+            {danceRoleOptions[p.data.danceRole]} |{" "}
+            {danceRoleOptions[p.data.danceRolePreference]}
+          </span>
+        </div>
+        <div className="border-b border-x rounded-b w-full flex gap-2 bg-gray-100 px-2">
+          <span className="font-bold">Inscrição:</span>
+          {statusRenderer({ value: p.data.status })}
+        </div>
+      </div>
+    );
+  }
+
+  function renderRowAdminMobile(p: any) {
+    const { api, node } = p;
+
+    function resizeRow() {
+      if (node.rowHeight !== 42) node.setRowHeight(42);
+      else node.setRowHeight(42 * 4 + 16);
+      api.onRowHeightChanged();
+    }
+
+    return (
+      <div className="flex flex-col w-full">
+        <button className="flex justify-between w-full" onClick={resizeRow}>
+          <span className="font-bold">{p.data.users_view.full_name}</span>
+          <span>{new Date(p.data.createdAt).toLocaleString("pt-BR")}</span>
+        </button>
+
+        <div className="border-t border-x rounded-t w-full flex gap-2 bg-gray-100 px-2">
+          <span className="font-bold">Papel:</span>
+          <span>
+            {danceRoleOptions[p.data.danceRole]} |{" "}
+            {danceRoleOptions[p.data.danceRolePreference]}
+          </span>
+        </div>
+        <div className="border-x w-full flex gap-2 bg-gray-100 px-2">
+          <span className="font-bold">Inscrição:</span>
+          {statusRenderer({ value: p.data.status })}
+        </div>
+        <div className="border-b border-x rounded-b w-full flex gap-2 bg-gray-100 px-2">
+          <span className="font-bold">Ações:</span>
+          {actionButtonRenderer(p)}
+        </div>
+      </div>
+    );
+  }
 
   function statusRenderer({
     value,
@@ -338,6 +427,13 @@ export default function ClassesIdPage() {
     setAttendances(attendances);
   }
 
+  function handleColumnDefs() {
+    if (user?.userRole === "admin") {
+      return windowWidth < 550 ? columnDefsAdminMobile : columnDefsAdmin;
+    }
+    return windowWidth < 550 ? columnDefsMobile : columnDefs;
+  }
+
   useEffect(() => {
     handleReadAttendances();
     handleReadEnrollments();
@@ -351,9 +447,7 @@ export default function ClassesIdPage() {
           user?.userRole === "admin" ? "w-full px-4 pt-4" : "w-full p-4"
         }
         rowData={rowData}
-        columnDefs={
-          user?.userRole === "admin" ? columnDefs : columnDefsNonAdmin
-        }
+        columnDefs={handleColumnDefs()}
         overlayNoRowsTemplate="ㅤ"
       />
 

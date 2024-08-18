@@ -19,7 +19,7 @@ export default function ButtonEnrollment(props: { id: string }) {
       }
       onClick={() => openModal("classEnrollment", classId)}
     >
-      {isEnrolled ? "Atualizar Inscrição" : "Fazer Inscrição"}
+      {isEnrolled ? "Atualizar" : "Inscrever"}
     </button>
   );
 }

@@ -14,6 +14,7 @@ import { modalIsOpenAtom, modalIdAtom } from "@/atoms/modalAtom";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
 import { TEnrollmentRow } from "@/app/api/enrollments/types";
+import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 
 export type TDanceRole = Database["public"]["Enums"]["danceRole"];
 export type TDanceRolePreference =
@@ -21,6 +22,7 @@ export type TDanceRolePreference =
 
 export default function ModalClassEnrollment() {
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
+  const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
   const classId = useRecoilValue(modalIdAtom);
   const [enrollments, setEnrollments] = useRecoilState(enrollmentsAtom);
   const [danceRole, setDanceRole] = useState<TDanceRole>(
@@ -165,6 +167,7 @@ export default function ModalClassEnrollment() {
           <CloseButton
             onClick={(e) => {
               e.preventDefault();
+              setShowMobileOptions(false);
               setIsModalOpen(false);
             }}
           >

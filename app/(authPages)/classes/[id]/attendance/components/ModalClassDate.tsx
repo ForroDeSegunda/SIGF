@@ -9,6 +9,7 @@ import { createClassDates } from "@/app/api/classDates/service";
 import { readClass } from "@/app/api/classes/controller";
 import { classDatesAtom } from "@/atoms/classDatesAtom";
 import { modalIsOpenAtom } from "@/atoms/modalAtom";
+import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";
@@ -20,6 +21,7 @@ export default function ModalClassDate() {
   const [classDates, setClassDates] = useRecoilState(classDatesAtom);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
+  const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
 
   async function handleCreateClassDate(
     event: React.FormEvent<HTMLFormElement>,
@@ -85,7 +87,10 @@ export default function ModalClassDate() {
         </button>
         <button
           className="border border-gray-700 rounded px-4 py-2 text-black"
-          onClick={() => setIsModalOpen(false)}
+          onClick={() => {
+            setShowMobileOptions(false);
+            setIsModalOpen(false);
+          }}
         >
           Fechar
         </button>

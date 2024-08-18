@@ -1,11 +1,13 @@
 import { createCalendar } from "@/app/api/calendar/controller";
 import { calendarsAtom } from "@/atoms/calendarAtom";
 import { modalIsOpenAtom } from "@/atoms/modalAtom";
+import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import { useState } from "react";
 import { useRecoilState, useSetRecoilState } from "recoil";
 
 export default function ModalCalendar() {
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
+  const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
   const [calendars, setCalendars] = useRecoilState(calendarsAtom);
   const [name, setName] = useState("");
   const [url, setUrl] = useState("");
@@ -46,7 +48,10 @@ export default function ModalCalendar() {
       <div className="flex justify-around gap-4">
         <button
           className="border border-gray-700 rounded px-4 py-2 text-black"
-          onClick={() => setIsModalOpen(false)}
+          onClick={() => {
+            setShowMobileOptions(false);
+            setIsModalOpen(false);
+          }}
         >
           Cancelar
         </button>

@@ -3,6 +3,7 @@
 import profilePicture from "@/assets/profile.png";
 import { sidebarMainAtom } from "@/atoms/sidebarsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
+import { useWindowWidth } from "@react-hook/window-size";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -12,10 +13,11 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import tw from "tailwind-styled-components";
 import LogoutButton from "./LogoutButton";
 import { useModal } from "./MainModal";
-import NavbarButtonIndex from "./NavbarButtonIndex";
+import { NavbarButtons } from "./NavbarButtons";
 
 export default function Navbar() {
   const openModal = useModal();
+  const windowWidth = useWindowWidth();
   const profileRef = useRef<HTMLImageElement>(null);
   const user = useRecoilValue(usersAtom);
   const [sidebarIsOpen, setSidebarIsOpen] = useRecoilState(sidebarMainAtom);
@@ -24,10 +26,6 @@ export default function Navbar() {
   const splitedPath = usePathname()
     .split("/")
     .filter((path) => path);
-
-  function toggleMenu() {
-    setProfileMenuVisible(!isProfileMenuVisible);
-  }
 
   function handleClickOutside(event: MouseEvent) {
     if (
@@ -55,7 +53,7 @@ export default function Navbar() {
         <LogoLink href="/classes">SIGF</LogoLink>
       </LeftSection>
 
-      <NavbarButtonIndex />
+      <NavbarButtons />
 
       <ProfileContainer>
         {splitedPath.length > 1 && (
@@ -67,7 +65,7 @@ export default function Navbar() {
           src={user?.user_metadata?.avatar_url || profilePicture.src}
           alt="Foto de Perfil"
           ref={profileRef}
-          onClick={toggleMenu}
+          onClick={() => setProfileMenuVisible(!isProfileMenuVisible)}
         />
 
         {isProfileMenuVisible && (
@@ -105,6 +103,8 @@ const LeftSection = tw.div`
 `;
 
 const LogoLink = tw(Link)`
+  hidden
+  sm:block
   font-bold
 `;
 
@@ -126,6 +126,7 @@ const ProfileMenu = tw.ul`
   absolute 
   right-4 
   bg-white 
+  top-11
   border 
   rounded-[10px] 
   p-4 

@@ -5,6 +5,7 @@ import tw from "tailwind-styled-components";
 import useUser from "@/hooks/useUser";
 import axios from "axios";
 import { toast } from "sonner";
+import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 
 export function ModalProfile() {
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
@@ -12,6 +13,7 @@ export function ModalProfile() {
   const [email, setEmail] = useState<string | undefined>(undefined);
   const [password, setPassword] = useState<string | undefined>(undefined);
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
+  const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
 
   async function handleSubmit() {
     const { data } = await axios.patch("/api/auth/update-user", {
@@ -70,7 +72,12 @@ export function ModalProfile() {
       />
 
       <ButtonRow>
-        <CancelButton onClick={() => setIsModalOpen(false)}>
+        <CancelButton
+          onClick={() => {
+            setShowMobileOptions(false);
+            setIsModalOpen(false);
+          }}
+        >
           Cancelar
         </CancelButton>
         <ConfirmButton onClick={handleSubmit}>Salvar</ConfirmButton>
