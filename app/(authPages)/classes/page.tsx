@@ -153,13 +153,15 @@ export default function ClassesPage() {
             </div>
             <div className="border-b border-x rounded-b w-full flex gap-2 bg-gray-100 px-2">
               <span className="font-bold">Ações:</span>
-              <ButtonOptions id={props.data.id} />
-              <Link
-                className="text-green-500 hover:text-green-600 font-bold"
-                href={`/classes/${props.data.id}`}
-              >
-                Abrir Turma
-              </Link>
+              <div className="flex w-full justify-between">
+                <ButtonOptions id={props.data.id} />
+                <Link
+                  className="text-green-500 hover:text-green-600 font-bold"
+                  href={`/classes/${props.data.id}`}
+                >
+                  Abrir Turma
+                </Link>
+              </div>
             </div>
           </>
         )}
