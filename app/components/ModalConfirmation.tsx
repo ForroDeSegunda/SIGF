@@ -1,10 +1,12 @@
 import { modalFunctionAtom, modalIsOpenAtom } from "@/atoms/modalAtom";
+import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import tw from "tailwind-styled-components";
 
 export function ModalConfirmation() {
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
   const modalFunction = useRecoilValue(modalFunctionAtom);
+  const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
 
   return (
     <Form onSubmit={(e) => e.preventDefault()}>
@@ -12,7 +14,12 @@ export function ModalConfirmation() {
 
       <ButtonContainer>
         <ButtonRow>
-          <CancelButton onClick={() => setIsModalOpen(false)}>
+          <CancelButton
+            onClick={() => {
+              setShowMobileOptions(false);
+              setIsModalOpen(false);
+            }}
+          >
             Cancelar
           </CancelButton>
           <ConfirmButton
