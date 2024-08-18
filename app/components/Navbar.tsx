@@ -50,7 +50,7 @@ export default function Navbar() {
           className="cursor-pointer"
           onClick={() => setSidebarIsOpen(!sidebarIsOpen)}
         />
-        {windowWidth >= 450 ? <LogoLink href="/classes">SIGF</LogoLink> : null}
+        <LogoLink href="/classes">SIGF</LogoLink>
       </LeftSection>
 
       <NavbarButtons />
@@ -103,6 +103,8 @@ const LeftSection = tw.div`
 `;
 
 const LogoLink = tw(Link)`
+  hidden
+  sm:block
   font-bold
 `;
 

@@ -183,12 +183,9 @@ export default function ClassesPage() {
           className="flex justify-between cursor-pointer"
           onClick={resizeRow}
         >
-          <Link
-            className="font-bold flex items-center gap-2"
-            href={`/classes/${props.data.id}`}
-          >
+          <div className="font-bold flex items-center gap-2">
             {props.data.name}
-          </Link>
+          </div>
           <div>
             {props.data.weekDays
               .split(",")
@@ -203,7 +200,15 @@ export default function ClassesPage() {
         {showOptions && (
           <div className="border rounded w-full flex gap-2 bg-gray-100 px-2">
             <span className="font-bold">Inscrição:</span>
-            <ButtonEnrollment id={props.data.id} />
+            <div className="flex justify-between w-full">
+              <ButtonEnrollment id={props.data.id} />
+              <Link
+                className="text-green-500 hover:text-green-600 font-bold"
+                href={`/classes/${props.data.id}`}
+              >
+                Abrir Turma
+              </Link>
+            </div>
           </div>
         )}
       </div>
