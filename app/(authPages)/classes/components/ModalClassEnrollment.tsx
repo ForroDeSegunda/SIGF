@@ -51,6 +51,11 @@ export default function ModalClassEnrollment() {
 
   async function handleUnenroll() {
     toast.info("Cancelando inscrição...");
+    if (!enrollmentIsPending) {
+      toast.error("Inscrição já processada, não é possível atualizar");
+      setIsModalOpen(false);
+      return;
+    }
     const { data, error } = await useUser();
     if (error) return toast.error("Erro ao obter usuário");
 
@@ -97,12 +102,12 @@ export default function ModalClassEnrollment() {
   }
 
   async function handleUpdateEnrollment() {
+    toast.info("Atualizando inscrição...");
     if (!enrollmentIsPending) {
       toast.error("Inscrição já processada, não é possível atualizar");
       setIsModalOpen(false);
       return;
     }
-    toast.info("Atualizando inscrição...");
     const { data, error } = await useUser();
     if (error) return toast.error("Erro ao obter usuário");
     try {
