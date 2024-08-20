@@ -60,14 +60,13 @@ export default function ModalClassEnrollment() {
     if (error) return toast.error("Erro ao obter usuário");
 
     try {
-      const deletedEnrollment = await deleteEnrollment(
-        { classId, userId: data.user.id },
-        enrollments,
-      );
+      const deletedEnrollment = await deleteEnrollment({
+        classId,
+        userId: data.user.id,
+      });
+
       const filteredEnrollments = enrollments.filter(
-        (enrollment) =>
-          enrollment.classId === deletedEnrollment.classId &&
-          enrollment.userId === deletedEnrollment.userId,
+        (enrollment) => enrollment.classId !== deletedEnrollment.classId,
       );
 
       setEnrollments(filteredEnrollments);

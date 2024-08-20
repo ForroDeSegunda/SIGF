@@ -54,15 +54,11 @@ export async function createEnrollment(enrollment: TEnrollmentInsert) {
 
 export async function deleteEnrollment(
   enrollment: TEnrollmentInsert,
-  userEnrollmentIds: any,
 ): Promise<TEnrollmentRow> {
   try {
     await axios.delete(`/api/enrollments`, { data: enrollment });
-    const filtered = userEnrollmentIds.filter(
-      (enrollmentId: string) => enrollmentId !== enrollment.classId,
-    );
 
-    return filtered as TEnrollmentRow;
+    return enrollment as TEnrollmentRow;
   } catch (error) {
     console.error("Error unenrolling class:", error);
     throw error;
