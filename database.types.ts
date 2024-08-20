@@ -348,6 +348,36 @@ export type Database = {
         }
         Relationships: []
       }
+      transaction: {
+        Row: {
+          amount: number
+          createdAt: string
+          date: string
+          description: string | null
+          id: string
+          lastEdited: string
+          type: Database["public"]["Enums"]["transactionType"]
+        }
+        Insert: {
+          amount: number
+          createdAt?: string
+          date?: string
+          description?: string | null
+          id?: string
+          lastEdited?: string
+          type: Database["public"]["Enums"]["transactionType"]
+        }
+        Update: {
+          amount?: number
+          createdAt?: string
+          date?: string
+          description?: string | null
+          id?: string
+          lastEdited?: string
+          type?: Database["public"]["Enums"]["transactionType"]
+        }
+        Relationships: []
+      }
       user: {
         Row: {
           created_at: string
@@ -414,7 +444,7 @@ export type Database = {
     Enums: {
       danceRole: "indifferent" | "led" | "leader"
       danceRolePreference: "led" | "leader"
-      enrollmentStatus: "pending" | "approved" | "rejected"
+      enrollmentStatus: "pending" | "approved" | "rejected" | "abandonment"
       presenceEnum: "notRegistered" | "present" | "absent" | "justified"
       semesterEnum: "first" | "second" | "firstVacation" | "secondVacation"
       state:
@@ -444,6 +474,7 @@ export type Database = {
         | "SP"
         | "SE"
         | "TO"
+      transactionType: "income" | "expense"
       userRole: "student" | "teacher" | "admin"
     }
     CompositeTypes: {

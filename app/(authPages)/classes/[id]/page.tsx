@@ -48,7 +48,7 @@ const danceRoleOptions = {
 const enrollmentStatusOptions = {
   approved: "Aprovado",
   pending: "Pendente",
-  rejected: "Rejeitado",
+  abandonment: "Abandono",
 };
 
 export default function ClassesIdPage() {
@@ -212,8 +212,8 @@ export default function ClassesIdPage() {
         return <span className="text-green-500 font-bold">Aprovado</span>;
       case "pending":
         return <span className="text-blue-500 font-bold">Pendente</span>;
-      case "rejected":
-        return <span className="text-orange-500 font-bold">Rejeitado</span>;
+      case "abandonment":
+        return <span className="text-orange-500 font-bold">Abandono</span>;
     }
   }
 
@@ -225,7 +225,7 @@ export default function ClassesIdPage() {
       text: string,
       color: string,
       hoverColor: string,
-      alterCount = true,
+      alterCount = true
     ) => (
       <button
         key={buttonStatus}
@@ -237,7 +237,7 @@ export default function ClassesIdPage() {
     );
 
     const getButtonsForStatus = (
-      currentStatus: Database["public"]["Enums"]["enrollmentStatus"],
+      currentStatus: Database["public"]["Enums"]["enrollmentStatus"]
     ) => {
       switch (currentStatus) {
         case "approved":
@@ -246,29 +246,29 @@ export default function ClassesIdPage() {
               "pending",
               "Resetar",
               "text-blue-500",
-              "hover:text-blue-600",
+              "hover:text-blue-600"
             ),
             renderButton(
-              "rejected",
-              "Rejeitar",
+              "abandonment",
+              "Abandono",
               "text-orange-500",
-              "hover:text-orange-600",
+              "hover:text-orange-600"
             ),
           ];
-        case "rejected":
+        case "abandonment":
           return [
             renderButton(
               "approved",
               "Aprovar",
               "text-green-500",
-              "hover:text-green-600",
+              "hover:text-green-600"
             ),
             renderButton(
               "pending",
               "Resetar",
               "text-blue-500",
               "hover:text-blue-600",
-              false,
+              false
             ),
           ];
         default:
@@ -277,14 +277,14 @@ export default function ClassesIdPage() {
               "approved",
               "Aprovar",
               "text-green-500",
-              "hover:text-green-600",
+              "hover:text-green-600"
             ),
             renderButton(
-              "rejected",
-              "Rejeitar",
+              "abandonment",
+              "Abandono",
               "text-orange-500",
               "hover:text-orange-600",
-              false,
+              false
             ),
           ];
       }
@@ -303,7 +303,7 @@ export default function ClassesIdPage() {
               danceRolePreference:
                 enrollment.danceRolePreference || row.danceRolePreference,
             }
-          : row,
+          : row
     );
   }
 
@@ -318,7 +318,7 @@ export default function ClassesIdPage() {
 
   function canBeEnrolled(
     enrollment: TEnrollmentRow,
-    status: Database["public"]["Enums"]["enrollmentStatus"],
+    status: Database["public"]["Enums"]["enrollmentStatus"]
   ): {
     canUpdate: boolean;
     role: Database["public"]["Enums"]["danceRolePreference"] | null;
@@ -345,12 +345,12 @@ export default function ClassesIdPage() {
   async function handleUpdateEnrollment(
     status: Database["public"]["Enums"]["enrollmentStatus"],
     userId: string,
-    alterCount = true,
+    alterCount = true
   ): Promise<void> {
     const userEnrollments = await readEnrollmentsByClassId(classId as string);
     const enrollment = userEnrollments.find(
       (enrollment: TEnrollmentRow) =>
-        enrollment.classId === classId && enrollment.userId === userId,
+        enrollment.classId === classId && enrollment.userId === userId
     );
 
     if (!enrollment) return console.error("Enrollment not found");
@@ -362,7 +362,7 @@ export default function ClassesIdPage() {
           enrollment.danceRolePreference === "led"
             ? "conduzidos(as)"
             : "condutores(as)"
-        }`,
+        }`
       );
       return;
     }
@@ -396,7 +396,7 @@ export default function ClassesIdPage() {
         status: Database["public"]["Enums"]["enrollmentStatus"];
       }) =>
         enrollment.danceRolePreference === "led" &&
-        enrollment.status === "approved",
+        enrollment.status === "approved"
     );
     const enrollmentsLeaderCount = enrollments.filter(
       (enrollment: {
@@ -404,12 +404,12 @@ export default function ClassesIdPage() {
         status: Database["public"]["Enums"]["enrollmentStatus"];
       }) =>
         enrollment.danceRolePreference === "leader" &&
-        enrollment.status === "approved",
+        enrollment.status === "approved"
     );
 
     const classes = await readClasses();
     const currentClass = classes.find(
-      (currentClass) => currentClass.id === classId,
+      (currentClass) => currentClass.id === classId
     );
     if (!currentClass) return console.error("Class not found");
     setEnrollmentsCount({
