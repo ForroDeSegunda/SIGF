@@ -12,7 +12,6 @@ import {
   IEnrollmentCounts,
   enrollmentCountAtom,
 } from "@/atoms/enrollmentsAtom";
-import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
 import useUser from "@/hooks/useUser";

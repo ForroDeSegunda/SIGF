@@ -34,8 +34,6 @@ export const periodsOptions = {
 
 export default function ModalClasses() {
   const [selectedWeekdays, setSelectedWeekdays] = useState<string[]>([]);
-  const validWeekDays = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-  const [isActive, setIsActive] = useState(true);
   const [size, setSize] = useState(30);
   const [name, setName] = useState("");
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
@@ -48,6 +46,7 @@ export default function ModalClasses() {
     event.preventDefault();
     toast.info("Salvando classe...");
     const periodId = event.target[2].value;
+    const status = event.target[3].value;
 
     if (!classId) {
       try {
@@ -55,8 +54,8 @@ export default function ModalClasses() {
           name,
           periodId,
           weekDays: selectedWeekdays.join(","),
+          status,
           size,
-          isActive,
         });
 
         setClasses(classData);
@@ -70,8 +69,8 @@ export default function ModalClasses() {
           id: classId,
           name,
           weekDays: selectedWeekdays.join(","),
+          status,
           size,
-          isActive,
         });
         setClasses(classData);
       } catch (error) {
@@ -99,9 +98,6 @@ export default function ModalClasses() {
         const currentSelectedWeekdays = classData.weekDays.split(",");
         setSelectedWeekdays(currentSelectedWeekdays);
         classData.size !== undefined ? setSize(classData.size) : setSize(30);
-        classData.isActive !== undefined
-          ? setIsActive(classData.isActive)
-          : setIsActive(false);
         setName(classData.name);
       }
       updateClassState();
@@ -141,18 +137,14 @@ export default function ModalClasses() {
           </option>
         ))}
       </Select>
-      <FlexContainer>
-        <Label>Classe Ativa</Label>
-        <Input
-          name="status"
-          type="checkbox"
-          checked={isActive}
-          onChange={() => setIsActive(!isActive)}
-        />
-      </FlexContainer>
+      <Label>Criar como:</Label>
+      <Select name="classState">
+        <option value="open">Aberta</option>
+        <option value="hidden">Oculta</option>
+      </Select>
       <Label>Dias da Semana</Label>
       <FlexContainer>
-        {validWeekDays.map(
+        {weekDaysOrder.map(
           (weekday, index) =>
             index < 4 && (
               <FlexItem key={weekday}>
@@ -170,7 +162,7 @@ export default function ModalClasses() {
         )}
       </FlexContainer>
       <FlexContainer>
-        {validWeekDays.map(
+        {weekDaysOrder.map(
           (weekday, index) =>
             index >= 4 && (
               <FlexItem key={weekday}>

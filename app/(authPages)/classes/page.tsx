@@ -12,11 +12,26 @@ import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FaCheck, FaXmark } from "react-icons/fa6";
+import {
+  FaBox,
+  FaCheck,
+  FaEye,
+  FaEyeSlash,
+  FaRotate,
+  FaXmark,
+} from "react-icons/fa6";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import ButtonEnrollment from "./components/ButtonEnrollment";
 import ButtonOptions from "./components/ButtonOptions";
 import { weekDaysOptions, weekDaysOrder } from "./components/ModalClasses";
+import { Database } from "@/database.types";
+
+const classStatusOptions = {
+  open: "Aberta",
+  hidden: "Oculta",
+  ongoing: "Em Andamento",
+  archived: "Arquivada",
+};
 
 export default function ClassesPage() {
   const user = useRecoilValue(usersAtom);
@@ -51,23 +66,23 @@ export default function ClassesPage() {
 
   const columnDefsAdmin: ColDef<TClasses>[] = [
     {
-      headerName: "Ativa | Nome",
-      field: "isActive",
+      headerName: "Nome",
+      field: "name",
       flex: 1,
-      sort: "desc",
       cellRenderer: (p: any) => (
         <Link
           className="font-bold flex items-center gap-2"
           href={`/classes/${p.data.id}`}
         >
-          {p.data.isActive ? (
-            <FaCheck className="fill-green-500" />
-          ) : (
-            <FaXmark className="fill-orange-500" />
-          )}
           {p.data.name}
         </Link>
       ),
+    },
+    {
+      headerName: "Status",
+      field: "status",
+      sort: "desc",
+      valueFormatter: ({ value }) => classStatusOptions[value],
     },
     ...columnDefsBase,
     {
@@ -79,8 +94,8 @@ export default function ClassesPage() {
 
   const columnDefsAdminMobile: ColDef<TClasses>[] = [
     {
-      headerName: "Ativa | Nome | Dias de Aula",
-      field: "isActive",
+      headerName: "Status | Nome | Dias de Aula",
+      field: "status",
       flex: 1,
       sort: "desc",
       cellRenderer: renderRowAdminMobile,
@@ -120,6 +135,21 @@ export default function ClassesPage() {
       setShowOptions(true);
     }
 
+    function handleStatusIcon(
+      status: Database["public"]["Enums"]["classStatus"],
+    ) {
+      switch (status) {
+        case "open":
+          return <FaEye className="fill-green-500" />;
+        case "hidden":
+          return <FaEyeSlash className="fill-orange-500" />;
+        case "ongoing":
+          return <FaRotate className="fill-blue-500" />;
+        case "archived":
+          return <FaBox className="fill-gray-500" />;
+      }
+    }
+
     return (
       <>
         <div
@@ -127,11 +157,7 @@ export default function ClassesPage() {
           onClick={resizeRow}
         >
           <div className="font-bold flex items-center gap-2">
-            {props.data.isActive ? (
-              <FaCheck className="fill-green-500" />
-            ) : (
-              <FaXmark className="fill-orange-500" />
-            )}
+            {handleStatusIcon(props.data.status)}
             {props.data.name}
           </div>
           <div>
@@ -220,7 +246,7 @@ export default function ClassesPage() {
   async function handleSetClasses() {
     const classes = await readClasses();
     if (user?.userRole === "admin") setClasses(classes);
-    else setClasses(classes.filter((c) => c.isActive));
+    else setClasses(classes.filter((c) => c.status === "open"));
   }
 
   function handleColumnDefs() {

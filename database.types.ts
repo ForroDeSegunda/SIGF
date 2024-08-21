@@ -172,7 +172,6 @@ export type Database = {
           description: string | null
           franchiseId: string | null
           id: string
-          isActive: boolean
           name: string
           periodId: string
           size: number
@@ -185,7 +184,6 @@ export type Database = {
           description?: string | null
           franchiseId?: string | null
           id?: string
-          isActive?: boolean
           name: string
           periodId: string
           size: number
@@ -198,7 +196,6 @@ export type Database = {
           description?: string | null
           franchiseId?: string | null
           id?: string
-          isActive?: boolean
           name?: string
           periodId?: string
           size?: number
