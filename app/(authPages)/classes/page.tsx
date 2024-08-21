@@ -1,30 +1,23 @@
 "use client";
 
 import { TClasses } from "@/app/api/classes/[id]/route";
-import { readClasses } from "@/app/api/classes/controller";
+import { readClasses } from "@/app/api/classes/service";
 import { readEnrollmentsByUser } from "@/app/api/enrollments/service";
 import { classesAtom, sortedClassesSelector } from "@/atoms/classesAtom";
 import { enrollmentsAtom } from "@/atoms/enrollmentsAtom";
 import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
+import { Database } from "@/database.types";
 import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  FaBox,
-  FaCheck,
-  FaEye,
-  FaEyeSlash,
-  FaRotate,
-  FaXmark,
-} from "react-icons/fa6";
+import { FaBox, FaEye, FaEyeSlash, FaRotate } from "react-icons/fa6";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import ButtonEnrollment from "./components/ButtonEnrollment";
 import ButtonOptions from "./components/ButtonOptions";
 import { weekDaysOptions, weekDaysOrder } from "./components/ModalClasses";
-import { Database } from "@/database.types";
 
 const classStatusOptions = {
   open: "Aberta",

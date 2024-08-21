@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  createClass,
-  readClass,
-  updateClass,
-} from "@/app/api/classes/controller";
+import { createClass, readClass, updateClass } from "@/app/api/classes/service";
 import { classesAtom } from "@/atoms/classesAtom";
 import { modalIsOpenAtom, modalIdAtom } from "@/atoms/modalAtom";
 import { periodsAtom } from "@/atoms/periodsAtom";

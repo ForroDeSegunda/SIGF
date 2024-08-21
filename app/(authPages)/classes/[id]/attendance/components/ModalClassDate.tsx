@@ -6,7 +6,7 @@ import {
   readApprovedEnrollments,
 } from "@/app/api/attendance/service";
 import { createClassDates } from "@/app/api/classDates/service";
-import { readClass } from "@/app/api/classes/controller";
+import { readClass } from "@/app/api/classes/service";
 import { classDatesAtom } from "@/atoms/classDatesAtom";
 import { modalIsOpenAtom } from "@/atoms/modalAtom";
 import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";

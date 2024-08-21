@@ -7,7 +7,7 @@ import {
   createClassDates,
   deleteClassDates,
 } from "@/app/api/classDates/service";
-import { readClass } from "@/app/api/classes/controller";
+import { readClass, updateClass } from "@/app/api/classes/service";
 import { useModal } from "@/app/components/MainModal";
 import { classDatesAtom } from "@/atoms/classDatesAtom";
 import { getWeekDays } from "@/utils/functions";
@@ -23,6 +23,11 @@ export default function GenerateClassDates() {
   async function handleDeleteAllClassDates() {
     toast.info("Excluindo aulas...");
     try {
+      const classData = await readClass(classId);
+      await updateClass({
+        ...classData,
+        status: "open",
+      });
       await deleteClassDates(classId);
       setClassDates([]);
     } catch (error) {
@@ -36,6 +41,10 @@ export default function GenerateClassDates() {
     toast.info("Gerando aulas...");
     try {
       const classData = await readClass(classId);
+      await updateClass({
+        ...classData,
+        status: "ongoing",
+      });
 
       const weekDays = classData.weekDays.split(",");
       const startDate = new Date(classData.period.startDate + "EDT");

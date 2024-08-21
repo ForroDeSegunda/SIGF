@@ -1,7 +1,7 @@
 "use client";
 
 import { readAttendances } from "@/app/api/attendance/service";
-import { readClasses } from "@/app/api/classes/controller";
+import { readClass, readClasses } from "@/app/api/classes/service";
 import {
   readEnrollmentsByClassId,
   updateEnrollment,
@@ -243,7 +243,7 @@ export default function ClassesIdPage() {
           return [
             renderButton(
               "pending",
-              "Resetar",
+              "Pendente",
               "text-blue-500",
               "hover:text-blue-600",
             ),
@@ -264,7 +264,7 @@ export default function ClassesIdPage() {
             ),
             renderButton(
               "pending",
-              "Resetar",
+              "Pendente",
               "text-blue-500",
               "hover:text-blue-600",
               false,
@@ -346,19 +346,19 @@ export default function ClassesIdPage() {
     userId: string,
     alterCount = true,
   ): Promise<void> {
-    const userEnrollments = await readEnrollmentsByClassId(classId as string);
-    const enrollment = userEnrollments.find(
+    const classEnrollments = await readEnrollmentsByClassId(classId as string);
+    const userEnrollment = classEnrollments.find(
       (enrollment: TEnrollmentRow) =>
         enrollment.classId === classId && enrollment.userId === userId,
     );
+    if (!userEnrollment) return console.error("Enrollment not found");
+    delete userEnrollment.users_view;
 
-    if (!enrollment) return console.error("Enrollment not found");
-    const verifiedEnrollment = canBeEnrolled(enrollment, status);
-
+    const verifiedEnrollment = canBeEnrolled(userEnrollment, status);
     if (!verifiedEnrollment.canUpdate) {
       toast.error(
         `Não é possível aprovar mais ${
-          enrollment.danceRolePreference === "led"
+          userEnrollment.danceRolePreference === "led"
             ? "conduzidos(as)"
             : "condutores(as)"
         }`,
@@ -366,11 +366,14 @@ export default function ClassesIdPage() {
       return;
     }
 
-    delete enrollment.users_view;
+    const classData = await readClass(classId as string);
+    if (classData.status === "ongoing") {
+      console.log("Class is ongoing");
+    }
 
     try {
       const updatedEnrollment = await updateEnrollment({
-        ...enrollment,
+        ...userEnrollment,
         danceRolePreference: verifiedEnrollment.role,
         status,
       });
