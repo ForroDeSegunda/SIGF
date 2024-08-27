@@ -1,6 +1,6 @@
 "use client";
 
-import { TAttendance } from "@/app/api/attendance/route";
+import { TAttendanceInsert } from "@/app/api/attendance/route";
 import {
   createAttendances,
   readApprovedEnrollments,
@@ -58,7 +58,7 @@ export default function ModalClassDate() {
       });
     });
 
-    createAttendances(attendances as TAttendance[]);
+    createAttendances(attendances as TAttendanceInsert[]);
     setClassDates(newClassDates);
     setIsModalOpen(false);
   }

@@ -1,4 +1,4 @@
-import { TAttendance } from "@/app/api/attendance/route";
+import { TAttendanceInsert } from "@/app/api/attendance/route";
 import {
   createAttendances,
   readApprovedEnrollments,
@@ -61,7 +61,7 @@ export default function GenerateClassDates() {
       });
 
       setClassDates(classDates);
-      createAttendances(attendances as TAttendance[]);
+      createAttendances(attendances as TAttendanceInsert[]);
     } catch (error) {
       toast.error("Erro ao gerar aulas");
       return;

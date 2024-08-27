@@ -47,7 +47,6 @@ export async function createClass(classData: TCreateClass) {
 }
 
 export async function updateClass(classData: TUpdateClass) {
-  if (classData.period) delete classData.period;
   try {
     const res = await axios.patch(`/api/classes`, classData);
     return res.data as TClasses;

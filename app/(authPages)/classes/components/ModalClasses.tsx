@@ -6,7 +6,7 @@ import { modalIsOpenAtom, modalIdAtom } from "@/atoms/modalAtom";
 import { periodsAtom } from "@/atoms/periodsAtom";
 import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import { useEffect, useState } from "react";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
 
@@ -34,7 +34,7 @@ export default function ModalClasses() {
   const [name, setName] = useState("");
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
   const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
-  const setClasses = useSetRecoilState(classesAtom);
+  const [classes, setClasses] = useRecoilState(classesAtom);
   const classId = useRecoilValue(modalIdAtom);
   const periods = useRecoilValue(periodsAtom);
 
@@ -68,7 +68,8 @@ export default function ModalClasses() {
           status,
           size,
         });
-        setClasses(classData);
+        const newClasses = classes.filter((c) => c.id !== classId);
+        setClasses([...newClasses, classData]);
       } catch (error) {
         toast.error("Erro ao atualizar classe");
         return;
