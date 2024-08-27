@@ -7,9 +7,8 @@ export type TUpdateClass = Database["public"]["Tables"]["classes"]["Update"];
 
 export async function readClass(classId: string | string[]) {
   try {
-    const res = await fetch(`/api/classes/${classId}`);
-    const classData: TClassAndPeriod = await res.json();
-    return classData as TClassAndPeriod;
+    const res = await axios.get(`/api/classes/${classId}`);
+    return res.data as TClassAndPeriod;
   } catch (error) {
     console.error("Error reading class:", error);
     throw error;
@@ -46,7 +45,8 @@ export async function createClass(classData: TCreateClass) {
   return data;
 }
 
-export async function updateClass(classData: TUpdateClass) {
+export async function updateClass(classData: TUpdateClass & { period?: any }) {
+  if (classData.period) delete classData.period;
   try {
     const res = await axios.patch(`/api/classes`, classData);
     return res.data as TClasses;
