@@ -172,10 +172,10 @@ export type Database = {
           description: string | null
           franchiseId: string | null
           id: string
-          isActive: boolean
           name: string
           periodId: string
           size: number
+          status: Database["public"]["Enums"]["classStatus"]
           teacherId: string | null
           weekDays: string
         }
@@ -184,10 +184,10 @@ export type Database = {
           description?: string | null
           franchiseId?: string | null
           id?: string
-          isActive?: boolean
           name: string
           periodId: string
           size: number
+          status?: Database["public"]["Enums"]["classStatus"]
           teacherId?: string | null
           weekDays: string
         }
@@ -196,10 +196,10 @@ export type Database = {
           description?: string | null
           franchiseId?: string | null
           id?: string
-          isActive?: boolean
           name?: string
           periodId?: string
           size?: number
+          status?: Database["public"]["Enums"]["classStatus"]
           teacherId?: string | null
           weekDays?: string
         }
@@ -442,6 +442,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      classStatus: "hidden" | "open" | "ongoing" | "archived"
       danceRole: "indifferent" | "led" | "leader"
       danceRolePreference: "led" | "leader"
       enrollmentStatus: "pending" | "approved" | "rejected" | "abandonment"

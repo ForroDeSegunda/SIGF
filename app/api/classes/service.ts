@@ -1,5 +1,6 @@
 import { Database } from "@/database.types";
 import { TClassAndPeriod, TClasses } from "./[id]/route";
+import axios from "axios";
 
 export type TCreateClass = Database["public"]["Tables"]["classes"]["Insert"];
 export type TUpdateClass = Database["public"]["Tables"]["classes"]["Update"];
@@ -8,7 +9,7 @@ export async function readClass(classId: string | string[]) {
   try {
     const res = await fetch(`/api/classes/${classId}`);
     const classData: TClassAndPeriod = await res.json();
-    return classData;
+    return classData as TClassAndPeriod;
   } catch (error) {
     console.error("Error reading class:", error);
     throw error;
@@ -46,16 +47,10 @@ export async function createClass(classData: TCreateClass) {
 }
 
 export async function updateClass(classData: TUpdateClass) {
+  if (classData.period) delete classData.period;
   try {
-    await fetch(`/api/classes`, {
-      method: "PATCH",
-      body: JSON.stringify(classData),
-    });
-
-    const response = await fetch("/api/classes");
-    const newClasses = await response.json();
-
-    return newClasses;
+    const res = await axios.patch(`/api/classes`, classData);
+    return res.data as TClasses;
   } catch (error) {
     throw error;
   }

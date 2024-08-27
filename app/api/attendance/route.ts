@@ -2,7 +2,8 @@ import supabase from "@/utils/db";
 import { Database } from "@/database.types";
 import { NextRequest, NextResponse } from "next/server";
 
-export type TAttendance = Database["public"]["Tables"]["attendance"]["Insert"];
+export type TAttendanceInsert =
+  Database["public"]["Tables"]["attendance"]["Insert"];
 
 const TABLE = "attendance";
 
@@ -15,14 +16,21 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const body: TAttendance = await request.json();
+  const body: TAttendanceInsert = await request.json();
 
   const { data, error } = await supabase.from(TABLE).insert(body).select();
 
   if (error) {
+    if (error.message.includes("duplicate key")) {
+      return NextResponse.json(
+        { message: "Already marked as present" },
+        { status: 400 },
+      );
+    }
+
     return NextResponse.json(error, { status: 500 });
   }
-  return NextResponse.json(data as TAttendance[]);
+  return NextResponse.json(data as TAttendanceInsert[]);
 }
 
 export async function DELETE(request: NextRequest) {

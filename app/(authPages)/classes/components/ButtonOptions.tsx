@@ -1,4 +1,4 @@
-import { deleteClass } from "@/app/api/classes/controller";
+import { deleteClass } from "@/app/api/classes/service";
 import { useModal } from "@/app/components/MainModal";
 import { classesAtom } from "@/atoms/classesAtom";
 import { useRecoilState } from "recoil";

@@ -1,7 +1,11 @@
 "use client";
 
-import { readAttendances } from "@/app/api/attendance/service";
-import { readClasses } from "@/app/api/classes/controller";
+import {
+  createAttendances,
+  readAttendances,
+} from "@/app/api/attendance/service";
+import { readClassDates } from "@/app/api/classDates/service";
+import { readClass, readClasses } from "@/app/api/classes/service";
 import {
   readEnrollmentsByClassId,
   updateEnrollment,
@@ -12,7 +16,6 @@ import {
   IEnrollmentCounts,
   enrollmentCountAtom,
 } from "@/atoms/enrollmentsAtom";
-import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
 import useUser from "@/hooks/useUser";
@@ -53,7 +56,7 @@ const enrollmentStatusOptions = {
 
 export default function ClassesIdPage() {
   const user = useRecoilValue(usersAtom);
-  const classId = useParams().id;
+  const classId = useParams().id as string;
   const [rowData, setRowData] = useState<IRow[]>([]);
   const gridRef = useRef<AgGridReact>(null);
   const windowWidth = useWindowWidth();
@@ -225,7 +228,7 @@ export default function ClassesIdPage() {
       text: string,
       color: string,
       hoverColor: string,
-      alterCount = true
+      alterCount = true,
     ) => (
       <button
         key={buttonStatus}
@@ -237,22 +240,22 @@ export default function ClassesIdPage() {
     );
 
     const getButtonsForStatus = (
-      currentStatus: Database["public"]["Enums"]["enrollmentStatus"]
+      currentStatus: Database["public"]["Enums"]["enrollmentStatus"],
     ) => {
       switch (currentStatus) {
         case "approved":
           return [
             renderButton(
               "pending",
-              "Resetar",
+              "Pendente",
               "text-blue-500",
-              "hover:text-blue-600"
+              "hover:text-blue-600",
             ),
             renderButton(
               "abandonment",
               "Abandono",
               "text-orange-500",
-              "hover:text-orange-600"
+              "hover:text-orange-600",
             ),
           ];
         case "abandonment":
@@ -261,14 +264,14 @@ export default function ClassesIdPage() {
               "approved",
               "Aprovar",
               "text-green-500",
-              "hover:text-green-600"
+              "hover:text-green-600",
             ),
             renderButton(
               "pending",
-              "Resetar",
+              "Pendente",
               "text-blue-500",
               "hover:text-blue-600",
-              false
+              false,
             ),
           ];
         default:
@@ -277,14 +280,14 @@ export default function ClassesIdPage() {
               "approved",
               "Aprovar",
               "text-green-500",
-              "hover:text-green-600"
+              "hover:text-green-600",
             ),
             renderButton(
               "abandonment",
               "Abandono",
               "text-orange-500",
               "hover:text-orange-600",
-              false
+              false,
             ),
           ];
       }
@@ -303,7 +306,7 @@ export default function ClassesIdPage() {
               danceRolePreference:
                 enrollment.danceRolePreference || row.danceRolePreference,
             }
-          : row
+          : row,
     );
   }
 
@@ -318,7 +321,7 @@ export default function ClassesIdPage() {
 
   function canBeEnrolled(
     enrollment: TEnrollmentRow,
-    status: Database["public"]["Enums"]["enrollmentStatus"]
+    status: Database["public"]["Enums"]["enrollmentStatus"],
   ): {
     canUpdate: boolean;
     role: Database["public"]["Enums"]["danceRolePreference"] | null;
@@ -345,33 +348,49 @@ export default function ClassesIdPage() {
   async function handleUpdateEnrollment(
     status: Database["public"]["Enums"]["enrollmentStatus"],
     userId: string,
-    alterCount = true
+    alterCount = true,
   ): Promise<void> {
-    const userEnrollments = await readEnrollmentsByClassId(classId as string);
-    const enrollment = userEnrollments.find(
+    const classEnrollments = await readEnrollmentsByClassId(classId as string);
+    const userEnrollment = classEnrollments.find(
       (enrollment: TEnrollmentRow) =>
-        enrollment.classId === classId && enrollment.userId === userId
+        enrollment.classId === classId && enrollment.userId === userId,
     );
+    if (!userEnrollment) return console.error("Enrollment not found");
+    delete userEnrollment.users_view;
 
-    if (!enrollment) return console.error("Enrollment not found");
-    const verifiedEnrollment = canBeEnrolled(enrollment, status);
-
+    const verifiedEnrollment = canBeEnrolled(userEnrollment, status);
     if (!verifiedEnrollment.canUpdate) {
       toast.error(
         `Não é possível aprovar mais ${
-          enrollment.danceRolePreference === "led"
+          userEnrollment.danceRolePreference === "led"
             ? "conduzidos(as)"
             : "condutores(as)"
-        }`
+        }`,
       );
       return;
     }
 
-    delete enrollment.users_view;
+    const classData = await readClass(classId as string);
+    if (classData.status === "ongoing" && status === "approved") {
+      const today = new Date();
+      const classDates = await readClassDates(classId);
+      if (!classDates) return console.error("No class dates found");
+      const classDatesFromToday = classDates.filter(
+        (classDate) => new Date(classDate.date) >= today,
+      );
+      const classDatesIds = classDatesFromToday.map(
+        (classDate) => classDate.id,
+      );
+      const attToCreate = classDatesIds.map((classDateId) => ({
+        classDateId,
+        userId,
+      }));
+      await createAttendances(attToCreate);
+    }
 
     try {
       const updatedEnrollment = await updateEnrollment({
-        ...enrollment,
+        ...userEnrollment,
         danceRolePreference: verifiedEnrollment.role,
         status,
       });
@@ -396,7 +415,7 @@ export default function ClassesIdPage() {
         status: Database["public"]["Enums"]["enrollmentStatus"];
       }) =>
         enrollment.danceRolePreference === "led" &&
-        enrollment.status === "approved"
+        enrollment.status === "approved",
     );
     const enrollmentsLeaderCount = enrollments.filter(
       (enrollment: {
@@ -404,12 +423,12 @@ export default function ClassesIdPage() {
         status: Database["public"]["Enums"]["enrollmentStatus"];
       }) =>
         enrollment.danceRolePreference === "leader" &&
-        enrollment.status === "approved"
+        enrollment.status === "approved",
     );
 
     const classes = await readClasses();
     const currentClass = classes.find(
-      (currentClass) => currentClass.id === classId
+      (currentClass) => currentClass.id === classId,
     );
     if (!currentClass) return console.error("Class not found");
     setEnrollmentsCount({
