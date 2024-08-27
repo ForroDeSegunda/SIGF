@@ -10,13 +10,15 @@ import {
 import { readClass, updateClass } from "@/app/api/classes/service";
 import { useModal } from "@/app/components/MainModal";
 import { classDatesAtom } from "@/atoms/classDatesAtom";
+import { currentClassAtom } from "@/atoms/currentClassAtom";
 import { getWeekDays } from "@/utils/functions";
 import { useParams } from "next/navigation";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 
 export default function GenerateClassDates() {
   const [classDates, setClassDates] = useRecoilState(classDatesAtom);
+  const setCurrentClass = useSetRecoilState(currentClassAtom);
   const classId = useParams().id;
   const openModal = useModal();
 
@@ -24,10 +26,12 @@ export default function GenerateClassDates() {
     toast.info("Excluindo aulas...");
     try {
       const classData = await readClass(classId);
-      await updateClass({
+      const currentClass = await updateClass({
         ...classData,
         status: "open",
       });
+      setCurrentClass(currentClass);
+
       await deleteClassDates(classId);
       setClassDates([]);
     } catch (error) {
@@ -41,10 +45,11 @@ export default function GenerateClassDates() {
     toast.info("Gerando aulas...");
     try {
       const classData = await readClass(classId);
-      await updateClass({
+      const currentClass = await updateClass({
         ...classData,
         status: "ongoing",
       });
+      setCurrentClass(currentClass);
 
       const weekDays = classData.weekDays.split(",");
       const startDate = new Date(classData.period.startDate + "EDT");

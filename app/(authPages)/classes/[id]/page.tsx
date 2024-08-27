@@ -5,20 +5,20 @@ import {
   readAttendances,
 } from "@/app/api/attendance/service";
 import { readClassDates } from "@/app/api/classDates/service";
-import { readClass, readClasses } from "@/app/api/classes/service";
+import { readClass } from "@/app/api/classes/service";
 import {
   readEnrollmentsByClassId,
   updateEnrollment,
 } from "@/app/api/enrollments/service";
 import { TEnrollmentRow } from "@/app/api/enrollments/types";
 import { attendancesAtom } from "@/atoms/attendanceAtom";
+import { currentClassAtom } from "@/atoms/currentClassAtom";
 import {
   IEnrollmentCounts,
   enrollmentCountAtom,
 } from "@/atoms/enrollmentsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
-import useUser from "@/hooks/useUser";
 import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
@@ -55,11 +55,13 @@ const enrollmentStatusOptions = {
 };
 
 export default function ClassesIdPage() {
+  const gridRef = useRef<AgGridReact>(null);
   const user = useRecoilValue(usersAtom);
   const classId = useParams().id as string;
   const [rowData, setRowData] = useState<IRow[]>([]);
-  const gridRef = useRef<AgGridReact>(null);
   const windowWidth = useWindowWidth();
+  const currentClass = useRecoilValue(currentClassAtom);
+
   const setAttendances = useSetRecoilState(attendancesAtom);
   const [enrollmentsCount, setEnrollmentsCount] =
     useRecoilState(enrollmentCountAtom);
@@ -125,7 +127,36 @@ export default function ClassesIdPage() {
       field: "createdAt",
       flex: 1,
       filter: true,
-      cellRenderer: mobileRenderer,
+      cellRenderer: (p: any) => {
+        const { api, node } = p;
+
+        function resizeRow() {
+          if (node.rowHeight !== 42) node.setRowHeight(42);
+          else node.setRowHeight(42 * 3 + 16);
+          api.onRowHeightChanged();
+        }
+
+        return (
+          <div className="flex flex-col w-full">
+            <button className="flex justify-between w-full" onClick={resizeRow}>
+              <span className="font-bold">{p.data.users_view.full_name}</span>
+              <span>{new Date(p.data.createdAt).toLocaleString("pt-BR")}</span>
+            </button>
+
+            <div className="border-t border-x rounded-t w-full flex gap-2 bg-gray-100 px-2">
+              <span className="font-bold">Papel:</span>
+              <span>
+                {danceRoleOptions[p.data.danceRole]} |{" "}
+                {danceRoleOptions[p.data.danceRolePreference]}
+              </span>
+            </div>
+            <div className="border-b border-x rounded-b w-full flex gap-2 bg-gray-100 px-2">
+              <span className="font-bold">Inscrição:</span>
+              {statusRenderer({ value: p.data.status })}
+            </div>
+          </div>
+        );
+      },
     },
   ];
 
@@ -135,75 +166,42 @@ export default function ClassesIdPage() {
       field: "createdAt",
       flex: 1,
       filter: true,
-      cellRenderer: adminMobileRenderer,
+      cellRenderer: (p: any) => {
+        const { api, node } = p;
+
+        function resizeRow() {
+          if (node.rowHeight !== 42) node.setRowHeight(42);
+          else node.setRowHeight(42 * 4 + 16);
+          api.onRowHeightChanged();
+        }
+
+        return (
+          <div className="flex flex-col w-full">
+            <button className="flex justify-between w-full" onClick={resizeRow}>
+              <span className="font-bold">{p.data.users_view.full_name}</span>
+              <span>{new Date(p.data.createdAt).toLocaleString("pt-BR")}</span>
+            </button>
+
+            <div className="border-t border-x rounded-t w-full flex gap-2 bg-gray-100 px-2">
+              <span className="font-bold">Papel:</span>
+              <span>
+                {danceRoleOptions[p.data.danceRole]} |{" "}
+                {danceRoleOptions[p.data.danceRolePreference]}
+              </span>
+            </div>
+            <div className="border-x w-full flex gap-2 bg-gray-100 px-2">
+              <span className="font-bold">Inscrição:</span>
+              {statusRenderer({ value: p.data.status })}
+            </div>
+            <div className="border-b border-x rounded-b w-full flex gap-2 bg-gray-100 px-2">
+              <span className="font-bold">Ações:</span>
+              {actionsRenderer(p)}
+            </div>
+          </div>
+        );
+      },
     },
   ];
-
-  function mobileRenderer(p: any) {
-    const { api, node } = p;
-
-    function resizeRow() {
-      if (node.rowHeight !== 42) node.setRowHeight(42);
-      else node.setRowHeight(42 * 3 + 16);
-      api.onRowHeightChanged();
-    }
-
-    return (
-      <div className="flex flex-col w-full">
-        <button className="flex justify-between w-full" onClick={resizeRow}>
-          <span className="font-bold">{p.data.users_view.full_name}</span>
-          <span>{new Date(p.data.createdAt).toLocaleString("pt-BR")}</span>
-        </button>
-
-        <div className="border-t border-x rounded-t w-full flex gap-2 bg-gray-100 px-2">
-          <span className="font-bold">Papel:</span>
-          <span>
-            {danceRoleOptions[p.data.danceRole]} |{" "}
-            {danceRoleOptions[p.data.danceRolePreference]}
-          </span>
-        </div>
-        <div className="border-b border-x rounded-b w-full flex gap-2 bg-gray-100 px-2">
-          <span className="font-bold">Inscrição:</span>
-          {statusRenderer({ value: p.data.status })}
-        </div>
-      </div>
-    );
-  }
-
-  function adminMobileRenderer(p: any) {
-    const { api, node } = p;
-
-    function resizeRow() {
-      if (node.rowHeight !== 42) node.setRowHeight(42);
-      else node.setRowHeight(42 * 4 + 16);
-      api.onRowHeightChanged();
-    }
-
-    return (
-      <div className="flex flex-col w-full">
-        <button className="flex justify-between w-full" onClick={resizeRow}>
-          <span className="font-bold">{p.data.users_view.full_name}</span>
-          <span>{new Date(p.data.createdAt).toLocaleString("pt-BR")}</span>
-        </button>
-
-        <div className="border-t border-x rounded-t w-full flex gap-2 bg-gray-100 px-2">
-          <span className="font-bold">Papel:</span>
-          <span>
-            {danceRoleOptions[p.data.danceRole]} |{" "}
-            {danceRoleOptions[p.data.danceRolePreference]}
-          </span>
-        </div>
-        <div className="border-x w-full flex gap-2 bg-gray-100 px-2">
-          <span className="font-bold">Inscrição:</span>
-          {statusRenderer({ value: p.data.status })}
-        </div>
-        <div className="border-b border-x rounded-b w-full flex gap-2 bg-gray-100 px-2">
-          <span className="font-bold">Ações:</span>
-          {actionsRenderer(p)}
-        </div>
-      </div>
-    );
-  }
 
   function statusRenderer({
     value,
@@ -223,7 +221,6 @@ export default function ClassesIdPage() {
   function actionsRenderer(params: { data: IRow; api: any }) {
     const { userId, status } = params.data;
     let canUpdate = false;
-
     status === "approved" ? (canUpdate = true) : (canUpdate = false);
 
     return (
@@ -236,14 +233,17 @@ export default function ClassesIdPage() {
             Aprovar
           </button>
         )}
-        {(status === "approved" || status === "abandonment") && (
-          <button
-            className="text-blue-500 hover:text-blue-600 font-bold"
-            onClick={() => handleUpdateEnrollment("pending", userId, canUpdate)}
-          >
-            Pendente
-          </button>
-        )}
+        {(status === "approved" || status === "abandonment") &&
+          currentClass?.status !== "ongoing" && (
+            <button
+              className="text-blue-500 hover:text-blue-600 font-bold"
+              onClick={() =>
+                handleUpdateEnrollment("pending", userId, canUpdate)
+              }
+            >
+              Pendente
+            </button>
+          )}
         {(status === "approved" || status === "pending") && (
           <button
             className="text-orange-500 hover:text-orange-600 font-bold"
@@ -312,7 +312,7 @@ export default function ClassesIdPage() {
     userId: string,
     alterCount = true,
   ): Promise<void> {
-    const classEnrollments = await readEnrollmentsByClassId(classId as string);
+    const classEnrollments = await readEnrollmentsByClassId(classId);
     const userEnrollment = classEnrollments.find(
       (enrollment: TEnrollmentRow) =>
         enrollment.classId === classId && enrollment.userId === userId,
@@ -332,7 +332,7 @@ export default function ClassesIdPage() {
       return;
     }
 
-    const classData = await readClass(classId as string);
+    const classData = await readClass(classId);
     if (classData.status === "ongoing" && status === "approved") {
       const today = new Date();
       const classDates = await readClassDates(classId);
@@ -368,7 +368,7 @@ export default function ClassesIdPage() {
   }
 
   async function handleReadEnrollments() {
-    const enrollments = await readEnrollmentsByClassId(classId as string);
+    const enrollments = await readEnrollmentsByClassId(classId);
     setRowData(enrollments);
 
     const enrollmentsLedCount = enrollments.filter(
@@ -388,10 +388,8 @@ export default function ClassesIdPage() {
         enrollment.status === "approved",
     );
 
-    const classes = await readClasses();
-    const currentClass = classes.find(
-      (currentClass) => currentClass.id === classId,
-    );
+    const currentClass = await readClass(classId);
+
     if (!currentClass) return console.error("Class not found");
     setEnrollmentsCount({
       max: currentClass.size,
@@ -402,18 +400,8 @@ export default function ClassesIdPage() {
   }
 
   async function handleReadAttendances() {
-    const { data } = await useUser();
-    const userId = data.user?.id;
-
-    const attendances = await readAttendances(userId, classId as string);
+    const attendances = await readAttendances(user?.id, classId);
     setAttendances(attendances);
-  }
-
-  function handleColumnDefs() {
-    if (user?.userRole === "admin") {
-      return windowWidth < 550 ? columnDefsAdminMobile : columnDefsAdmin;
-    }
-    return windowWidth < 550 ? columnDefsMobile : columnDefs;
   }
 
   useEffect(() => {
@@ -425,17 +413,25 @@ export default function ClassesIdPage() {
     <div className="flex flex-col w-full">
       <AgGridReact
         ref={gridRef}
+        rowData={rowData}
+        overlayNoRowsTemplate="ㅤ"
         className={
           user?.userRole === "admin" ? "w-full px-4 pt-4" : "w-full p-4"
         }
-        rowData={rowData}
-        columnDefs={handleColumnDefs()}
-        overlayNoRowsTemplate="ㅤ"
+        columnDefs={
+          windowWidth < 550
+            ? user?.userRole === "admin"
+              ? columnDefsAdminMobile
+              : columnDefsMobile
+            : user?.userRole === "admin"
+              ? columnDefsAdmin
+              : columnDefs
+        }
       />
 
       {user?.userRole === "admin" && (
         <button
-          className="text-blue-500"
+          className="text-blue-500 font-bold"
           onClick={() => gridRef.current?.api.exportDataAsCsv()}
         >
           Baixar CSV

@@ -1,6 +1,7 @@
 import { Database } from "@/database.types";
 import { TClassAndPeriod, TClasses } from "./[id]/route";
 import axios from "axios";
+import { TClassRow } from "@/atoms/currentClassAtom";
 
 export type TCreateClass = Database["public"]["Tables"]["classes"]["Insert"];
 export type TUpdateClass = Database["public"]["Tables"]["classes"]["Update"];
@@ -49,7 +50,7 @@ export async function updateClass(classData: TUpdateClass & { period?: any }) {
   if (classData.period) delete classData.period;
   try {
     const res = await axios.patch(`/api/classes`, classData);
-    return res.data as TClasses;
+    return res.data as TClassRow;
   } catch (error) {
     throw error;
   }

@@ -1,23 +1,23 @@
 import { deleteClass } from "@/app/api/classes/service";
 import { useModal } from "@/app/components/MainModal";
 import { classesAtom } from "@/atoms/classesAtom";
+import { TClassRow } from "@/atoms/currentClassAtom";
 import { useRecoilState } from "recoil";
 import { toast } from "sonner";
 
-export default function ButtonOptions(props: { id: string }) {
+export default function ButtonOptions(props: TClassRow) {
   const [classes, setClasses] = useRecoilState(classesAtom);
   const openModal = useModal();
-  const classId = props.id;
 
   async function handleDeleteClass() {
     toast.info("Excluindo classe...");
     try {
-      await deleteClass(classId);
+      await deleteClass(props.id);
     } catch (error) {
       toast.error("Erro ao excluir classe");
       return;
     }
-    setClasses(classes.filter((classItem) => classItem.id !== classId));
+    setClasses(classes.filter((classItem) => classItem.id !== props.id));
     toast.success("Classe excluída com sucesso!");
   }
 
@@ -25,13 +25,13 @@ export default function ButtonOptions(props: { id: string }) {
     <div className="flex gap-2">
       <button
         className="text-blue-500 hover:text-blue-600 font-bold"
-        onClick={() => openModal("classes", classId)}
+        onClick={() => openModal("classes", props.id)}
       >
         Editar
       </button>
       <button
         className="text-orange-500 hover:text-orange-600 font-bold"
-        onClick={() => openModal("confirmation", classId, handleDeleteClass)}
+        onClick={() => openModal("confirmation", props.id, handleDeleteClass)}
       >
         Excluir
       </button>
