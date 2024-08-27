@@ -35,7 +35,7 @@ export default function AttendancePage() {
       headerName: "Data",
       flex: 1,
       valueFormatter: ({ value }) =>
-        new Date(value).toLocaleDateString("pt-BR"),
+        new Date(value + "EDT").toLocaleDateString("pt-BR"),
     },
     { headerName: "Presenças", flex: 1, cellRenderer: renderActions },
   ];

@@ -1,6 +1,10 @@
 "use client";
 
-import { readAttendances } from "@/app/api/attendance/service";
+import {
+  createAttendances,
+  readAttendances,
+} from "@/app/api/attendance/service";
+import { readClassDates } from "@/app/api/classDates/service";
 import { readClass, readClasses } from "@/app/api/classes/service";
 import {
   readEnrollmentsByClassId,
@@ -52,7 +56,7 @@ const enrollmentStatusOptions = {
 
 export default function ClassesIdPage() {
   const user = useRecoilValue(usersAtom);
-  const classId = useParams().id;
+  const classId = useParams().id as string;
   const [rowData, setRowData] = useState<IRow[]>([]);
   const gridRef = useRef<AgGridReact>(null);
   const windowWidth = useWindowWidth();
@@ -367,8 +371,21 @@ export default function ClassesIdPage() {
     }
 
     const classData = await readClass(classId as string);
-    if (classData.status === "ongoing") {
-      console.log("Class is ongoing");
+    if (classData.status === "ongoing" && status === "approved") {
+      const today = new Date();
+      const classDates = await readClassDates(classId);
+      if (!classDates) return console.error("No class dates found");
+      const classDatesFromToday = classDates.filter(
+        (classDate) => new Date(classDate.date) >= today,
+      );
+      const classDatesIds = classDatesFromToday.map(
+        (classDate) => classDate.id,
+      );
+      const attToCreate = classDatesIds.map((classDateId) => ({
+        classDateId,
+        userId,
+      }));
+      await createAttendances(attToCreate);
     }
 
     try {

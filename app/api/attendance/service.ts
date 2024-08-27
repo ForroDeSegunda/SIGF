@@ -1,9 +1,9 @@
-import axios from "axios";
+import axios, { AxiosError, isAxiosError } from "axios";
 import { TApprovedEnrollment } from "../enrollments/types";
-import { TAttendance } from "./route";
+import { TAttendanceInsert } from "./route";
 import { TClassDatesRow } from "../classDates/route";
 
-export type TAttendanceWithClassDates = TAttendance & {
+export type TAttendanceWithClassDates = TAttendanceInsert & {
   classDates: TClassDatesRow;
 };
 
@@ -34,12 +34,15 @@ export async function readAttendances(
   }
 }
 
-export async function createAttendances(attendances: TAttendance[]) {
+export async function createAttendances(attendances: TAttendanceInsert[]) {
   try {
     const res = await axios.post(`/api/attendance`, attendances);
-    const createdAttendances: TAttendance[] = res.data;
+    const createdAttendances: TAttendanceInsert[] = res.data;
     return createdAttendances;
-  } catch (error) {
+  } catch (error: any | AxiosError) {
+    if (isAxiosError(error)) {
+      if (error.response?.data.message === "Already marked as present") return;
+    }
     console.error("Error creating attendances:", error);
     throw error;
   }
