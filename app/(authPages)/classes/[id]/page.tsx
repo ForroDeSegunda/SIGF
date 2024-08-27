@@ -115,7 +115,7 @@ export default function ClassesIdPage() {
       field: "actionButton",
       headerName: "Ações",
       flex: 3,
-      cellRenderer: actionButtonRenderer,
+      cellRenderer: actionsRenderer,
     },
   ];
 
@@ -125,7 +125,7 @@ export default function ClassesIdPage() {
       field: "createdAt",
       flex: 1,
       filter: true,
-      cellRenderer: renderRowMobile,
+      cellRenderer: mobileRenderer,
     },
   ];
 
@@ -135,11 +135,11 @@ export default function ClassesIdPage() {
       field: "createdAt",
       flex: 1,
       filter: true,
-      cellRenderer: renderRowAdminMobile,
+      cellRenderer: adminMobileRenderer,
     },
   ];
 
-  function renderRowMobile(p: any) {
+  function mobileRenderer(p: any) {
     const { api, node } = p;
 
     function resizeRow() {
@@ -170,7 +170,7 @@ export default function ClassesIdPage() {
     );
   }
 
-  function renderRowAdminMobile(p: any) {
+  function adminMobileRenderer(p: any) {
     const { api, node } = p;
 
     function resizeRow() {
@@ -199,7 +199,7 @@ export default function ClassesIdPage() {
         </div>
         <div className="border-b border-x rounded-b w-full flex gap-2 bg-gray-100 px-2">
           <span className="font-bold">Ações:</span>
-          {actionButtonRenderer(p)}
+          {actionsRenderer(p)}
         </div>
       </div>
     );
@@ -220,80 +220,42 @@ export default function ClassesIdPage() {
     }
   }
 
-  function actionButtonRenderer(params: { data: IRow; api: any }) {
+  function actionsRenderer(params: { data: IRow; api: any }) {
     const { userId, status } = params.data;
+    let canUpdate = false;
 
-    const renderButton = (
-      buttonStatus: Database["public"]["Enums"]["enrollmentStatus"],
-      text: string,
-      color: string,
-      hoverColor: string,
-      alterCount = true,
-    ) => (
-      <button
-        key={buttonStatus}
-        className={`${color} ${hoverColor} font-bold`}
-        onClick={() => handleUpdateEnrollment(buttonStatus, userId, alterCount)}
-      >
-        {text}
-      </button>
+    status === "approved" ? (canUpdate = true) : (canUpdate = false);
+
+    return (
+      <div className="flex gap-2">
+        {(status === "pending" || status === "abandonment") && (
+          <button
+            className="text-green-500 hover:text-green-600 font-bold"
+            onClick={() => handleUpdateEnrollment("approved", userId)}
+          >
+            Aprovar
+          </button>
+        )}
+        {(status === "approved" || status === "abandonment") && (
+          <button
+            className="text-blue-500 hover:text-blue-600 font-bold"
+            onClick={() => handleUpdateEnrollment("pending", userId, canUpdate)}
+          >
+            Pendente
+          </button>
+        )}
+        {(status === "approved" || status === "pending") && (
+          <button
+            className="text-orange-500 hover:text-orange-600 font-bold"
+            onClick={() =>
+              handleUpdateEnrollment("abandonment", userId, canUpdate)
+            }
+          >
+            Abandono
+          </button>
+        )}
+      </div>
     );
-
-    const getButtonsForStatus = (
-      currentStatus: Database["public"]["Enums"]["enrollmentStatus"],
-    ) => {
-      switch (currentStatus) {
-        case "approved":
-          return [
-            renderButton(
-              "pending",
-              "Pendente",
-              "text-blue-500",
-              "hover:text-blue-600",
-            ),
-            renderButton(
-              "abandonment",
-              "Abandono",
-              "text-orange-500",
-              "hover:text-orange-600",
-            ),
-          ];
-        case "abandonment":
-          return [
-            renderButton(
-              "approved",
-              "Aprovar",
-              "text-green-500",
-              "hover:text-green-600",
-            ),
-            renderButton(
-              "pending",
-              "Pendente",
-              "text-blue-500",
-              "hover:text-blue-600",
-              false,
-            ),
-          ];
-        default:
-          return [
-            renderButton(
-              "approved",
-              "Aprovar",
-              "text-green-500",
-              "hover:text-green-600",
-            ),
-            renderButton(
-              "abandonment",
-              "Abandono",
-              "text-orange-500",
-              "hover:text-orange-600",
-              false,
-            ),
-          ];
-      }
-    };
-
-    return <div className="flex gap-2">{getButtonsForStatus(status)}</div>;
   }
 
   function updateRowData(rowData: IRow[], enrollment: TEnrollmentRow): IRow[] {
@@ -438,6 +400,7 @@ export default function ClassesIdPage() {
       leader: enrollmentsLeaderCount.length,
     });
   }
+
   async function handleReadAttendances() {
     const { data } = await useUser();
     const userId = data.user?.id;
