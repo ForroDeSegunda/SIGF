@@ -3,8 +3,8 @@ import { TClassAndPeriod, TClasses } from "./[id]/route";
 import axios from "axios";
 import { TClassRow } from "@/atoms/currentClassAtom";
 
-export type TCreateClass = Database["public"]["Tables"]["classes"]["Insert"];
-export type TUpdateClass = Database["public"]["Tables"]["classes"]["Update"];
+export type TClassInsert = Database["public"]["Tables"]["classes"]["Insert"];
+export type TClassUpdate = Database["public"]["Tables"]["classes"]["Update"];
 
 export async function readClass(classId: string | string[]) {
   try {
@@ -27,7 +27,7 @@ export async function readClasses() {
   }
 }
 
-export async function createClass(classData: TCreateClass) {
+export async function createClass(classData: TClassInsert) {
   const resCreateClass = await fetch("/api/classes", {
     method: "POST",
     body: JSON.stringify(classData),
@@ -46,7 +46,7 @@ export async function createClass(classData: TCreateClass) {
   return data;
 }
 
-export async function updateClass(classData: TUpdateClass & { period?: any }) {
+export async function updateClass(classData: TClassUpdate & { period?: any }) {
   if (classData.period) delete classData.period;
   try {
     const res = await axios.patch(`/api/classes`, classData);

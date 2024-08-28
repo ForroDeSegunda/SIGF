@@ -1,12 +1,13 @@
 import { deleteClass } from "@/app/api/classes/service";
 import { useModal } from "@/app/components/MainModal";
 import { classesAtom } from "@/atoms/classesAtom";
-import { TClassRow } from "@/atoms/currentClassAtom";
-import { useRecoilState } from "recoil";
+import { TClassRow, currentClassAtom } from "@/atoms/currentClassAtom";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 
 export default function ButtonOptions(props: TClassRow) {
   const [classes, setClasses] = useRecoilState(classesAtom);
+  const setCurrentClass = useSetRecoilState(currentClassAtom);
   const openModal = useModal();
 
   async function handleDeleteClass() {
@@ -25,7 +26,10 @@ export default function ButtonOptions(props: TClassRow) {
     <div className="flex gap-2">
       <button
         className="text-blue-500 hover:text-blue-600 font-bold"
-        onClick={() => openModal("classes", props.id)}
+        onClick={() => {
+          setCurrentClass(props);
+          openModal("classes", props.id);
+        }}
       >
         Editar
       </button>

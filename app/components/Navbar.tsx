@@ -3,7 +3,6 @@
 import profilePicture from "@/assets/profile.png";
 import { sidebarMainAtom } from "@/atoms/sidebarsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
-import { useWindowWidth } from "@react-hook/window-size";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -17,7 +16,6 @@ import { NavbarButtons } from "./NavbarButtons";
 
 export default function Navbar() {
   const openModal = useModal();
-  const windowWidth = useWindowWidth();
   const profileRef = useRef<HTMLImageElement>(null);
   const user = useRecoilValue(usersAtom);
   const [sidebarIsOpen, setSidebarIsOpen] = useRecoilState(sidebarMainAtom);
@@ -85,72 +83,12 @@ export default function Navbar() {
   );
 }
 
-const Nav = tw.nav`
-  border-b-[1px] 
-  border-gray-300 
-  h-16 
-  w-full 
-  flex 
-  items-center 
-  justify-between
-`;
-
-const LeftSection = tw.div`
-  flex 
-  items-center 
-  pl-4 
-  gap-4
-`;
-
-const LogoLink = tw(Link)`
-  hidden
-  sm:block
-  font-bold
-`;
-
-const ProfileContainer = tw.div`
-  flex
-  gap-4
-  pr-4 
-  relative
-`;
-
-const ProfileImage = tw.img`
-  cursor-pointer 
-  rounded-full 
-  h-10 
-  w-10
-`;
-
-const ProfileMenu = tw.ul`
-  absolute 
-  right-4 
-  bg-white 
-  top-11
-  border 
-  rounded-[10px] 
-  p-4 
-  flex 
-  flex-col 
-  items-center 
-  z-50 
-  gap-4
-`;
-
+const Nav = tw.nav`border-b-[1px] border-gray-300 h-16 w-full flex items-center justify-between`;
+const LeftSection = tw.div`flex items-center pl-4 gap-4`;
+const LogoLink = tw(Link)`hidden sm:block font-bold`;
+const ProfileContainer = tw.div`flex gap-4 pr-4 relative`;
+const ProfileImage = tw.img`cursor-pointer rounded-full h-10 w-10`;
+const ProfileMenu = tw.ul`absolute right-4 bg-white top-11 border rounded-[10px] p-4 flex flex-col items-center z-50 gap-4`;
 const ProfileMenuItem = tw.li``;
-
-const ProfileButtonGroup = tw.li`
-  flex 
-  w-full 
-  justify-between 
-  gap-2
-`;
-
-const EditButton = tw.button`
-  py-2 
-  px-4 
-  rounded-md 
-  bg-blue-500 
-  hover:bg-blue-600 
-  text-white
-`;
+const ProfileButtonGroup = tw.li`flex w-full justify-between gap-2`;
+const EditButton = tw.button`py-2 px-4 rounded-md bg-blue-500 hover:bg-blue-600 text-white`;
