@@ -1,17 +1,18 @@
 "use client";
 
 import { attendancesAtom } from "@/atoms/attendanceAtom";
+import { currentClassAtom } from "@/atoms/currentClassAtom";
 import { enrollmentCountAtom } from "@/atoms/enrollmentsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { useWindowWidth } from "@react-hook/window-size";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRecoilValue } from "recoil";
+import { useEffect, useRef, useState } from "react";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
+import { useRecoilValue, useResetRecoilState } from "recoil";
 import ButtonNewCalendar from "../(authPages)/calendar/components/ButtonNewCalendar";
 import GenerateClassDates from "../(authPages)/classes/[id]/attendance/components/CreateClassDates";
 import { useModal } from "./MainModal";
-import { useEffect, useRef, useState } from "react";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 
 export function NavbarButtons() {
   const openModal = useModal();
@@ -23,6 +24,7 @@ export function NavbarButtons() {
   const actionButtonsRef = useRef<HTMLButtonElement>(null);
   const [isActionsButtonsVisible, setIsActionsButtonsVisible] = useState(false);
   const windowWidth = useWindowWidth();
+  const resetCurrentClass = useResetRecoilState(currentClassAtom);
 
   const classesIdRegex = new RegExp(
     /\/classes\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
@@ -87,7 +89,10 @@ export function NavbarButtons() {
     return (
       <>
         <button
-          onClick={() => openModal("classes")}
+          onClick={() => {
+            resetCurrentClass();
+            openModal("classes");
+          }}
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
         >
           Criar Turma

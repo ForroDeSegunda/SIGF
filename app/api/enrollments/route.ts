@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
   const { data, error } = await supabase
     .from("enrollment")
-    .insert([{ ...body }])
+    .insert(body)
     .select();
 
   if (error) {

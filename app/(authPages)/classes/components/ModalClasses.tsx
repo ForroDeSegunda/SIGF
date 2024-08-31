@@ -6,7 +6,12 @@ import { currentClassAtom } from "@/atoms/currentClassAtom";
 import { modalIdAtom, modalIsOpenAtom } from "@/atoms/modalAtom";
 import { periodsAtom } from "@/atoms/periodsAtom";
 import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import {
+  useRecoilState,
+  useRecoilValue,
+  useResetRecoilState,
+  useSetRecoilState,
+} from "recoil";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
 
@@ -30,14 +35,17 @@ export const periodsOptions = {
 
 export default function ModalClasses() {
   const [currentClass, setCurrentClass] = useRecoilState(currentClassAtom);
+  const resetCurrentClass = useResetRecoilState(currentClassAtom);
   const [classes, setClasses] = useRecoilState(classesAtom);
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
   const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
   const classId = useRecoilValue(modalIdAtom);
   const periods = useRecoilValue(periodsAtom);
-  const name = currentClass?.name || "";
-  const size = currentClass?.size || 30;
-  const selectedWeekdays = currentClass?.weekDays.split(",") || [];
+  const name = currentClass.name;
+  const size = currentClass.size;
+  const selectedWeekdays = currentClass.weekDays
+    .split(",")
+    .filter((str) => str.trim() !== "");
 
   async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -77,7 +85,7 @@ export default function ModalClasses() {
         return;
       }
     }
-    setCurrentClass(null);
+    resetCurrentClass();
     setIsModalOpen(false);
     toast.success("Classe salva com sucesso!");
   }
@@ -86,9 +94,11 @@ export default function ModalClasses() {
     const updatedWeekdays = selectedWeekdays.includes(weekday)
       ? selectedWeekdays.filter((day) => day !== weekday)
       : [...selectedWeekdays, weekday];
-    if (currentClass)
-      setCurrentClass({ ...currentClass, weekDays: updatedWeekdays.join(",") });
+
+    setCurrentClass({ ...currentClass, weekDays: updatedWeekdays.join(",") });
   }
+
+  console.log("currentClass: ", currentClass);
 
   return (
     <Form onSubmit={handleFormSubmit}>
@@ -120,80 +130,71 @@ export default function ModalClasses() {
             setCurrentClass({ ...currentClass, size: 10 });
         }}
       />
-      {currentClass &&
-      (currentClass.status === "open" || currentClass.status === "hidden") ? (
-        <>
-          <Label>Criar com status de:</Label>
-          <Select name="classState" defaultValue={currentClass?.status}>
-            <option value="hidden">Oculta</option>
-            <option value="open">Aberta</option>
-          </Select>
-        </>
+      <Label>Status da Turma:</Label>
+      {currentClass.status &&
+      ["ongoing", "archived"].includes(currentClass.status) ? (
+        <Select name="classState" defaultValue={currentClass.status}>
+          <option value="ongoing">Em andamento</option>
+          <option value="archived">Arquivada</option>
+        </Select>
       ) : (
         <>
-          <Label>Mudar status para:</Label>
-          <Select name="classState" defaultValue={currentClass?.status}>
-            <option value="ongoing">Em andamento</option>
-            <option value="archived">Arquivada</option>
+          <Select name="classState" defaultValue={currentClass.status}>
+            <option value="open">Aberta</option>
+            <option value="hidden">Oculta</option>
           </Select>
+          <Label>Semestre</Label>
+          <Select name="periodId">
+            {periods.map((period: any) => (
+              <option key={period.id} value={period.id}>
+                {periodsOptions[period.semester]} - {period.year}
+              </option>
+            ))}
+          </Select>
+          <Label>Dias da Semana</Label>
+          <FlexContainer>
+            {weekDaysOrder.map(
+              (weekday, index) =>
+                index < 4 && (
+                  <FlexItem key={weekday}>
+                    <Input
+                      type="checkbox"
+                      id={weekday}
+                      name="weekdays"
+                      value={weekday}
+                      checked={selectedWeekdays.includes(weekday)}
+                      onChange={() => handleWeekDaysCheckboxChange(weekday)}
+                    />
+                    <CheckboxLabel>{weekDaysOptions[weekday]}</CheckboxLabel>
+                  </FlexItem>
+                ),
+            )}
+          </FlexContainer>
+          <FlexContainer>
+            {weekDaysOrder.map(
+              (weekday, index) =>
+                index >= 4 && (
+                  <FlexItem key={weekday}>
+                    <Input
+                      type="checkbox"
+                      id={weekday}
+                      name="weekdays"
+                      value={weekday}
+                      checked={selectedWeekdays.includes(weekday)}
+                      onChange={() => handleWeekDaysCheckboxChange(weekday)}
+                    />
+                    <CheckboxLabel>{weekDaysOptions[weekday]}</CheckboxLabel>
+                  </FlexItem>
+                ),
+            )}
+          </FlexContainer>
         </>
       )}
-      {currentClass &&
-        (currentClass.status === "open" ||
-          currentClass.status === "hidden") && (
-          <>
-            <Label>Semestre</Label>
-            <Select name="periodId">
-              {periods.map((period: any) => (
-                <option key={period.id} value={period.id}>
-                  {periodsOptions[period.semester]} - {period.year}
-                </option>
-              ))}
-            </Select>
-            <Label>Dias da Semana</Label>
-            <FlexContainer>
-              {weekDaysOrder.map(
-                (weekday, index) =>
-                  index < 4 && (
-                    <FlexItem key={weekday}>
-                      <Input
-                        type="checkbox"
-                        id={weekday}
-                        name="weekdays"
-                        value={weekday}
-                        checked={selectedWeekdays.includes(weekday)}
-                        onChange={() => handleWeekDaysCheckboxChange(weekday)}
-                      />
-                      <CheckboxLabel>{weekDaysOptions[weekday]}</CheckboxLabel>
-                    </FlexItem>
-                  ),
-              )}
-            </FlexContainer>
-            <FlexContainer>
-              {weekDaysOrder.map(
-                (weekday, index) =>
-                  index >= 4 && (
-                    <FlexItem key={weekday}>
-                      <Input
-                        type="checkbox"
-                        id={weekday}
-                        name="weekdays"
-                        value={weekday}
-                        checked={selectedWeekdays.includes(weekday)}
-                        onChange={() => handleWeekDaysCheckboxChange(weekday)}
-                      />
-                      <CheckboxLabel>{weekDaysOptions[weekday]}</CheckboxLabel>
-                    </FlexItem>
-                  ),
-              )}
-            </FlexContainer>
-          </>
-        )}
       <ButtonContainer>
         <CloseButton
           type="button"
           onClick={() => {
-            setCurrentClass(null);
+            resetCurrentClass();
             setIsModalOpen(false);
             setShowMobileOptions(false);
           }}

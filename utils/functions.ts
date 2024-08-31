@@ -20,3 +20,34 @@ export function getWeekDays(
   }
   return classDates;
 }
+
+export function replaceSpecialChars(str: string): string {
+  const specialCharsMap: { [key: string]: string } = {
+    a: "áàãâä",
+    A: "ÁÀÃÂÄ",
+    e: "éèêë",
+    E: "ÉÈÊË",
+    i: "íìîï",
+    I: "ÍÌÎÏ",
+    o: "óòõôö",
+    O: "ÓÒÕÔÖ",
+    u: "úùûü",
+    U: "ÚÙÛÜ",
+    c: "ç",
+    C: "Ç",
+  };
+
+  return str.replace(
+    /[áàãâäéèêëíìîïóòõôöúùûüçÁÀÃÂÄÉÈÊËÍÌÎÏÓÒÕÔÖÚÙÛÜÇ]/g,
+    (match) => {
+      for (const [simpleChar, specialChars] of Object.entries(
+        specialCharsMap,
+      )) {
+        if (specialChars.includes(match)) {
+          return simpleChar;
+        }
+      }
+      return match; // This line should never be reached, as all special characters are mapped
+    },
+  );
+}

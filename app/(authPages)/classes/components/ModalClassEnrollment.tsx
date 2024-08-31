@@ -5,7 +5,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { Database } from "@/database.types";
 import {
   deleteEnrollment,
-  createEnrollment,
+  createEnrollments,
   updateEnrollment,
 } from "@/app/api/enrollments/service";
 import useUser from "@/hooks/useUser";
@@ -84,14 +84,16 @@ export default function ModalClassEnrollment() {
     if (error) return toast.error("Erro ao obter usuário");
 
     try {
-      const createdEnrollment = await createEnrollment({
-        classId,
-        userId: data.user.id,
-        danceRolePreference,
-        danceRole,
-      });
+      const createdEnrollment = await createEnrollments([
+        {
+          classId,
+          userId: data.user.id,
+          danceRolePreference,
+          danceRole,
+        },
+      ]);
 
-      setEnrollments([...enrollments, createdEnrollment]);
+      setEnrollments([...enrollments, createdEnrollment[0]]);
     } catch (error) {
       toast.error("Erro ao se inscrever");
       return;

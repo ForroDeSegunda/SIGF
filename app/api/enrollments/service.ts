@@ -42,10 +42,10 @@ export async function readEnrollmentsByUser() {
   }
 }
 
-export async function createEnrollment(enrollment: TEnrollmentInsert) {
+export async function createEnrollments(enrollments: TEnrollmentInsert[]) {
   try {
-    const res = await axios.post(`/api/enrollments`, enrollment);
-    return res.data[0];
+    const res = await axios.post(`/api/enrollments`, enrollments);
+    return res.data;
   } catch (error) {
     console.error("Error enrolling class:", error);
     throw error;

@@ -19,6 +19,7 @@ import {
 } from "@/atoms/enrollmentsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
+import { replaceSpecialChars } from "@/utils/functions";
 import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
@@ -388,8 +389,6 @@ export default function ClassesIdPage() {
         enrollment.status === "approved",
     );
 
-    const currentClass = await readClass(classId);
-
     if (!currentClass) return console.error("Class not found");
     setEnrollmentsCount({
       max: currentClass.size,
@@ -404,13 +403,54 @@ export default function ClassesIdPage() {
     setAttendances(attendances);
   }
 
+  function exportToCsv() {
+    const params = {
+      fileName: replaceSpecialChars(
+        currentClass?.name.toLowerCase().replaceAll(" ", "_") || "inscricoes",
+      ),
+    };
+    gridRef.current?.api.exportDataAsCsv(params);
+  }
+
+  const handleOnSubmit = (event) => {
+    event.preventDefault();
+    const fileReader = new FileReader();
+    fileReader.readAsText(event.target.files[0]);
+
+    function parseCSVToObjects(csv) {
+      const lines = csv.split("\n");
+
+      const headers = lines[0]
+        .split(",")
+        .map((header) => header.replace(/"/g, "").trim());
+
+      const dataObjects = lines.slice(1).map((line) => {
+        const data = line
+          .split(",")
+          .map((field) => field.replace(/"/g, "").trim());
+        return headers.reduce((obj, header, index) => {
+          obj[header] = data[index];
+          return obj;
+        }, {});
+      });
+
+      return dataObjects;
+    }
+
+    fileReader.onloadend = (event) => {
+      const input = event.target?.result;
+      const parsedObjects = parseCSVToObjects(input);
+      console.log("input: ", parsedObjects);
+    };
+  };
+
   useEffect(() => {
     handleReadAttendances();
     handleReadEnrollments();
   }, []);
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full justify-center">
       <AgGridReact
         ref={gridRef}
         rowData={rowData}
@@ -429,14 +469,29 @@ export default function ClassesIdPage() {
         }
       />
 
-      {user?.userRole === "admin" && (
-        <button
-          className="text-blue-500 font-bold"
-          onClick={() => gridRef.current?.api.exportDataAsCsv()}
-        >
-          Baixar CSV
-        </button>
-      )}
+      {user?.userRole === "admin" &&
+        (rowData.length > 0 ? (
+          <button className="text-blue-500 font-bold" onClick={exportToCsv}>
+            Baixar CSV
+          </button>
+        ) : (
+          <form className="flex justify-center">
+            <input
+              className="hidden"
+              type={"file"}
+              id="csvFileInput"
+              accept={".csv"}
+              title={"Importar CSV"}
+              onChange={handleOnSubmit}
+            />
+            <label
+              htmlFor="csvFileInput"
+              className="text-green-500 font-bold cursor-pointer"
+            >
+              Importar CSV
+            </label>
+          </form>
+        ))}
     </div>
   );
 }
