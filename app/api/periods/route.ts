@@ -1,13 +1,10 @@
-import supabase from "@/utils/db";
-import { Database } from "@/database.types";
+import supabase, { TPeriod } from "@/utils/db";
 import { NextResponse } from "next/server";
 
-export type TPeriod = Database["public"]["Tables"]["period"]["Insert"];
-
-const table = "period";
+const TABLE = "period";
 
 export async function GET() {
-  const { data, error } = await supabase.from(table).select();
+  const { data, error } = await supabase.from(TABLE).select();
 
   if (error) {
     return NextResponse.json(error, { status: 500 });
@@ -18,7 +15,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const body = await request.json();
 
-  const { data, error } = await supabase.from(table).insert(body);
+  const { data, error } = await supabase.from(TABLE).insert(body);
 
   if (error) {
     return NextResponse.json(error, { status: 500 });
@@ -28,7 +25,7 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   const body = await request.json();
-  const { data, error } = await supabase.from(table).delete().eq("id", body.id);
+  const { data, error } = await supabase.from(TABLE).delete().eq("id", body.id);
 
   if (error) {
     if (error.code === "23503")
@@ -43,7 +40,7 @@ export async function PATCH(request: Request) {
   const body = await request.json();
 
   const { data, error } = await supabase
-    .from(table)
+    .from(TABLE)
     .update(body)
     .eq("id", body.id);
 

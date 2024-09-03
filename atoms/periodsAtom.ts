@@ -1,4 +1,4 @@
-import { TPeriod } from "@/app/api/periods/route";
+import { TPeriod } from "@/utils/db";
 import { atom } from "recoil";
 
 export const periodsAtom = atom<TPeriod[] | []>({

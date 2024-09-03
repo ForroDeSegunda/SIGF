@@ -1,6 +1,5 @@
-import supabase from "@/utils/db";
+import supabase, { TEnrollmentRow } from "@/utils/db";
 import { NextResponse } from "next/server";
-import { TEnrollmentRow } from "../../types";
 
 export async function GET(_: any, { params }: { params: { id: string } }) {
   const { data, error } = await supabase

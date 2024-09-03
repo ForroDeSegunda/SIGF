@@ -1,12 +1,11 @@
-import supabase from "@/utils/db";
+import supabase, { TUser } from "@/utils/db";
 import { NextResponse } from "next/server";
-import { TUser } from "../route";
 
-const table = "user";
+const TABLE = "user";
 
-export async function GET(_, { params }) {
+export async function GET(_: any, { params }) {
   const { data, error } = await supabase
-    .from(table)
+    .from(TABLE)
     .select()
     .eq("id", params.id);
 

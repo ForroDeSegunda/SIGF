@@ -1,17 +1,7 @@
-import supabase from "@/utils/db";
-import { Database } from "@/database.types";
+import supabase, { TUser, TUserViewPlusRole } from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
-export type TUser = Database["public"]["Tables"]["user"]["Insert"];
-export type TUserViewPlusRole = {
-  email: string;
-  id: string;
-  full_name: string;
-} & {
-  user: TUser;
-};
-
-const table = "user";
+const TABLE = "user";
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
@@ -35,7 +25,7 @@ export async function GET(req: NextRequest) {
 export async function POST(request: Request) {
   const body: TUser = await request.json();
 
-  const { data, error } = await supabase.from(table).insert(body).select();
+  const { data, error } = await supabase.from(TABLE).insert(body).select();
 
   if (error) {
     return NextResponse.json(error, { status: 500 });
@@ -47,7 +37,7 @@ export async function PATCH(request: Request) {
   const body: TUser = await request.json();
 
   const { data, error } = await supabase
-    .from(table)
+    .from(TABLE)
     .update(body)
     .eq("id", body.id)
     .select();

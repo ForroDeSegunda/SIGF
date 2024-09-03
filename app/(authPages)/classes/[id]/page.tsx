@@ -11,7 +11,6 @@ import {
   readEnrollmentsByClassId,
   updateEnrollment,
 } from "@/app/api/enrollments/service";
-import { TEnrollmentInsert, TEnrollmentRow } from "@/app/api/enrollments/types";
 import { readUsers } from "@/app/api/users/service";
 import { attendancesAtom } from "@/atoms/attendanceAtom";
 import { currentClassAtom } from "@/atoms/currentClassAtom";
@@ -21,7 +20,11 @@ import {
 } from "@/atoms/enrollmentsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
-import { TEnrollmentDataRow } from "@/utils/db";
+import {
+  TEnrollmentDataRow,
+  TEnrollmentInsert,
+  TEnrollmentRow,
+} from "@/utils/db";
 import { csvToJson, replaceSpecialChars } from "@/utils/functions";
 import { danceRoleOptions, enrollmentStatusOptions } from "@/utils/humanize";
 import { useWindowWidth } from "@react-hook/window-size";

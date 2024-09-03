@@ -5,12 +5,11 @@ import {
   deleteEnrollment,
   updateEnrollment,
 } from "@/app/api/enrollments/service";
-import { TEnrollmentRow } from "@/app/api/enrollments/types";
 import { enrollmentsAtom } from "@/atoms/enrollmentsAtom";
 import { modalIdAtom, modalIsOpenAtom } from "@/atoms/modalAtom";
 import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import useUser from "@/hooks/useUser";
-import { TDanceRole, TDanceRolePreference } from "@/utils/db";
+import { TDanceRole, TDanceRolePreference, TEnrollmentRow } from "@/utils/db";
 import { optionalRoleOptions, rolesOptions } from "@/utils/humanize";
 import { useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";

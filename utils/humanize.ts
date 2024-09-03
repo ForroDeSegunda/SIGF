@@ -61,3 +61,9 @@ export const presenceOptions = {
   justified: "Justificada",
   notRegistered: "Não Registrada",
 };
+
+export const studentRoleOptions = {
+  student: "Aluno",
+  teacher: "Professor",
+  admin: "Admin",
+};

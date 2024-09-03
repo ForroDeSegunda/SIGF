@@ -1,6 +1,10 @@
 import useUser from "@/hooks/useUser";
+import {
+  TEnrollmentInsert,
+  TEnrollmentRow,
+  TEnrollmentUpdate,
+} from "@/utils/db";
 import axios from "axios";
-import { TEnrollmentInsert, TEnrollmentRow, TEnrollmentUpdate } from "./types";
 
 export async function readEnrollments() {
   try {

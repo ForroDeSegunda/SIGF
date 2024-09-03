@@ -1,18 +1,12 @@
 "use client";
 
 import { createUser, readUsers, updateUser } from "@/app/api/users/service";
-import { TUser, TUserViewPlusRole } from "@/app/api/users/route";
+import { TUserViewPlusRole, TUser } from "@/utils/db";
+import { studentRoleOptions } from "@/utils/humanize";
 import { useWindowWidth } from "@react-hook/window-size";
-import { ColDef } from "ag-grid-community";
+import { ColDef, GridApi } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { GridApi } from "ag-grid-community";
 import { useEffect, useState } from "react";
-
-const studentRoleOptions = {
-  student: "Aluno",
-  teacher: "Professor",
-  admin: "Admin",
-};
 
 export default function UsersPage() {
   const [users, setUsers] = useState<TUserViewPlusRole[]>([]);

@@ -1,9 +1,6 @@
-import supabase from "@/utils/db";
+import supabase, { TUser, TUserViewPlusRole, TUserWithRole } from "@/utils/db";
 import { User } from "@supabase/supabase-js";
 import axios from "axios";
-import { TUser, TUserViewPlusRole } from "./route";
-
-export type TUserWithRole = User & { userRole: string };
 
 export async function readUserWithRole() {
   const { data, error } = await supabase.auth.getUser();

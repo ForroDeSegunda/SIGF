@@ -1,5 +1,5 @@
 import { Database } from "@/database.types";
-import { TPeriod } from "./route";
+import { TPeriod } from "@/utils/db";
 import axios from "axios";
 
 export async function deletePeriod(id: string) {

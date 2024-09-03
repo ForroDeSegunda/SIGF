@@ -1,4 +1,4 @@
-import { TEnrollmentRow } from "@/app/api/enrollments/types";
+import { TEnrollmentRow } from "@/utils/db";
 import { atom } from "recoil";
 
 export interface IEnrollmentCounts {

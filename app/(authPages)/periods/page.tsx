@@ -1,9 +1,9 @@
 "use client";
 
-import { TPeriod } from "@/app/api/periods/route";
 import { deletePeriod } from "@/app/api/periods/service";
 import { useModal } from "@/app/components/MainModal";
 import { periodsAtom } from "@/atoms/periodsAtom";
+import { TPeriod } from "@/utils/db";
 import { periodsOptions } from "@/utils/humanize";
 import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef, GridApi } from "ag-grid-community";

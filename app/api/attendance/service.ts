@@ -1,7 +1,7 @@
 import axios, { AxiosError, isAxiosError } from "axios";
-import { TApprovedEnrollment } from "../enrollments/types";
 import { TAttendanceInsert } from "./route";
 import { TClassDatesRow } from "../classDates/route";
+import { TApprovedEnrollment } from "@/utils/db";
 
 export type TAttendanceWithClassDates = TAttendanceInsert & {
   classDates: TClassDatesRow;
