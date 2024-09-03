@@ -1,5 +1,5 @@
-import { TUserWithRole } from "@/app/api/users/controller";
 import { atom } from "recoil";
+import { TUserWithRole } from "../app/api/users/service";
 
 export const usersAtom = atom<TUserWithRole | null>({
   key: "usersAtom",

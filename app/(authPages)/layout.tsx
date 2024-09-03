@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
-import { readUserWithRole } from "../api/users/controller";
+import { readUserWithRole } from "../api/users/service";
 import { periodsAtom } from "@/atoms/periodsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { readPeriods } from "../api/periods/service";

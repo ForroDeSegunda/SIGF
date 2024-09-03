@@ -1,5 +1,6 @@
-import { User } from "@supabase/supabase-js";
 import supabase from "@/utils/db";
+import { User } from "@supabase/supabase-js";
+import axios from "axios";
 import { TUser, TUserViewPlusRole } from "./route";
 
 export type TUserWithRole = User & { userRole: string };
@@ -26,11 +27,11 @@ export async function readUserWithRole() {
   }
 }
 
-export async function readUsers() {
+export async function readUsers(emails?: string[]) {
+  const params = { emails };
   try {
-    const res = await fetch(`/api/users`);
-    const users: TUserViewPlusRole[] = await res.json();
-    return users;
+    const res = await axios.get(`/api/users`, { params });
+    return res.data as TUserViewPlusRole[];
   } catch (error) {
     console.error("Error reading users:", error);
     throw error;

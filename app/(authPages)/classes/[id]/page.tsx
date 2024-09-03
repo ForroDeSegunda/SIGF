@@ -7,10 +7,12 @@ import {
 import { readClassDates } from "@/app/api/classDates/service";
 import { readClass } from "@/app/api/classes/service";
 import {
+  createEnrollments,
   readEnrollmentsByClassId,
   updateEnrollment,
 } from "@/app/api/enrollments/service";
-import { TEnrollmentRow } from "@/app/api/enrollments/types";
+import { TEnrollmentInsert, TEnrollmentRow } from "@/app/api/enrollments/types";
+import { readUsers } from "@/app/api/users/service";
 import { attendancesAtom } from "@/atoms/attendanceAtom";
 import { currentClassAtom } from "@/atoms/currentClassAtom";
 import {
@@ -19,29 +21,20 @@ import {
 } from "@/atoms/enrollmentsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
-import { replaceSpecialChars } from "@/utils/functions";
+import { csvToJson, replaceSpecialChars } from "@/utils/functions";
 import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 
-interface IRow {
-  classId: "";
-  userId: "";
-  status: Database["public"]["Enums"]["enrollmentStatus"];
-  attendance: "";
-  danceRole: Database["public"]["Enums"]["danceRole"];
-  danceRolePreference: Database["public"]["Enums"]["danceRolePreference"];
-  createdAt: Date;
-  users_view: {
-    full_name: "";
-    email: "";
-  };
+type TEnrollmentDataRow = Database["public"]["Tables"]["enrollment"]["Row"] & {
   actionButton?: React.ReactNode;
-}
+  attendance: string;
+  users_view: Database["public"]["Views"]["users_view"]["Row"];
+};
 
 const danceRoleOptions = {
   led: "Conduzido(a)",
@@ -59,7 +52,7 @@ export default function ClassesIdPage() {
   const gridRef = useRef<AgGridReact>(null);
   const user = useRecoilValue(usersAtom);
   const classId = useParams().id as string;
-  const [rowData, setRowData] = useState<IRow[]>([]);
+  const [enrollments, setEnrollments] = useState<TEnrollmentDataRow[]>([]);
   const windowWidth = useWindowWidth();
   const currentClass = useRecoilValue(currentClassAtom);
 
@@ -67,7 +60,7 @@ export default function ClassesIdPage() {
   const [enrollmentsCount, setEnrollmentsCount] =
     useRecoilState(enrollmentCountAtom);
 
-  const columnDefs: ColDef<IRow>[] = [
+  const columnDefs: ColDef<TEnrollmentDataRow>[] = [
     {
       field: "users_view.full_name",
       headerName: "Nome",
@@ -112,7 +105,7 @@ export default function ClassesIdPage() {
     },
   ];
 
-  const columnDefsAdmin: ColDef<IRow>[] = [
+  const columnDefsAdmin: ColDef<TEnrollmentDataRow>[] = [
     ...columnDefs,
     {
       field: "actionButton",
@@ -122,7 +115,7 @@ export default function ClassesIdPage() {
     },
   ];
 
-  const columnDefsMobile: ColDef<IRow>[] = [
+  const columnDefsMobile: ColDef<TEnrollmentDataRow>[] = [
     {
       headerName: "Nome | Data da inscrição",
       field: "createdAt",
@@ -161,7 +154,7 @@ export default function ClassesIdPage() {
     },
   ];
 
-  const columnDefsAdminMobile: ColDef<IRow>[] = [
+  const columnDefsAdminMobile: ColDef<TEnrollmentDataRow>[] = [
     {
       headerName: "Nome | Data da inscrição",
       field: "createdAt",
@@ -219,7 +212,7 @@ export default function ClassesIdPage() {
     }
   }
 
-  function actionsRenderer(params: { data: IRow; api: any }) {
+  function actionsRenderer(params: { data: TEnrollmentDataRow; api: any }) {
     const { userId, status } = params.data;
     let canUpdate = false;
     status === "approved" ? (canUpdate = true) : (canUpdate = false);
@@ -259,9 +252,12 @@ export default function ClassesIdPage() {
     );
   }
 
-  function updateRowData(rowData: IRow[], enrollment: TEnrollmentRow): IRow[] {
+  function updateRowData(
+    rowData: TEnrollmentDataRow[],
+    enrollment: TEnrollmentRow,
+  ): TEnrollmentDataRow[] {
     return rowData.map(
-      (row: IRow): IRow =>
+      (row: TEnrollmentDataRow): TEnrollmentDataRow =>
         row.classId === enrollment.classId && row.userId === enrollment.userId
           ? {
               ...row,
@@ -358,9 +354,9 @@ export default function ClassesIdPage() {
         status,
       });
 
-      const updatedRowData = updateRowData(rowData, updatedEnrollment);
+      const updatedRowData = updateRowData(enrollments, updatedEnrollment);
 
-      setRowData(updatedRowData);
+      setEnrollments(updatedRowData);
 
       if (alterCount) updateEnrollmentCount(updatedEnrollment);
     } catch (error) {
@@ -370,7 +366,7 @@ export default function ClassesIdPage() {
 
   async function handleReadEnrollments() {
     const enrollments = await readEnrollmentsByClassId(classId);
-    setRowData(enrollments);
+    setEnrollments(enrollments);
 
     const enrollmentsLedCount = enrollments.filter(
       (enrollment: {
@@ -412,37 +408,43 @@ export default function ClassesIdPage() {
     gridRef.current?.api.exportDataAsCsv(params);
   }
 
-  const handleOnSubmit = (event) => {
+  async function handleImportCsv(event: ChangeEvent<HTMLInputElement>) {
     event.preventDefault();
+    if (!event.target.files) return console.error("No file selected");
+
     const fileReader = new FileReader();
     fileReader.readAsText(event.target.files[0]);
 
-    function parseCSVToObjects(csv) {
-      const lines = csv.split("\n");
-
-      const headers = lines[0]
-        .split(",")
-        .map((header) => header.replace(/"/g, "").trim());
-
-      const dataObjects = lines.slice(1).map((line) => {
-        const data = line
-          .split(",")
-          .map((field) => field.replace(/"/g, "").trim());
-        return headers.reduce((obj, header, index) => {
-          obj[header] = data[index];
-          return obj;
-        }, {});
-      });
-
-      return dataObjects;
-    }
-
-    fileReader.onloadend = (event) => {
+    fileReader.onloadend = async function onLoad(event) {
       const input = event.target?.result;
-      const parsedObjects = parseCSVToObjects(input);
-      console.log("input: ", parsedObjects);
+      const json = csvToJson(input as string);
+
+      const emails = json.map((obj) => obj.Email);
+      if (emails[0] === undefined) return console.error("No emails found");
+
+      const users = await readUsers(emails);
+
+      const dict = {
+        "Conduzido(a)": "led",
+        "Condutor(a)": "leader",
+        Indiferente: "indifferent",
+        Aprovado: "approved",
+        Pendente: "pending",
+        Abandono: "abandonment",
+      };
+
+      const enrollments: TEnrollmentInsert[] = json.map((obj) => ({
+        danceRole: dict[obj["Papel"]],
+        danceRolePreference: dict[obj["Preferência"]],
+        status: dict[obj["Inscrição"]],
+        classId,
+        userId: users.find((user) => user.email === obj.Email)!.id,
+      }));
+
+      const newEnrollments = await createEnrollments(enrollments);
+      setEnrollments([...newEnrollments]);
     };
-  };
+  }
 
   useEffect(() => {
     handleReadAttendances();
@@ -453,7 +455,7 @@ export default function ClassesIdPage() {
     <div className="flex flex-col w-full justify-center">
       <AgGridReact
         ref={gridRef}
-        rowData={rowData}
+        rowData={enrollments}
         overlayNoRowsTemplate="ㅤ"
         className={
           user?.userRole === "admin" ? "w-full px-4 pt-4" : "w-full p-4"
@@ -470,7 +472,7 @@ export default function ClassesIdPage() {
       />
 
       {user?.userRole === "admin" &&
-        (rowData.length > 0 ? (
+        (enrollments.length > 0 ? (
           <button className="text-blue-500 font-bold" onClick={exportToCsv}>
             Baixar CSV
           </button>
@@ -482,7 +484,7 @@ export default function ClassesIdPage() {
               id="csvFileInput"
               accept={".csv"}
               title={"Importar CSV"}
-              onChange={handleOnSubmit}
+              onChange={handleImportCsv}
             />
             <label
               htmlFor="csvFileInput"

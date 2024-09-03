@@ -21,6 +21,58 @@ export function getWeekDays(
   return classDates;
 }
 
+export function csvToJson(str: string) {
+  const lines = str.split("\n").filter((line) => line.trim() !== "");
+
+  // Extract headers and remove quotes
+  const headers = lines[0]
+    .split(",")
+    .map((header) => header.replace(/"/g, "").trim());
+
+  // Function to split lines correctly
+  const splitCSVLine = (line: string) => {
+    const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/;
+    return line
+      .split(regex)
+      .map((field) => field.replace(/(^"|"$)/g, "").trim());
+  };
+
+  // Convert each line to an object
+  const dataObjects = lines.slice(1).map((line) => {
+    const data = splitCSVLine(line);
+    return headers.reduce(
+      (obj, header, index) => {
+        obj[header] = data[index];
+        return obj;
+      },
+      {} as { [key: string]: string },
+    );
+  });
+
+  return dataObjects;
+}
+
+export function replaceKeysInObjects(
+  array: Object[],
+  keyMap: { [key: string]: string },
+) {
+  return array.map((obj) => {
+    const newObj = {};
+    for (const [oldKey, newKey] of Object.entries(keyMap)) {
+      if (obj.hasOwnProperty(oldKey)) {
+        newObj[newKey] = obj[oldKey];
+      }
+    }
+    // Add any keys that were not in the keyMap
+    for (const key of Object.keys(obj)) {
+      if (!keyMap[key]) {
+        newObj[key] = obj[key];
+      }
+    }
+    return newObj;
+  });
+}
+
 export function replaceSpecialChars(str: string): string {
   const specialCharsMap: { [key: string]: string } = {
     a: "áàãâä",

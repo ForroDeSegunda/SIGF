@@ -1,5 +1,5 @@
-import { Database } from "@/database.types";
 import { atom } from "recoil";
+import { Database } from "../database.types";
 
 type TClassDates = Database["public"]["Tables"]["classDates"]["Insert"];
 
