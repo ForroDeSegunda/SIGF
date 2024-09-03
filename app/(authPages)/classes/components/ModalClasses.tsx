@@ -7,6 +7,11 @@ import { modalIdAtom, modalIsOpenAtom } from "@/atoms/modalAtom";
 import { periodsAtom } from "@/atoms/periodsAtom";
 import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import {
+  periodsOptions,
+  weekDaysOptions,
+  weekDaysOrder,
+} from "@/utils/humanize";
+import {
   useRecoilState,
   useRecoilValue,
   useResetRecoilState,
@@ -15,23 +20,16 @@ import {
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
 
-export const weekDaysOptions = {
-  sun: "Dom",
-  mon: "Seg",
-  tue: "Ter",
-  wed: "Qua",
-  thu: "Qui",
-  fri: "Sex",
-  sat: "Sáb",
-};
-export const weekDaysOrder = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-
-export const periodsOptions = {
-  first: "Primeiro",
-  second: "Segundo",
-  firstVacation: "Primeiro/Férias",
-  secondVacation: "Segundo/Férias",
-};
+const Form = tw.form`flex-1 flex flex-col w-full justify-center gap-2 text-foreground z-1000`;
+const Label = tw.label`text-md`;
+const Input = tw.input`border rounded-md px-4 py-2 pl-2`;
+const Select = tw.select`rounded-md px-4 py-2 bg-inherit border mb-2`;
+const FlexContainer = tw.div`flex gap-2 justify-left`;
+const FlexItem = tw.div`flex items-center`;
+const CheckboxLabel = tw.label`ml-2`;
+const ButtonContainer = tw.div`flex justify-end gap-4 mt-4`;
+const CloseButton = tw.button`border border-gray-700 rounded px-4 py-2 text-black`;
+const SubmitButton = tw.button`bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded`;
 
 export default function ModalClasses() {
   const [currentClass, setCurrentClass] = useRecoilState(currentClassAtom);
@@ -208,14 +206,3 @@ export default function ModalClasses() {
     </Form>
   );
 }
-
-const Form = tw.form`flex-1 flex flex-col w-full justify-center gap-2 text-foreground z-1000`;
-const Label = tw.label`text-md`;
-const Input = tw.input`border rounded-md px-4 py-2 pl-2`;
-const Select = tw.select`rounded-md px-4 py-2 bg-inherit border mb-2`;
-const FlexContainer = tw.div`flex gap-2 justify-left`;
-const FlexItem = tw.div`flex items-center`;
-const CheckboxLabel = tw.label`ml-2`;
-const ButtonContainer = tw.div`flex justify-end gap-4 mt-4`;
-const CloseButton = tw.button`border border-gray-700 rounded px-4 py-2 text-black`;
-const SubmitButton = tw.button`bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded`;

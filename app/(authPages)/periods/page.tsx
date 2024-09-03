@@ -4,12 +4,12 @@ import { TPeriod } from "@/app/api/periods/route";
 import { deletePeriod } from "@/app/api/periods/service";
 import { useModal } from "@/app/components/MainModal";
 import { periodsAtom } from "@/atoms/periodsAtom";
+import { periodsOptions } from "@/utils/humanize";
 import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef, GridApi } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useRecoilState } from "recoil";
 import { toast } from "sonner";
-import { periodsOptions } from "../classes/components/ModalClasses";
 
 export default function PeriodsPage() {
   const [periods, setPeriods] = useRecoilState<TPeriod[]>(periodsAtom);

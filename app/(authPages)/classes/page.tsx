@@ -9,6 +9,11 @@ import { enrollmentsAtom } from "@/atoms/enrollmentsAtom";
 import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
+import {
+  classStatusOptions,
+  weekDaysOptions,
+  weekDaysOrder,
+} from "@/utils/humanize";
 import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
@@ -18,14 +23,6 @@ import { FaBox, FaEye, FaEyeSlash, FaRotate } from "react-icons/fa6";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import ButtonEnrollment from "./components/ButtonEnrollment";
 import ButtonOptions from "./components/ButtonOptions";
-import { weekDaysOptions, weekDaysOrder } from "./components/ModalClasses";
-
-const classStatusOptions = {
-  open: "Aberta",
-  hidden: "Oculta",
-  ongoing: "Em Andamento",
-  archived: "Arquivada",
-};
 
 export default function ClassesPage() {
   const user = useRecoilValue(usersAtom);

@@ -2,27 +2,27 @@
 
 import { TAttendanceWithClassDates } from "@/app/api/attendance/service";
 import { attendancesAtom } from "@/atoms/attendanceAtom";
+import { presenceOptions, weekDays } from "@/utils/humanize";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useRecoilValue } from "recoil";
 import tw from "tailwind-styled-components";
 
-const weekDays = [
-  "Domingo",
-  "Segunda",
-  "Terça",
-  "Quarta",
-  "Quinta",
-  "Sexta",
-  "Sabado",
-];
-
-const presenceOptions = {
-  present: "Presente",
-  absent: "Ausente",
-  justified: "Justificada",
-  notRegistered: "Não Registrada",
-};
+const PresenceColor = tw.p<{ value: keyof typeof presenceOptions }>`
+  font-bold
+  ${(p) => {
+    switch (p.value) {
+      case "present":
+        return "text-green-500";
+      case "absent":
+        return "text-orange-500";
+      case "justified":
+        return "text-blue-500";
+      case "notRegistered":
+        return "text-gray-500 font-normal";
+    }
+  }}
+`;
 
 export default function AttendancePage() {
   const attendances = useRecoilValue(attendancesAtom);
@@ -62,19 +62,3 @@ export default function AttendancePage() {
     />
   );
 }
-
-const PresenceColor = tw.p<{ value: keyof typeof presenceOptions }>`
-  font-bold
-  ${(p) => {
-    switch (p.value) {
-      case "present":
-        return "text-green-500";
-      case "absent":
-        return "text-orange-500";
-      case "justified":
-        return "text-blue-500";
-      case "notRegistered":
-        return "text-gray-500 font-normal";
-    }
-  }}
-`;

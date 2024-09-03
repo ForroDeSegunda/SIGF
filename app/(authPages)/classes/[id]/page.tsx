@@ -21,7 +21,9 @@ import {
 } from "@/atoms/enrollmentsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
+import { TEnrollmentDataRow } from "@/utils/db";
 import { csvToJson, replaceSpecialChars } from "@/utils/functions";
+import { danceRoleOptions, enrollmentStatusOptions } from "@/utils/humanize";
 import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
@@ -29,24 +31,6 @@ import { useParams } from "next/navigation";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
-
-type TEnrollmentDataRow = Database["public"]["Tables"]["enrollment"]["Row"] & {
-  actionButton?: React.ReactNode;
-  attendance: string;
-  users_view: Database["public"]["Views"]["users_view"]["Row"];
-};
-
-const danceRoleOptions = {
-  led: "Conduzido(a)",
-  leader: "Condutor(a)",
-  indifferent: "Indiferente",
-};
-
-const enrollmentStatusOptions = {
-  approved: "Aprovado",
-  pending: "Pendente",
-  abandonment: "Abandono",
-};
 
 export default function ClassesIdPage() {
   const gridRef = useRef<AgGridReact>(null);

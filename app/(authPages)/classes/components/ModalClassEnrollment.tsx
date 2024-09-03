@@ -1,24 +1,31 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { Database } from "@/database.types";
 import {
-  deleteEnrollment,
   createEnrollments,
+  deleteEnrollment,
   updateEnrollment,
 } from "@/app/api/enrollments/service";
-import useUser from "@/hooks/useUser";
+import { TEnrollmentRow } from "@/app/api/enrollments/types";
 import { enrollmentsAtom } from "@/atoms/enrollmentsAtom";
-import { modalIsOpenAtom, modalIdAtom } from "@/atoms/modalAtom";
+import { modalIdAtom, modalIsOpenAtom } from "@/atoms/modalAtom";
+import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
+import useUser from "@/hooks/useUser";
+import { TDanceRole, TDanceRolePreference } from "@/utils/db";
+import { optionalRoleOptions, rolesOptions } from "@/utils/humanize";
+import { useState } from "react";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
-import { TEnrollmentRow } from "@/app/api/enrollments/types";
-import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 
-export type TDanceRole = Database["public"]["Enums"]["danceRole"];
-export type TDanceRolePreference =
-  Database["public"]["Enums"]["danceRolePreference"];
+const Form = tw.form`flex-1 flex flex-col w-full justify-center gap-2 text-foreground`;
+const Label = tw.label`text-md`;
+const Select = tw.select`rounded-md px-4 py-2 bg-inherit border mb-6`;
+const ButtonContainer = tw.div`flex flex-col gap-4`;
+const ButtonRow = tw.div`flex gap-4`;
+const UnenrollButton = tw.button`bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded`;
+const UpdateEnrollmentButton = tw.button`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded`;
+const EnrollButton = tw.button`bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded`;
+const CloseButton = tw.button`border border-gray-700 rounded px-4 py-2 text-black`;
 
 export default function ModalClassEnrollment() {
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
@@ -39,15 +46,6 @@ export default function ModalClassEnrollment() {
     (enrollment) =>
       enrollment.classId === classId && enrollment.status === "pending",
   );
-
-  const optionalRoleOptions = {
-    led: "Conduzido(a)",
-    leader: "Condutor(a)",
-  };
-  const rolesOptions = {
-    ...optionalRoleOptions,
-    indifferent: "Indiferente",
-  };
 
   async function handleUnenroll() {
     toast.info("Cancelando inscrição...");
@@ -196,13 +194,3 @@ export default function ModalClassEnrollment() {
     </Form>
   );
 }
-
-const Form = tw.form`flex-1 flex flex-col w-full justify-center gap-2 text-foreground`;
-const Label = tw.label`text-md`;
-const Select = tw.select`rounded-md px-4 py-2 bg-inherit border mb-6`;
-const ButtonContainer = tw.div`flex flex-col gap-4`;
-const ButtonRow = tw.div`flex gap-4`;
-const UnenrollButton = tw.button`bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded`;
-const UpdateEnrollmentButton = tw.button`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded`;
-const EnrollButton = tw.button`bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded`;
-const CloseButton = tw.button`border border-gray-700 rounded px-4 py-2 text-black`;

@@ -1,12 +1,11 @@
 "use client";
 
-import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
+import { presenceOptions } from "@/utils/humanize";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useRecoilValue } from "recoil";
 
 export interface IClassDatesRow {
   id: string;
@@ -26,13 +25,6 @@ export interface IClassDatesRow {
     createdAt: string;
   };
 }
-
-const presenceOptions = {
-  present: "Presente",
-  absent: "Ausente",
-  justified: "Justificada",
-  notRegistered: "Não Registrada",
-};
 
 export default function AttendancePage() {
   const params = useParams();
