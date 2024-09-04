@@ -2,6 +2,7 @@
 
 import { attendancesAtom } from "@/atoms/attendanceAtom";
 import { currentClassAtom } from "@/atoms/currentClassAtom";
+import { currentPeriodAtom } from "@/atoms/currentPeriod";
 import { enrollmentCountAtom } from "@/atoms/enrollmentsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { useWindowWidth } from "@react-hook/window-size";
@@ -25,6 +26,7 @@ export function NavbarButtons() {
   const [isActionsButtonsVisible, setIsActionsButtonsVisible] = useState(false);
   const windowWidth = useWindowWidth();
   const resetCurrentClass = useResetRecoilState(currentClassAtom);
+  const resetCurrentPeriod = useResetRecoilState(currentPeriodAtom);
 
   const classesIdRegex = new RegExp(
     /\/classes\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
@@ -76,7 +78,10 @@ export function NavbarButtons() {
     return (
       <>
         <button
-          onClick={() => openModal("periods")}
+          onClick={() => {
+            resetCurrentPeriod();
+            openModal("periods");
+          }}
           className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
         >
           Criar Período

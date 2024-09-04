@@ -1,8 +1,5 @@
-import { Database } from "@/database.types";
+import { TClassInsert } from "@/types/classTypes";
 import { atom } from "recoil";
-
-export type TClassRow = Database["public"]["Tables"]["classes"]["Row"];
-export type TClassInsert = Database["public"]["Tables"]["classes"]["Insert"];
 
 export const currentClassAtom = atom<TClassInsert>({
   key: "currentClassAtom",

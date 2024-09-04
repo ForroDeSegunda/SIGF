@@ -1,4 +1,4 @@
-import supabase, { TPeriod } from "@/utils/db";
+import supabase, { TPeriodInsert } from "@/utils/db";
 import { NextResponse } from "next/server";
 
 const TABLE = "period";
@@ -9,13 +9,12 @@ export async function GET() {
   if (error) {
     return NextResponse.json(error, { status: 500 });
   }
-  return NextResponse.json(data as TPeriod[]);
+  return NextResponse.json(data as TPeriodInsert[]);
 }
 
 export async function POST(request: Request) {
   const body = await request.json();
-
-  const { data, error } = await supabase.from(TABLE).insert(body);
+  const { data, error } = await supabase.from(TABLE).insert(body).select();
 
   if (error) {
     return NextResponse.json(error, { status: 500 });
@@ -42,7 +41,8 @@ export async function PATCH(request: Request) {
   const { data, error } = await supabase
     .from(TABLE)
     .update(body)
-    .eq("id", body.id);
+    .eq("id", body.id)
+    .select();
 
   if (error) {
     return NextResponse.json(error, { status: 500 });

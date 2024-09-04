@@ -1,4 +1,4 @@
-import supabase, { TPeriod } from "@/utils/db";
+import supabase, { TPeriodInsert } from "@/utils/db";
 import { NextResponse } from "next/server";
 
 const TABLE = "period";
@@ -12,5 +12,5 @@ export async function GET(_: any, { params }) {
   if (error) {
     return NextResponse.json(error, { status: 500 });
   }
-  return NextResponse.json(data[0] as TPeriod);
+  return NextResponse.json(data[0] as TPeriodInsert);
 }

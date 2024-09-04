@@ -28,7 +28,9 @@ export type TUserViewPlusRole = {
 };
 export type TUserWithRole = User & { userRole: string };
 
-export type TPeriod = Database["public"]["Tables"]["period"]["Insert"];
+export type TPeriodRow = Database["public"]["Tables"]["period"]["Row"];
+export type TPeriodUpdate = Database["public"]["Tables"]["period"]["Update"];
+export type TPeriodInsert = Database["public"]["Tables"]["period"]["Insert"];
 
 export type TEnrollmentRow = Database["public"]["Tables"]["enrollment"]["Row"];
 export type TEnrollmentInsert =

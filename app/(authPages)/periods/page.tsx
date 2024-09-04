@@ -2,21 +2,23 @@
 
 import { deletePeriod } from "@/app/api/periods/service";
 import { useModal } from "@/app/components/MainModal";
+import { currentPeriodAtom } from "@/atoms/currentPeriod";
 import { periodsAtom } from "@/atoms/periodsAtom";
-import { TPeriod } from "@/utils/db";
+import { TPeriodInsert } from "@/utils/db";
 import { periodsOptions } from "@/utils/humanize";
 import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef, GridApi } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 
 export default function PeriodsPage() {
-  const [periods, setPeriods] = useRecoilState<TPeriod[]>(periodsAtom);
+  const [periods, setPeriods] = useRecoilState<TPeriodInsert[]>(periodsAtom);
+  const setCurrentPeriod = useSetRecoilState(currentPeriodAtom);
   const windowWidth = useWindowWidth();
   const openModal = useModal();
 
-  const columnDefs: ColDef<TPeriod>[] = [
+  const columnDefs: ColDef<TPeriodInsert>[] = [
     {
       field: "semester",
       headerName: "Semestre",
@@ -42,11 +44,11 @@ export default function PeriodsPage() {
       headerName: "Ações",
       minWidth: 150,
       flex: 2,
-      cellRenderer: actionCellRenderer,
+      cellRenderer: actionsRenderer,
     },
   ];
 
-  const columnDefsMobile: ColDef<TPeriod>[] = [
+  const columnDefsMobile: ColDef<TPeriodInsert>[] = [
     {
       field: "semester",
       headerName: "Semestre | Ano | Ações",
@@ -55,13 +57,17 @@ export default function PeriodsPage() {
     },
   ];
 
-  function renderRowMobile(props: { data: TPeriod; api: GridApi; node: any }) {
+  function renderRowMobile(props: {
+    data: TPeriodInsert;
+    api: GridApi;
+    node: any;
+  }) {
     const { data } = props;
     return (
       <div className="flex flex-col w-full h-full justify-start">
         <div className="flex w-full justify-between">
           <span>{`${periodsOptions[data?.semester]} - ${data?.year}`}</span>
-          <span>{actionCellRenderer({ data })}</span>
+          <span>{actionsRenderer({ data })}</span>
         </div>
         <div className="w-full flex gap-2">
           <span className="font-bold">Período:</span>
@@ -91,12 +97,15 @@ export default function PeriodsPage() {
     toast.success("Período excluído com sucesso!");
   }
 
-  function actionCellRenderer({ data }: { data: TPeriod }) {
+  function actionsRenderer({ data }: { data: TPeriodInsert }) {
     return (
       <div className="flex gap-2 w-full">
         <button
           className="text-blue-500 hover:text-blue-600 font-bold"
-          onClick={() => openModal("periods", data.id ?? "")}
+          onClick={() => {
+            setCurrentPeriod(data);
+            openModal("periods", data.id ?? "");
+          }}
           data-action="edit"
         >
           Editar

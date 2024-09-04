@@ -1,17 +1,17 @@
 "use client";
 
 import {
-  createPeriod,
-  editPeriod,
-  readPeriod,
+  createPeriods,
+  readPeriods,
+  updatePeriod,
 } from "@/app/api/periods/service";
+import { currentPeriodAtom } from "@/atoms/currentPeriod";
 import { modalIdAtom, modalIsOpenAtom } from "@/atoms/modalAtom";
 import { periodsAtom } from "@/atoms/periodsAtom";
 import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
-import { Database } from "@/database.types";
-import { useEffect, useState } from "react";
+import { TSemesterEnum } from "@/types/enum";
 import DatePicker from "react-datepicker";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
 
@@ -23,60 +23,39 @@ const CloseButton = tw.button`border border-gray-700 rounded px-4 py-2 text-blac
 const FlexRowReverse = tw.div`flex flex-row-reverse gap-4`;
 
 export default function ModalPeriods() {
-  const setPeriods = useSetRecoilState(periodsAtom);
-  const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
+  const [currentPeriod, setCurrentPeriod] = useRecoilState(currentPeriodAtom);
+  const [periods, setPeriods] = useRecoilState(periodsAtom);
   const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
+  const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
   const periodId = useRecoilValue(modalIdAtom);
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const [year, setYear] = useState(new Date());
-  const [semester, setSemester] =
-    useState<Database["public"]["Enums"]["semesterEnum"]>("first");
 
-  async function handleFormSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    toast.info("Salvando período...");
-
-    let periodData: any;
-    if (!periodId) {
-      periodData = await createPeriod(year, semester, startDate, endDate);
-    } else {
-      periodData = await editPeriod(
-        periodId,
-        year,
-        semester,
-        startDate,
-        endDate,
-      );
-    }
-
-    setPeriods(periodData);
+  async function handleCreatePeriod() {
+    toast.info("Criando período...");
+    const createdPeriods = await createPeriods([currentPeriod]);
+    setPeriods([...periods, createdPeriods[0]]);
     setIsModalOpen(false);
-    toast.success("Período salvo com sucesso!");
+    toast.success("Período criado com sucesso!");
   }
 
-  if (periodId) {
-    useEffect(() => {
-      async function readCurrentSelectedPeriod() {
-        const periodData = await readPeriod(periodId);
-        setSemester(periodData.semester);
-        setYear(new Date(periodData.year.toString() + "EDT"));
-        setStartDate(new Date(periodData.startDate + "EDT"));
-        setEndDate(new Date(periodData.endDate + "EDT"));
-      }
-      readCurrentSelectedPeriod();
-    }, []);
+  async function handleUpdatePeriod() {
+    toast.info("Editando período...");
+    await updatePeriod(currentPeriod);
+    const updatedPeriods = await readPeriods();
+    setPeriods(updatedPeriods);
+    setIsModalOpen(false);
+    toast.success("Período atualizado com sucesso!");
   }
 
   return (
-    <Form onSubmit={handleFormSubmit}>
+    <Form onSubmit={(e) => e.preventDefault()}>
       <Label htmlFor="semester">Semestre</Label>
       <Select
-        value={semester}
+        value={currentPeriod.semester || "first"}
         onChange={(e) => {
-          setSemester(
-            e.target.value as Database["public"]["Enums"]["semesterEnum"],
-          );
+          setCurrentPeriod({
+            ...currentPeriod,
+            semester: e.target.value as TSemesterEnum,
+          });
         }}
         required
       >
@@ -88,9 +67,9 @@ export default function ModalPeriods() {
       <Label htmlFor="year">Ano</Label>
       <DatePicker
         className="rounded-md px-4 py-2 bg-inherit border mb-2"
-        selected={year}
+        selected={new Date(currentPeriod.year, 0, 1) || new Date()}
         onChange={(date) => {
-          setYear(date || new Date());
+          setCurrentPeriod({ ...currentPeriod, year: date!.getFullYear() });
         }}
         showYearPicker
         dateFormat="yyyy"
@@ -98,23 +77,33 @@ export default function ModalPeriods() {
       <Label htmlFor="startDate">Data de Início</Label>
       <DatePicker
         className="rounded-md px-4 py-2 bg-inherit border mb-2"
-        selected={startDate}
+        selected={new Date(currentPeriod.startDate + "EDT") || new Date()}
         dateFormat="dd/MM/yyyy"
         onChange={(date) => {
-          setStartDate(date || new Date());
+          setCurrentPeriod({
+            ...currentPeriod,
+            startDate: date?.toISOString().split("T")[0]!,
+          });
         }}
       />
       <Label htmlFor="endDate">Data de Término</Label>
       <DatePicker
         className="rounded-md px-4 py-2 bg-inherit border mb-2"
-        selected={endDate}
+        selected={new Date(currentPeriod.endDate + "EDT") || new Date()}
         dateFormat="dd/MM/yyyy"
         onChange={(date) => {
-          setEndDate(date || new Date());
+          setCurrentPeriod({
+            ...currentPeriod,
+            endDate: date?.toISOString().split("T")[0]!,
+          });
         }}
       />
       <FlexRowReverse>
-        <Button type="submit">{periodId ? "Salvar" : "Criar"}</Button>
+        {periodId ? (
+          <Button onClick={handleUpdatePeriod}>Salvar</Button>
+        ) : (
+          <Button onClick={handleCreatePeriod}>Criar</Button>
+        )}
         <CloseButton
           onClick={() => {
             setShowMobileOptions(false);
