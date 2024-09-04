@@ -1,4 +1,4 @@
-import { TAttendanceWithClassDates } from "@/app/api/attendance/service";
+import { TAttendanceWithClassDates } from "@/utils/db";
 import { atom } from "recoil";
 
 export const attendancesAtom = atom<TAttendanceWithClassDates[] | []>({

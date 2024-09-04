@@ -43,3 +43,9 @@ export type TApprovedEnrollment =
 export type TAttendanceWithClassDates = TAttendanceInsert & {
   classDates: TClassDatesRow;
 };
+export type TAttendanceInsert =
+  Database["public"]["Tables"]["attendance"]["Insert"];
+
+export type TClassDatesRow = Database["public"]["Tables"]["classDates"]["Row"];
+export type TClassDatesInsert =
+  Database["public"]["Tables"]["classDates"]["Insert"];

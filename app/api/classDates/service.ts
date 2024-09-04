@@ -1,5 +1,5 @@
+import { TClassDatesRow, TClassDatesInsert } from "@/utils/db";
 import axios from "axios";
-import { TClassDatesInsert, TClassDatesRow } from "./route";
 
 export async function readClassDates(
   classId: string,

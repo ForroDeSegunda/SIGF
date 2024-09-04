@@ -1,6 +1,5 @@
 "use client";
 
-import { TAttendanceInsert } from "@/app/api/attendance/route";
 import {
   createAttendances,
   readApprovedEnrollments,
@@ -10,6 +9,7 @@ import { readClass } from "@/app/api/classes/service";
 import { classDatesAtom } from "@/atoms/classDatesAtom";
 import { modalIsOpenAtom } from "@/atoms/modalAtom";
 import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
+import { TAttendanceInsert } from "@/utils/db";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
 import DatePicker from "react-datepicker";

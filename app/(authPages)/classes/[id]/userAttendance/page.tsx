@@ -1,7 +1,7 @@
 "use client";
 
-import { TAttendanceWithClassDates } from "@/app/api/attendance/service";
 import { attendancesAtom } from "@/atoms/attendanceAtom";
+import { TAttendanceWithClassDates } from "@/utils/db";
 import { presenceOptions, weekDays } from "@/utils/humanize";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
