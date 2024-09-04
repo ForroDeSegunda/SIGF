@@ -2,6 +2,7 @@
 
 import { deletePeriod } from "@/app/api/periods/service";
 import { useModal } from "@/app/components/MainModal";
+import { classesAtom } from "@/atoms/classesAtom";
 import { currentPeriodAtom } from "@/atoms/currentPeriod";
 import { periodsAtom } from "@/atoms/periodsAtom";
 import { TPeriodInsert } from "@/utils/db";
@@ -13,7 +14,8 @@ import { useRecoilState, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 
 export default function PeriodsPage() {
-  const [periods, setPeriods] = useRecoilState<TPeriodInsert[]>(periodsAtom);
+  const [periods, setPeriods] = useRecoilState(periodsAtom);
+  const [classes, setClasses] = useRecoilState(classesAtom);
   const setCurrentPeriod = useSetRecoilState(currentPeriodAtom);
   const windowWidth = useWindowWidth();
   const openModal = useModal();
@@ -98,6 +100,13 @@ export default function PeriodsPage() {
   }
 
   function actionsRenderer({ data }: { data: TPeriodInsert }) {
+    const notEditable = classes.some(
+      (c) =>
+        c.periodId === data.id &&
+        (c.status === "ongoing" || c.status === "archived"),
+    );
+    if (notEditable) return null;
+
     return (
       <div className="flex gap-2 w-full">
         <button

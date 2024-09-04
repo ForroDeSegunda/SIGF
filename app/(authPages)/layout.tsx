@@ -1,10 +1,12 @@
 "use client";
 
+import { classesAtom } from "@/atoms/classesAtom";
 import { periodsAtom } from "@/atoms/periodsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { useEffect } from "react";
 import { useSetRecoilState } from "recoil";
 import tw from "tailwind-styled-components";
+import { readClasses } from "../api/classes/service";
 import { readPeriods } from "../api/periods/service";
 import { readUserWithRole } from "../api/users/service";
 import MainModal from "../components/MainModal";
@@ -18,13 +20,12 @@ const Content = tw.div`flex-grow flex`;
 export default function PagesLayout(props: { children: React.ReactNode }) {
   const setPeriods = useSetRecoilState(periodsAtom);
   const setUsers = useSetRecoilState(usersAtom);
+  const setClasses = useSetRecoilState(classesAtom);
 
   async function handleLoadGlobalStates() {
-    const periods = await readPeriods();
-    const user = await readUserWithRole();
-
-    setPeriods(periods);
-    setUsers(user);
+    setClasses(await readClasses());
+    setPeriods(await readPeriods());
+    setUsers(await readUserWithRole());
   }
 
   useEffect(() => {

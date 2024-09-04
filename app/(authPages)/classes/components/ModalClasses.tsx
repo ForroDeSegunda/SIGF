@@ -96,8 +96,6 @@ export default function ModalClasses() {
     setCurrentClass({ ...currentClass, weekDays: updatedWeekdays.join(",") });
   }
 
-  console.log("currentClass: ", currentClass);
-
   return (
     <Form onSubmit={handleFormSubmit}>
       <Label>Nome</Label>
