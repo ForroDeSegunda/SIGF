@@ -38,6 +38,8 @@ export async function POST(request: Request) {
     }
     if (error.status === 400)
       return NextResponse.json({ ...error, message: "Email inválido." });
+    console.log("Error signing up: ", error);
+
     return NextResponse.json({
       ...error,
       status: 500,
