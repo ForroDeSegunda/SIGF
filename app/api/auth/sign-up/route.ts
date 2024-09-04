@@ -40,6 +40,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ...error, message: "Email inválido." });
     return NextResponse.json({
       ...error,
+      status: 500,
       message: "Erro ao cadastrar usuário.",
     });
   }
