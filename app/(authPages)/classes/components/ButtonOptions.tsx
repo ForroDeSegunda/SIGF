@@ -1,7 +1,8 @@
 import { deleteClass } from "@/app/api/classes/service";
 import { useModal } from "@/app/components/MainModal";
 import { classesAtom } from "@/atoms/classesAtom";
-import { TClassRow, currentClassAtom } from "@/atoms/currentClassAtom";
+import { currentClassAtom } from "@/atoms/currentClassAtom";
+import { TClassRow } from "@/types/classTypes";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 

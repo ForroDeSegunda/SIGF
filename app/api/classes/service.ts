@@ -1,7 +1,7 @@
 import { Database } from "@/database.types";
 import { TClassAndPeriod, TClasses } from "./[id]/route";
 import axios from "axios";
-import { TClassRow } from "@/atoms/currentClassAtom";
+import { TClassRow } from "@/types/classTypes";
 
 export type TClassInsert = Database["public"]["Tables"]["classes"]["Insert"];
 export type TClassUpdate = Database["public"]["Tables"]["classes"]["Update"];
