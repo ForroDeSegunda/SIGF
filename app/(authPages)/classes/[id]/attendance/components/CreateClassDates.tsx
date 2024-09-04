@@ -1,4 +1,3 @@
-import { TAttendanceInsert } from "@/app/api/attendance/route";
 import {
   createAttendances,
   readApprovedEnrollments,
@@ -11,6 +10,7 @@ import { readClass, updateClass } from "@/app/api/classes/service";
 import { useModal } from "@/app/components/MainModal";
 import { classDatesAtom } from "@/atoms/classDatesAtom";
 import { currentClassAtom } from "@/atoms/currentClassAtom";
+import { TAttendanceInsert } from "@/utils/db";
 import { getWeekDays } from "@/utils/functions";
 import { useParams } from "next/navigation";
 import { useRecoilState, useSetRecoilState } from "recoil";

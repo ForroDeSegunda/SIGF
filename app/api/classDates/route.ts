@@ -1,11 +1,6 @@
-import supabase from "@/utils/db";
-import { Database } from "@/database.types";
+import supabase, { TClassDatesInsert } from "@/utils/db";
 import { PostgrestError } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
-
-export type TClassDatesRow = Database["public"]["Tables"]["classDates"]["Row"];
-export type TClassDatesInsert =
-  Database["public"]["Tables"]["classDates"]["Insert"];
 
 export async function POST(
   request: NextRequest,

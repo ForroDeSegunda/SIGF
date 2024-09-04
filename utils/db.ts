@@ -39,3 +39,7 @@ export type TApprovedEnrollment =
   Database["public"]["Tables"]["enrollment"]["Insert"] & {
     user_view: Database["public"]["Views"]["users_view"]["Insert"];
   };
+
+export type TAttendanceWithClassDates = TAttendanceInsert & {
+  classDates: TClassDatesRow;
+};

@@ -2,6 +2,7 @@
 
 import {
   createAttendances,
+  deleteAttendances,
   readAttendances,
 } from "@/app/api/attendance/service";
 import { readClassDates } from "@/app/api/classDates/service";
@@ -21,6 +22,7 @@ import {
 import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
 import {
+  TAttendanceInsert,
   TEnrollmentDataRow,
   TEnrollmentInsert,
   TEnrollmentRow,
@@ -209,7 +211,7 @@ export default function ClassesIdPage() {
         {(status === "pending" || status === "abandonment") && (
           <button
             className="text-green-500 hover:text-green-600 font-bold"
-            onClick={() => handleUpdateEnrollment("approved", userId)}
+            onClick={() => handleApprove(userId)}
           >
             Aprovar
           </button>
@@ -218,9 +220,7 @@ export default function ClassesIdPage() {
           currentClass?.status !== "ongoing" && (
             <button
               className="text-blue-500 hover:text-blue-600 font-bold"
-              onClick={() =>
-                handleUpdateEnrollment("pending", userId, canUpdate)
-              }
+              onClick={() => handlePending(userId)}
             >
               Pendente
             </button>
@@ -228,9 +228,7 @@ export default function ClassesIdPage() {
         {(status === "approved" || status === "pending") && (
           <button
             className="text-orange-500 hover:text-orange-600 font-bold"
-            onClick={() =>
-              handleUpdateEnrollment("abandonment", userId, canUpdate)
-            }
+            onClick={() => handleAbandonment(userId)}
           >
             Abandono
           </button>
@@ -239,11 +237,11 @@ export default function ClassesIdPage() {
     );
   }
 
-  function updateRowData(
+  function updateEnrollments(
     rowData: TEnrollmentDataRow[],
     enrollment: TEnrollmentRow,
-  ): TEnrollmentDataRow[] {
-    return rowData.map(
+  ) {
+    const updatedEnrollments = rowData.map(
       (row: TEnrollmentDataRow): TEnrollmentDataRow =>
         row.classId === enrollment.classId && row.userId === enrollment.userId
           ? {
@@ -254,9 +252,10 @@ export default function ClassesIdPage() {
             }
           : row,
     );
+    setEnrollments(updatedEnrollments);
   }
 
-  function updateEnrollmentCount(enrollment: TEnrollmentRow): void {
+  function handleUpdateEnrollmentCount(enrollment: TEnrollmentRow): void {
     const countChange = enrollment.status === "approved" ? 1 : -1;
     const role = enrollment.danceRolePreference === "led" ? "led" : "leader";
     setEnrollmentsCount((prevCount: IEnrollmentCounts) => ({
@@ -265,90 +264,107 @@ export default function ClassesIdPage() {
     }));
   }
 
-  function canBeEnrolled(
-    enrollment: TEnrollmentRow,
-    status: Database["public"]["Enums"]["enrollmentStatus"],
-  ): {
-    canUpdate: boolean;
-    role: Database["public"]["Enums"]["danceRolePreference"] | null;
+  function canBeEnrolled(enrollment: TEnrollmentRow): {
+    canEnroll: boolean;
+    role: Database["public"]["Enums"]["danceRolePreference"];
   } {
-    if (!enrollment.danceRolePreference)
-      return { canUpdate: false, role: null };
-
-    const preferedRole = enrollment.danceRolePreference;
+    const preferedRole = enrollment.danceRolePreference!;
     const opositeRole = preferedRole === "led" ? "leader" : "led";
 
-    if (status !== "approved") return { canUpdate: true, role: preferedRole };
-
     if (enrollmentsCount[preferedRole] < enrollmentsCount.half) {
-      return { canUpdate: true, role: enrollment.danceRolePreference };
+      return { canEnroll: true, role: preferedRole };
     } else if (
       enrollmentsCount[opositeRole] < enrollmentsCount.half &&
       enrollment.danceRole === "indifferent"
     ) {
-      return { canUpdate: true, role: opositeRole };
+      return { canEnroll: true, role: opositeRole };
     }
-    return { canUpdate: false, role: null };
+    return { canEnroll: false, role: "led" };
   }
 
-  async function handleUpdateEnrollment(
-    status: Database["public"]["Enums"]["enrollmentStatus"],
-    userId: string,
-    alterCount = true,
-  ): Promise<void> {
+  async function handleAbandonment(userId: string) {
     const classEnrollments = await readEnrollmentsByClassId(classId);
     const userEnrollment = classEnrollments.find(
       (enrollment: TEnrollmentRow) =>
         enrollment.classId === classId && enrollment.userId === userId,
     );
-    if (!userEnrollment) return console.error("Enrollment not found");
     delete userEnrollment.users_view;
 
-    const verifiedEnrollment = canBeEnrolled(userEnrollment, status);
-    if (!verifiedEnrollment.canUpdate) {
-      toast.error(
-        `Não é possível aprovar mais ${
-          userEnrollment.danceRolePreference === "led"
-            ? "conduzidos(as)"
-            : "condutores(as)"
-        }`,
-      );
-      return;
+    handleDeleteAttendances(userId);
+
+    const updatedEnrollment = await updateEnrollment({
+      ...userEnrollment,
+      status: "abandonment",
+    });
+    updateEnrollments(enrollments, updatedEnrollment);
+    if (userEnrollment.status === "approved")
+      handleUpdateEnrollmentCount(updatedEnrollment);
+  }
+
+  async function handlePending(userId: string) {
+    const classEnrollments = await readEnrollmentsByClassId(classId);
+    const userEnrollment = classEnrollments.find(
+      (enrollment: TEnrollmentRow) =>
+        enrollment.classId === classId && enrollment.userId === userId,
+    );
+    delete userEnrollment.users_view;
+    const updatedEnrollment = await updateEnrollment({
+      ...userEnrollment,
+      status: "pending",
+    });
+    updateEnrollments(enrollments, updatedEnrollment);
+    if (userEnrollment.status === "approved") {
+      handleUpdateEnrollmentCount(updatedEnrollment);
     }
+  }
 
-    const classData = await readClass(classId);
-    if (classData.status === "ongoing" && status === "approved") {
-      const today = new Date();
-      const classDates = await readClassDates(classId);
-      if (!classDates) return console.error("No class dates found");
-      const classDatesFromToday = classDates.filter(
-        (classDate) => new Date(classDate.date) >= today,
+  async function handleApprove(userId: string) {
+    const classEnrollments = await readEnrollmentsByClassId(classId);
+    const userEnrollment = classEnrollments.find(
+      (enrollment: TEnrollmentRow) =>
+        enrollment.classId === classId && enrollment.userId === userId,
+    );
+    delete userEnrollment.users_view;
+
+    const { canEnroll, role } = canBeEnrolled(userEnrollment);
+    if (!canEnroll)
+      return toast.error(
+        "Não é possível aprovar mais inscrições para este papel",
       );
-      const classDatesIds = classDatesFromToday.map(
-        (classDate) => classDate.id,
-      );
-      const attToCreate = classDatesIds.map((classDateId) => ({
-        classDateId,
-        userId,
-      }));
-      await createAttendances(attToCreate);
-    }
 
-    try {
-      const updatedEnrollment = await updateEnrollment({
-        ...userEnrollment,
-        danceRolePreference: verifiedEnrollment.role,
-        status,
-      });
+    if (currentClass.status === "ongoing") handleCreateNewAttendances(userId);
 
-      const updatedRowData = updateRowData(enrollments, updatedEnrollment);
+    const updatedEnrollment = await updateEnrollment({
+      ...userEnrollment,
+      status: "approved",
+      danceRole: role,
+    });
+    updateEnrollments(enrollments, updatedEnrollment);
+    handleUpdateEnrollmentCount(updatedEnrollment);
+  }
 
-      setEnrollments(updatedRowData);
+  async function handleDeleteAttendances(userId: string) {
+    const today = new Date();
+    const classDates = await readClassDates(classId);
+    const classDatesFromToday = classDates!.filter(
+      (classDate) => new Date(classDate.date) >= today,
+    );
+    const classDatesIds = classDatesFromToday.map((classDate) => classDate.id);
+    deleteAttendances([userId], classDatesIds);
+  }
 
-      if (alterCount) updateEnrollmentCount(updatedEnrollment);
-    } catch (error) {
-      console.error("Error updating enrollment:", error);
-    }
+  async function handleCreateNewAttendances(userId: string) {
+    const today = new Date();
+    const classDates = await readClassDates(classId);
+    const classDatesFromToday = classDates!.filter(
+      (classDate) => new Date(classDate.date) >= today,
+    );
+    const classDatesIds = classDatesFromToday.map((classDate) => classDate.id);
+    const newAttendances = classDatesIds.map((classDateId) => ({
+      classDateId,
+      userId,
+    }));
+    createAttendances(newAttendances);
   }
 
   async function handleReadEnrollments() {

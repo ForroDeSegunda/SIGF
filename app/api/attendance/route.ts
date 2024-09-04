@@ -1,9 +1,5 @@
-import supabase from "@/utils/db";
-import { Database } from "@/database.types";
+import supabase, { TAttendanceInsert } from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
-
-export type TAttendanceInsert =
-  Database["public"]["Tables"]["attendance"]["Insert"];
 
 const TABLE = "attendance";
 
@@ -34,17 +30,22 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const { classId } = await request.json();
+  const body = await request.json();
+  const userIds: string[] = body.userIds;
+  const classDateIds: string[] = body.classDateIds;
 
   const { data, error } = await supabase
     .from(TABLE)
     .delete()
-    .eq("classId", classId)
+    .in("userId", userIds)
+    .in("classDateId", classDateIds)
     .select();
 
   if (error) {
     return NextResponse.json(error, { status: 500 });
   }
+  console.log("data", data);
+
   return NextResponse.json(data);
 }
 

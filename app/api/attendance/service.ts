@@ -1,11 +1,9 @@
+import {
+  TApprovedEnrollment,
+  TAttendanceInsert,
+  TAttendanceWithClassDates,
+} from "@/utils/db";
 import axios, { AxiosError, isAxiosError } from "axios";
-import { TAttendanceInsert } from "./route";
-import { TClassDatesRow } from "../classDates/route";
-import { TApprovedEnrollment } from "@/utils/db";
-
-export type TAttendanceWithClassDates = TAttendanceInsert & {
-  classDates: TClassDatesRow;
-};
 
 export async function readAttendances(
   userId?: string | string[],
@@ -34,6 +32,17 @@ export async function readAttendances(
   }
 }
 
+export async function readApprovedEnrollments(classId: string | string[]) {
+  try {
+    const res = await axios.get(`/api/enrollments/classId/${classId}/approved`);
+    const approvedEnrollments: TApprovedEnrollment[] = res.data;
+    return approvedEnrollments;
+  } catch (error) {
+    console.error("Error reading approved enrollments:", error);
+    throw error;
+  }
+}
+
 export async function createAttendances(attendances: TAttendanceInsert[]) {
   try {
     const res = await axios.post(`/api/attendance`, attendances);
@@ -48,13 +57,18 @@ export async function createAttendances(attendances: TAttendanceInsert[]) {
   }
 }
 
-export async function readApprovedEnrollments(classId: string | string[]) {
+export async function deleteAttendances(
+  userIds: string[],
+  classDateIds: string[],
+) {
   try {
-    const res = await axios.get(`/api/enrollments/classId/${classId}/approved`);
-    const approvedEnrollments: TApprovedEnrollment[] = res.data;
-    return approvedEnrollments;
+    const res = await axios.delete(`/api/attendance`, {
+      data: { userIds, classDateIds },
+    });
+    const deletedAttendances = res.data;
+    return deletedAttendances;
   } catch (error) {
-    console.error("Error reading approved enrollments:", error);
+    console.error("Error deleting attendances:", error);
     throw error;
   }
 }
