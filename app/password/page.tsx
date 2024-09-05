@@ -1,5 +1,7 @@
 "use client";
 
+import supabase from "@/utils/db";
+import { useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
@@ -13,18 +15,33 @@ const ButtonPrimary = tw.button`bg-green-500 hover:bg-green-600 rounded px-4 py-
 export default function PasswordRecovery() {
   const password = useRef("");
   const passwordConfirmation = useRef("");
+  const email = useSearchParams().get("email");
 
   function passwordsMatch() {
     if (password.current !== passwordConfirmation.current) {
       toast.error("As senhas não coincidem");
       return false;
     }
+    toast.success("Senhas coincidem");
     return true;
   }
 
-  function handlePasswordRecovery(event: any) {
+  async function handlePasswordRecovery(event: any) {
     event.preventDefault();
     if (!passwordsMatch()) return;
+
+    const { data, error } = await supabase.auth.updateUser({
+      email: email!,
+      password: password.current,
+    });
+    console.log("data: ", data);
+
+    if (error) {
+      console.error(error);
+      toast.error("Erro ao alterar senha");
+      return;
+    }
+    toast.success("Senha alterada com sucesso");
   }
 
   return (
@@ -36,7 +53,6 @@ export default function PasswordRecovery() {
           type="password"
           name="password"
           placeholder="••••••••"
-          value={password.current}
           onChange={(event) => (password.current = event.target.value)}
         />
         <Label htmlFor="password-confirmation">Confirmar Senha</Label>
@@ -45,13 +61,14 @@ export default function PasswordRecovery() {
           type="password"
           name="password-confirmation"
           placeholder="••••••••"
-          onBlur={() => console.log("onBlur")}
-          value={passwordConfirmation.current}
+          onBlur={passwordsMatch}
           onChange={(event) =>
             (passwordConfirmation.current = event.target.value)
           }
         />
-        <ButtonPrimary>Alterar senha</ButtonPrimary>
+        <ButtonPrimary onClick={handlePasswordRecovery}>
+          Alterar senha
+        </ButtonPrimary>
       </LoginForm>
     </AuthContainer>
   );
