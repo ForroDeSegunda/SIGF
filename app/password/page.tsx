@@ -30,6 +30,16 @@ export default function PasswordRecovery() {
     event.preventDefault();
     if (!passwordsMatch()) return;
 
+    const url = window.location.href;
+    const params = new URLSearchParams(url.split("#")[1]);
+    const accessToken = params.get("access_token");
+    const refreshToken = params.get("refresh_token");
+
+    supabase.auth.setSession({
+      access_token: accessToken!,
+      refresh_token: refreshToken!,
+    });
+
     const { data, error } = await supabase.auth.updateUser({
       email: email!,
       password: password.current,
