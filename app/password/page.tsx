@@ -41,7 +41,7 @@ export default function PasswordRecovery() {
       refresh_token: refreshToken!,
     });
 
-    const { data, error } = await supabase.auth.updateUser({
+    const { error } = await supabase.auth.updateUser({
       email: email!,
       password: password.current,
     });
