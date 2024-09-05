@@ -2,7 +2,7 @@
 
 import supabase from "@/utils/db";
 import { useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
 
