@@ -1,7 +1,7 @@
 "use client";
 
 import supabase from "@/utils/db";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useRef } from "react";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
@@ -16,6 +16,7 @@ export default function PasswordRecovery() {
   const password = useRef("");
   const passwordConfirmation = useRef("");
   const email = useSearchParams().get("email");
+  const router = useRouter();
 
   function passwordsMatch() {
     if (password.current !== passwordConfirmation.current) {
@@ -52,6 +53,7 @@ export default function PasswordRecovery() {
       return;
     }
     toast.success("Senha alterada com sucesso");
+    router.push("/classes");
   }
 
   return (
