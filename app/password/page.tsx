@@ -45,7 +45,6 @@ export default function PasswordRecovery() {
       email: email!,
       password: password.current,
     });
-    console.log("data: ", data);
 
     if (error) {
       console.error(error);
