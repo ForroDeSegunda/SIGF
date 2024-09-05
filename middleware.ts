@@ -1,5 +1,5 @@
 import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const whiteList = {
   student: {
@@ -79,16 +79,18 @@ function replaceUuids(paramsString: string) {
   return paramsString.replace(uuidRegex, "[id]");
 }
 
-export async function middleware(req: any) {
+const noAuthPaths = ["/login", "/password"];
+
+export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const reqUrl = new URL(req.url);
   const reqGenericPath = replaceUuids(reqUrl.pathname);
   const reqMethod = req.method.toLowerCase();
-
   const supabase = createMiddlewareClient({ req, res });
 
   const { data, error } = await supabase.auth.getSession();
-  if (!data.session) return NextResponse.redirect(`${reqUrl.origin}`);
+  if (!data.session && !noAuthPaths.includes(req.nextUrl.pathname))
+    return NextResponse.redirect(`${reqUrl.origin}`);
 
   const userRoleData = await supabase
     .from("user")

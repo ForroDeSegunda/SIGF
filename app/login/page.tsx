@@ -6,6 +6,14 @@ import { useState } from "react";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
 
+const AuthContainer = tw.div`flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2`;
+const LoginForm = tw.form`flex flex-col w-full justify-center gap-2 text-foreground`;
+const RegisterForm = tw.form`flex flex-col w-full justify-center gap-2 text-foreground`;
+const Label = tw.label`text-md`;
+const Input = tw.input`rounded-md px-4 py-2 bg-inherit border mb-6`;
+const ButtonPrimary = tw.button`bg-green-500 hover:bg-green-600 rounded px-4 py-2 text-white mb-2 font-bold`;
+const ButtonGoogle = tw.button`bg-blue-500 hover:bg-blue-600 rounded px-4 py-2 text-white mb-2 w-full font-bold`;
+
 export default function Login() {
   const router = useRouter();
   const [isLoginForm, setIsLoginForm] = useState(true);
@@ -71,23 +79,21 @@ export default function Login() {
           <Input name="email" placeholder="exemplo@exemplo.com" required />
           <Label htmlFor="password">Senha</Label>
           <Input
+            className="mb-0"
             type="password"
             name="password"
             placeholder="••••••••"
             required
           />
-          <p className="text-gray-500">
-            Não tem uma conta?{" "}
-            <button
-              className="text-blue-500"
-              onClick={(e) => {
-                e.preventDefault();
-                setIsLoginForm(false);
-              }}
-            >
-              Cadastrar
-            </button>
-          </p>
+          <button
+            className="text-blue-500 font-bold flex justify-end mb-4"
+            onClick={(e) => {
+              e.preventDefault();
+              console.log("Esqueceu sua senha?");
+            }}
+          >
+            Esqueceu sua senha?
+          </button>
           <ButtonPrimary onClick={handleEmailLogin}>
             {isLoadingEmail ? "Carregando..." : "Entrar"}
           </ButtonPrimary>
@@ -125,14 +131,18 @@ export default function Login() {
       <ButtonGoogle onClick={handleGoogleLogin}>
         {isLoadingGoogle ? "Carregando..." : "Entrar com Google"}
       </ButtonGoogle>
+      <p className="text-gray-500 flex justify-center gap-2">
+        Ainda não tem conta?
+        <button
+          className="text-blue-500 font-bold"
+          onClick={(e) => {
+            e.preventDefault();
+            setIsLoginForm(false);
+          }}
+        >
+          Cadastre-se
+        </button>
+      </p>
     </AuthContainer>
   );
 }
-
-const AuthContainer = tw.div`flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2`;
-const LoginForm = tw.form`flex flex-col w-full justify-center gap-2 text-foreground`;
-const RegisterForm = tw.form`flex flex-col w-full justify-center gap-2 text-foreground`;
-const Label = tw.label`text-md`;
-const Input = tw.input`rounded-md px-4 py-2 bg-inherit border mb-6`;
-const ButtonPrimary = tw.button`bg-green-500 hover:bg-green-600 rounded px-4 py-2 text-white mb-2`;
-const ButtonGoogle = tw.button`bg-blue-500 hover:bg-blue-600 rounded px-4 py-2 text-white mb-2 w-full`;
