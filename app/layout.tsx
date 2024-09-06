@@ -1,13 +1,10 @@
-import "react-datepicker/dist/react-datepicker.css";
-import "./globals.css";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
+import { Suspense } from "react";
+import "react-datepicker/dist/react-datepicker.css";
 import { Toaster } from "sonner";
 import RecoilWrapper from "./components/RecoilWrapper";
-import tw from "tailwind-styled-components";
-import { Suspense } from "react";
-
-const Body = tw.body`min-h-screen ag-theme-quartz bg-background flex flex-col items-center`;
+import "./globals.css";
 
 export const metadata = {
   title: "SIGF",
@@ -24,7 +21,12 @@ export default function RootLayout({
       <Suspense>
         <Toaster theme="light" richColors visibleToasts={2} />
         <RecoilWrapper>
-          <Body id="__modal">{children}</Body>
+          <body
+            className="min-h-screen ag-theme-quartz bg-background flex flex-col items-center"
+            id="__modal"
+          >
+            {children}
+          </body>
         </RecoilWrapper>
       </Suspense>
     </html>
