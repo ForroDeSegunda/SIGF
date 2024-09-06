@@ -1,9 +1,10 @@
-import supabase, { TUser, TUserViewPlusRole, TUserWithRole } from "@/utils/db";
+import { supabaseClient } from "@/supabase/client";
+import { TUser, TUserViewPlusRole, TUserWithRole } from "@/utils/db";
 import { User } from "@supabase/supabase-js";
 import axios from "axios";
 
 export async function readUserWithRole() {
-  const { data, error } = await supabase.auth.getUser();
+  const { data, error } = await supabaseClient.auth.getUser();
 
   if (error) {
     console.error("Error reading user session:", error);

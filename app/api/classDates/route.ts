@@ -1,4 +1,5 @@
-import supabase, { TClassDatesInsert } from "@/utils/db";
+import { supabaseClient } from "@/supabase/client";
+import { TClassDatesInsert } from "@/utils/db";
 import { PostgrestError } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,7 +8,7 @@ export async function POST(
 ): Promise<NextResponse<TClassDatesInsert[] | PostgrestError>> {
   const body = await request.json();
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("classDates")
     .insert(body)
     .select();
@@ -21,7 +22,7 @@ export async function POST(
 export async function DELETE(request: NextRequest) {
   const { classId } = await request.json();
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("classDates")
     .delete()
     .eq("classId", classId)

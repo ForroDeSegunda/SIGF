@@ -1,13 +1,16 @@
-import supabase from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 import { TClasses } from "./[id]/route";
+import { supabaseClient } from "@/supabase/client";
 
 const table = "classes";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  const { data, error } = await supabase.from(table).insert([body]).select();
+  const { data, error } = await supabaseClient
+    .from(table)
+    .insert([body])
+    .select();
 
   if (error) {
     return NextResponse.json(error, { status: 500 });
@@ -18,7 +21,7 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const body: TClasses = await request.json();
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from(table)
     .update({ ...body })
     .eq("id", body.id)
@@ -31,7 +34,7 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function GET() {
-  const { data, error } = await supabase.from(table).select();
+  const { data, error } = await supabaseClient.from(table).select();
 
   if (error) {
     return NextResponse.json(error, { status: 500 });

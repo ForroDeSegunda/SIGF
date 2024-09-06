@@ -1,5 +1,5 @@
-import supabase from "@/utils/db";
 import { Database } from "@/database.types";
+import { supabaseClient } from "@/supabase/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export type TClasses = Database["public"]["Tables"]["classes"]["Insert"];
@@ -10,7 +10,7 @@ export type TClassAndPeriod = TClasses & {
 const table = "classes";
 
 export async function DELETE(_: NextRequest, { params }: any) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from(table)
     .delete()
     .eq("id", params.id);
@@ -24,7 +24,7 @@ export async function DELETE(_: NextRequest, { params }: any) {
 export async function PATCH(request: NextRequest, { params }: any) {
   const { name, weekDays } = await request.json();
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from(table)
     .update({ name, weekDays })
     .eq("id", params.id);
@@ -36,7 +36,7 @@ export async function PATCH(request: NextRequest, { params }: any) {
 }
 
 export async function GET(_, { params }) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from(table)
     .select("*, period(*)")
     .eq("id", params.id);

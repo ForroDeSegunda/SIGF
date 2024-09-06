@@ -1,8 +1,8 @@
-import supabase from "@/utils/db";
+import { supabaseClient } from "@/supabase/client";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
-  const { data, error } = await supabase.from("calendar").select("*");
+  const { data, error } = await supabaseClient.from("calendar").select("*");
 
   if (error) {
     return NextResponse.json(error, { status: 500 });
@@ -13,7 +13,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("calendar")
     .insert([{ ...body }])
     .select("*");
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   const body = await request.json();
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("calendar")
     .update({ ...body })
     .eq("id", body.id)
@@ -40,7 +40,7 @@ export async function PATCH(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   const body = await request.json();
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("calendar")
     .delete()
     .eq("id", body.id)

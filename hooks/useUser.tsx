@@ -1,5 +1,5 @@
-import supabase from "@/utils/db";
+import { supabaseClient } from "@/supabase/client";
 
 export default async function useUser() {
-  return await supabase.auth.getUser();
+  return await supabaseClient.auth.getUser();
 }

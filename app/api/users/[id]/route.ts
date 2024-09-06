@@ -1,10 +1,11 @@
-import supabase, { TUser } from "@/utils/db";
+import { supabaseClient } from "@/supabase/client";
+import { TUser } from "@/utils/db";
 import { NextResponse } from "next/server";
 
 const TABLE = "user";
 
 export async function GET(_: any, { params }) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from(TABLE)
     .select()
     .eq("id", params.id);

@@ -1,8 +1,9 @@
-import supabase, { TApprovedEnrollment } from "@/utils/db";
+import { supabaseClient } from "@/supabase/client";
+import { TApprovedEnrollment } from "@/utils/db";
 import { NextResponse } from "next/server";
 
 export async function GET(_: any, { params }: { params: { id: string } }) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("enrollment")
     .select("*, users_view(*)")
     .eq("classId", params.id)

@@ -1,11 +1,5 @@
 import { Database } from "@/database.types";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { User } from "@supabase/supabase-js";
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-const supabase = createClientComponentClient({ supabaseUrl, supabaseKey });
-export default supabase;
 
 export type TDanceRole = Database["public"]["Enums"]["danceRole"];
 export type TDanceRolePreference =

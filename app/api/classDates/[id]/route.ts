@@ -1,10 +1,10 @@
-import supabase from "@/utils/db";
+import { supabaseClient } from "@/supabase/client";
 import { NextResponse } from "next/server";
 
 const tableName = "classDates";
 
 export async function GET(_, { params }) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from(tableName)
     .select("date, id, classes(name, id)")
     .eq("classId", params.id);
@@ -16,7 +16,7 @@ export async function GET(_, { params }) {
 }
 
 export async function DELETE(_, { params }) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from(tableName)
     .delete()
     .eq("id", params.id)

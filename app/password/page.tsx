@@ -1,7 +1,7 @@
 "use client";
 
-import supabase from "@/utils/db";
-import { useRouter, useSearchParams } from "next/navigation";
+import { supabaseClient } from "@/supabase/client";
+import { useSearchParams } from "next/navigation";
 import { useRef } from "react";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
@@ -15,8 +15,8 @@ const ButtonPrimary = tw.button`bg-green-500 hover:bg-green-600 rounded px-4 py-
 export default function PasswordRecovery() {
   const password = useRef("");
   const passwordConfirmation = useRef("");
-  const email = useSearchParams().get("email");
-  const router = useRouter();
+  const code = useSearchParams().get("code");
+  // const email = useSearchParams().get("email");
 
   function passwordsMatch() {
     if (password.current !== passwordConfirmation.current) {
@@ -31,18 +31,10 @@ export default function PasswordRecovery() {
     event.preventDefault();
     if (!passwordsMatch()) return;
 
-    const url = window.location.href;
-    const params = new URLSearchParams(url.split("#")[1]);
-    const accessToken = params.get("access_token");
-    const refreshToken = params.get("refresh_token");
+    const url = window.location.origin;
+    console.log("url", url);
 
-    supabase.auth.setSession({
-      access_token: accessToken!,
-      refresh_token: refreshToken!,
-    });
-
-    const { error } = await supabase.auth.updateUser({
-      email: email!,
+    const { error } = await supabaseClient.auth.updateUser({
       password: password.current,
     });
 
@@ -52,7 +44,25 @@ export default function PasswordRecovery() {
       return;
     }
     toast.success("Senha alterada com sucesso");
-    router.push("/classes");
+  }
+
+  async function test() {
+    const origin = window.location.origin;
+    console.log("origin", origin);
+    console.log("code", code);
+
+    const res = await supabaseClient.auth.getSession();
+    console.log("res", res);
+
+    if (!code) return;
+    console.log("code exists");
+
+    try {
+      const res2 = await supabaseClient.auth.exchangeCodeForSession(code);
+      console.log("res2", res2);
+    } catch (error) {
+      console.log("error", error);
+    }
   }
 
   return (
@@ -81,6 +91,7 @@ export default function PasswordRecovery() {
           Alterar senha
         </ButtonPrimary>
       </LoginForm>
+      <ButtonPrimary onClick={test}>Teste</ButtonPrimary>
     </AuthContainer>
   );
 }

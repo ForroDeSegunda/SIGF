@@ -1,8 +1,8 @@
+import { supabaseClient } from "@/supabase/client";
 import { NextRequest, NextResponse } from "next/server";
-import supabase from "@/utils/db";
 
 export async function GET(_: any, { params }: { params: { id: string } }) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("enrollment")
     .select("*, users_view(*)")
     .eq("classId", params.id);
@@ -16,7 +16,7 @@ export async function GET(_: any, { params }: { params: { id: string } }) {
 export async function PATCH(request: NextRequest) {
   const body = await request.json();
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("enrollment")
     .update(body)
     .eq("classId", body.classId)

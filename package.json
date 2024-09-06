@@ -8,11 +8,10 @@
   "dependencies": {
     "@auth/supabase-adapter": "^0.1.13",
     "@react-hook/window-size": "^3.1.1",
-    "@supabase/auth-helpers-nextjs": "^0.8.7",
-    "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/auth-ui-react": "^0.4.6",
     "@supabase/auth-ui-shared": "^0.1.8",
-    "@supabase/supabase-js": "^2.39.1",
+    "@supabase/ssr": "^0.5.1",
+    "@supabase/supabase-js": "^2.45.3",
     "ag-grid-react": "^31.0.0",
     "autoprefixer": "10.4.14",
     "axios": "^1.7.2",

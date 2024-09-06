@@ -6,7 +6,6 @@ import {
   readAttendances,
 } from "@/app/api/attendance/service";
 import { readClassDates } from "@/app/api/classDates/service";
-import { readClass } from "@/app/api/classes/service";
 import {
   createEnrollments,
   readEnrollmentsByClassId,
@@ -22,7 +21,6 @@ import {
 import { usersAtom } from "@/atoms/usersAtom";
 import { Database } from "@/database.types";
 import {
-  TAttendanceInsert,
   TEnrollmentDataRow,
   TEnrollmentInsert,
   TEnrollmentRow,

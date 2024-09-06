@@ -1,10 +1,13 @@
-import supabase, { TAttendanceInsert } from "@/utils/db";
+import { supabaseClient } from "@/supabase/client";
+import { TAttendanceInsert } from "@/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
 const TABLE = "attendance";
 
 export async function GET() {
-  const { data, error } = await supabase.from(TABLE).select(`*, classDates(*)`);
+  const { data, error } = await supabaseClient
+    .from(TABLE)
+    .select(`*, classDates(*)`);
   if (error) {
     return NextResponse.json(error, { status: 500 });
   }
@@ -14,7 +17,10 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   const body: TAttendanceInsert = await request.json();
 
-  const { data, error } = await supabase.from(TABLE).insert(body).select();
+  const { data, error } = await supabaseClient
+    .from(TABLE)
+    .insert(body)
+    .select();
 
   if (error) {
     if (error.message.includes("duplicate key")) {
@@ -34,7 +40,7 @@ export async function DELETE(request: NextRequest) {
   const userIds: string[] = body.userIds;
   const classDateIds: string[] = body.classDateIds;
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from(TABLE)
     .delete()
     .in("userId", userIds)
@@ -51,7 +57,7 @@ export async function DELETE(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const { id, ...body } = await request.json();
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from(TABLE)
     .update(body)
     .eq("id", id)

@@ -1,10 +1,10 @@
-import supabase from "@/utils/db";
+import { supabaseClient } from "@/supabase/client";
 import { NextRequest, NextResponse } from "next/server";
 
 const TABLE = "attendance";
 
 export async function GET(_: any, { params }) {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from(TABLE)
     .select("*, classDates(*), users_view(*)")
     .eq("classDateId", params.classDateId);
@@ -18,7 +18,10 @@ export async function GET(_: any, { params }) {
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  const { data, error } = await supabase.from(TABLE).insert(body).select();
+  const { data, error } = await supabaseClient
+    .from(TABLE)
+    .insert(body)
+    .select();
 
   if (error) {
     return NextResponse.json(error, { status: 500 });

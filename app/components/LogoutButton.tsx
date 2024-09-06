@@ -1,20 +1,17 @@
-"use client";
-
+import { supabaseClient } from "@/supabase/client";
 import { useRouter } from "next/navigation";
 
 export default function LogoutButton() {
   const router = useRouter();
 
   async function logout() {
-    await fetch("/api/auth/sign-out", {
-      method: "POST",
-    });
+    supabaseClient.auth.signOut();
     router.push("/");
   }
 
   return (
     <button
-      className="py-2 px-4 rounded-md no-underline bg-green-500 hover:bg-green-600 text-white"
+      className="py-2 px-4 rounded-md no-underline bg-green-500 hover:bg-green-400 text-white"
       onClick={logout}
     >
       Sair
