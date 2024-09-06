@@ -51,7 +51,7 @@ export default function PasswordRecovery() {
     }
 
     toast.success("Senha alterada com sucesso");
-    router.push("/");
+    router.push("/classes");
   }
 
   return (
