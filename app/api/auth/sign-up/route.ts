@@ -1,10 +1,12 @@
-import { supabaseClient } from "@/supabase/client";
+import { useSupabaseServer } from "@/supabase/server";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   const requestUrl = new URL(request.url);
+  const supabaseServer = useSupabaseServer();
+
   const { email, password, full_name } = await request.json();
   if (!email || !password || !full_name) {
     return NextResponse.json({
@@ -13,7 +15,7 @@ export async function POST(request: Request) {
     });
   }
 
-  const { data, error } = await supabaseClient.auth.signUp({
+  const { data, error } = await supabaseServer.auth.signUp({
     email,
     password,
     options: {
