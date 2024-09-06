@@ -46,7 +46,7 @@ export default function Login() {
   async function handleResetPassword(event: any) {
     event.preventDefault();
     const email = event.target.form.email.value;
-    const origin = window.location.origin;
+
     const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
     if (error) {
       if (error.message.includes("Unable to validate email address")) {
