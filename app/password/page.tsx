@@ -30,6 +30,12 @@ export default function PasswordRecovery() {
     event.preventDefault();
     if (!passwordsMatch()) return;
 
+    if (true) {
+      const fullUrl = window.location.href;
+      console.log("fullUrl", fullUrl);
+      return;
+    }
+
     const { error } = await supabaseClient.auth.updateUser({
       password: password.current,
     });
