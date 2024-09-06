@@ -18,17 +18,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <Suspense>
+      <body
+        className="min-h-screen ag-theme-quartz bg-background flex flex-col items-center"
+        id="__modal"
+      >
         <Toaster theme="light" richColors visibleToasts={2} />
         <RecoilWrapper>
-          <body
-            className="min-h-screen ag-theme-quartz bg-background flex flex-col items-center"
-            id="__modal"
-          >
-            {children}
-          </body>
+          <Suspense>{children}</Suspense>
         </RecoilWrapper>
-      </Suspense>
+      </body>
     </html>
   );
 }
