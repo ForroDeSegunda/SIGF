@@ -1,5 +1,6 @@
 "use client";
 
+import supabase from "@/utils/db";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -7,8 +8,7 @@ import { toast } from "sonner";
 import tw from "tailwind-styled-components";
 
 const AuthContainer = tw.div`flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2`;
-const LoginForm = tw.form`flex flex-col w-full justify-center gap-2 text-foreground`;
-const RegisterForm = tw.form`flex flex-col w-full justify-center gap-2 text-foreground`;
+const Form = tw.form`flex flex-col w-full justify-center gap-2 text-foreground`;
 const Label = tw.label`text-md`;
 const Input = tw.input`rounded-md px-4 py-2 bg-inherit border mb-6`;
 const ButtonPrimary = tw.button`bg-green-500 hover:bg-green-600 rounded px-4 py-2 text-white mb-2 font-bold`;
@@ -20,6 +20,7 @@ export default function Login() {
   const [isLoadingGoogle, setIsLoadingGoogle] = useState(false);
   const [isLoadingEmail, setIsLoadingEmail] = useState(false);
   const [isLoadingRegister, setIsLoadingRegister] = useState(false);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
 
   async function handleGoogleLogin() {
     setIsLoadingGoogle(true);
@@ -71,10 +72,46 @@ export default function Login() {
     }
   }
 
+  async function handleResetPassword(event: any) {
+    event.preventDefault();
+    const email = event.target.form.email.value;
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) {
+      if (error.message.includes("Unable to validate email address")) {
+        toast.error("Email inválido");
+        return;
+      }
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Enviada para: " + email);
+    router.push("/");
+  }
+
+  if (isForgotPassword) {
+    return (
+      <AuthContainer>
+        <Form>
+          <Label htmlFor="email">Email</Label>
+          <Input name="email" placeholder="exemplo@exemplo.com" required />
+          <ButtonPrimary onClick={handleResetPassword}>
+            Enviar link de recuperação
+          </ButtonPrimary>
+        </Form>
+        <button
+          className="text-blue-500 font-bold"
+          onClick={() => setIsForgotPassword(false)}
+        >
+          Voltar
+        </button>
+      </AuthContainer>
+    );
+  }
+
   return (
     <AuthContainer>
       {isLoginForm ? (
-        <LoginForm>
+        <Form>
           <Label htmlFor="email">Email</Label>
           <Input name="email" placeholder="exemplo@exemplo.com" required />
           <Label htmlFor="password">Senha</Label>
@@ -89,7 +126,7 @@ export default function Login() {
             className="text-blue-500 font-bold flex justify-end mb-4"
             onClick={(e) => {
               e.preventDefault();
-              console.log("Esqueceu sua senha?");
+              setIsForgotPassword(true);
             }}
           >
             Esqueceu sua senha?
@@ -97,9 +134,9 @@ export default function Login() {
           <ButtonPrimary onClick={handleEmailLogin}>
             {isLoadingEmail ? "Carregando..." : "Entrar"}
           </ButtonPrimary>
-        </LoginForm>
+        </Form>
       ) : (
-        <RegisterForm>
+        <Form>
           <Label htmlFor="full_name">Nome</Label>
           <Input name="full_name" placeholder="João" required />
           <Label htmlFor="email">Email</Label>
@@ -126,7 +163,7 @@ export default function Login() {
           <ButtonPrimary onClick={handleRegister}>
             {isLoadingRegister ? "Carregando..." : "Cadastrar"}
           </ButtonPrimary>
-        </RegisterForm>
+        </Form>
       )}
       <ButtonGoogle onClick={handleGoogleLogin}>
         {isLoadingGoogle ? "Carregando..." : "Entrar com Google"}
