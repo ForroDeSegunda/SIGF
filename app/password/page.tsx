@@ -30,10 +30,14 @@ export default function PasswordRecovery() {
     event.preventDefault();
     if (!passwordsMatch()) return;
 
-    if (true) {
-      const fullUrl = window.location.href;
-      console.log("fullUrl", fullUrl);
-      return;
+    const fragment = window.location.href.split("#")[1];
+    if (fragment) {
+      const params = new URLSearchParams(fragment);
+
+      await supabaseClient.auth.setSession({
+        access_token: params.get("access_token")!,
+        refresh_token: params.get("refresh_token")!,
+      });
     }
 
     const { error } = await supabaseClient.auth.updateUser({
