@@ -47,9 +47,7 @@ export default function Login() {
     event.preventDefault();
     const email = event.target.form.email.value;
     const origin = window.location.origin;
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-      redirectTo: `${origin}/password`,
-    });
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
     if (error) {
       if (error.message.includes("Unable to validate email address")) {
         toast.error("Email inválido");
