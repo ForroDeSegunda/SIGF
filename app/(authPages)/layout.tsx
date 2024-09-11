@@ -23,9 +23,14 @@ export default function PagesLayout(props: { children: React.ReactNode }) {
   const setClasses = useSetRecoilState(classesAtom);
 
   async function handleLoadGlobalStates() {
-    setClasses(await readClasses());
-    setPeriods(await readPeriods());
-    setUsers(await readUserWithRole());
+    const classes = await readClasses();
+    setClasses(classes);
+
+    const periods = await readPeriods();
+    setPeriods(periods);
+
+    const users = await readUserWithRole();
+    setUsers(users);
   }
 
   useEffect(() => {

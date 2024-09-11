@@ -1,11 +1,18 @@
 import { modalIsOpenAtom } from "@/atoms/modalAtom";
+import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
+import useUser from "@/hooks/useUser";
 import { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
-import tw from "tailwind-styled-components";
-import useUser from "@/hooks/useUser";
-import axios from "axios";
 import { toast } from "sonner";
-import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
+import tw from "tailwind-styled-components";
+import { updateUser } from "../(authPages)/users/actions";
+
+const Input = tw.input`border rounded-md px-4 py-2 pl-2`;
+const Label = tw.label`text-md`;
+const Form = tw.form`flex-1 flex flex-col w-full justify-center gap-2 text-foreground`;
+const ButtonRow = tw.div`flex gap-4 justify-end pt-4`;
+const ConfirmButton = tw.button`bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded`;
+const CancelButton = tw.button`border border-gray-700 rounded px-4 py-2 text-black`;
 
 export function ModalProfile() {
   const setIsModalOpen = useSetRecoilState(modalIsOpenAtom);
@@ -16,15 +23,17 @@ export function ModalProfile() {
   const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
 
   async function handleSubmit() {
-    const { data } = await axios.patch("/api/auth/update-user", {
+    const { error } = await updateUser({
       email: email,
       password: password,
-      full_name: fullName,
-      avatar_url: avatar,
+      data: {
+        full_name: fullName,
+        avatar_url: avatar,
+      },
     });
 
-    if (data.status !== 204) {
-      toast.error(data.message);
+    if (error) {
+      toast.error(error.message);
       return;
     }
 
@@ -85,10 +94,3 @@ export function ModalProfile() {
     </Form>
   );
 }
-
-const Input = tw.input`border rounded-md px-4 py-2 pl-2`;
-const Label = tw.label`text-md`;
-const Form = tw.form`flex-1 flex flex-col w-full justify-center gap-2 text-foreground`;
-const ButtonRow = tw.div`flex gap-4 justify-end pt-4`;
-const ConfirmButton = tw.button`bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded`;
-const CancelButton = tw.button`border border-gray-700 rounded px-4 py-2 text-black`;

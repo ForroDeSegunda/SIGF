@@ -19,6 +19,7 @@ export async function readClass(classId: string | string[]) {
 export async function readClasses() {
   try {
     const res = await fetch("/api/classes");
+
     const classes: TClasses[] = await res.json();
     return classes;
   } catch (error) {
