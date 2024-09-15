@@ -77,10 +77,12 @@ export default function UsersPage() {
     newRole: TUser["role"],
   ) {
     if (userData.user.created_at === "never") {
-      const createdUser = await createUser({
-        id: userData.id,
-        role: newRole,
-      });
+      const createdUser = await createUser([
+        {
+          id: userData.id,
+          role: newRole,
+        },
+      ]);
 
       const newUsers = users.map((user) => {
         if (user.user && user.id === createdUser.id) {
