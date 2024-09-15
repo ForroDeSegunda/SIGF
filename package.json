@@ -15,9 +15,9 @@
     "ag-grid-react": "^31.0.0",
     "autoprefixer": "10.4.14",
     "axios": "^1.7.2",
-    "eslint-config-next": "^14.2.5",
+    "eslint-config-next": "^14.2.9",
     "jsonwebtoken": "^9.0.2",
-    "next": "^14.2.5",
+    "next": "^14.2.9",
     "next-auth": "^4.24.5",
     "next-client-cookies": "^1.1.0",
     "react": "^18.3.1",
@@ -28,7 +28,8 @@
     "recoil": "^0.7.7",
     "sharp": "^0.33.3",
     "sonner": "^1.5.0",
-    "tailwind-styled-components": "^2.2.0"
+    "tailwind-styled-components": "^2.2.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.5",

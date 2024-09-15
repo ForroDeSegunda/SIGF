@@ -36,7 +36,7 @@ export async function readUsers(emails?: string[]) {
   }
 }
 
-export async function createUser(user: TUser) {
+export async function createUser(user: TUser[]) {
   try {
     const res = await fetch(`/api/users`, {
       method: "POST",

@@ -27,7 +27,7 @@ export function csvToJson(str: string) {
   // Extract headers and remove quotes
   const headers = lines[0]
     .split(",")
-    .map((header) => header.replace(/"/g, "").trim());
+    .map((header) => header.replace(/"/g, "").toLowerCase().trim());
 
   // Function to split lines correctly
   const splitCSVLine = (line: string) => {

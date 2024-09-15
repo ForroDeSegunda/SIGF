@@ -25,7 +25,7 @@ import {
   TEnrollmentInsert,
   TEnrollmentRow,
 } from "@/utils/db";
-import { csvToJson, replaceSpecialChars } from "@/utils/functions";
+import { replaceSpecialChars } from "@/utils/functions";
 import { danceRoleOptions, enrollmentStatusOptions } from "@/utils/humanize";
 import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef } from "ag-grid-community";
@@ -34,6 +34,8 @@ import { useParams } from "next/navigation";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
+import { read, utils } from "xlsx";
+import { createUsersForXlsxImport } from "./actions";
 
 export default function ClassesIdPage() {
   const gridRef = useRef<AgGridReact>(null);
@@ -53,10 +55,13 @@ export default function ClassesIdPage() {
       headerName: "Nome",
       flex: 3,
       filter: true,
+      valueFormatter: ({ data }: any) =>
+        data.users_view?.full_name || data.users_view?.email || "",
     },
     {
       field: "createdAt",
       headerName: "Data da inscrição",
+      sort: "asc",
       flex: 3,
       valueFormatter: ({ value }) => new Date(value).toLocaleString("pt-BR"),
     },
@@ -413,38 +418,45 @@ export default function ClassesIdPage() {
     event.preventDefault();
     if (!event.target.files) return console.error("No file selected");
 
-    const fileReader = new FileReader();
-    fileReader.readAsText(event.target.files[0]);
-
-    fileReader.onloadend = async function onLoad(event) {
-      const input = event.target?.result;
-      const json = csvToJson(input as string);
-
-      const emails = json.map((obj) => obj.Email);
-      if (emails[0] === undefined) return console.error("No emails found");
-
-      const users = await readUsers(emails);
-
-      const dict = {
-        "Conduzido(a)": "led",
-        "Condutor(a)": "leader",
-        Indiferente: "indifferent",
-        Aprovado: "approved",
-        Pendente: "pending",
-        Abandono: "abandonment",
-      };
-
-      const enrollments: TEnrollmentInsert[] = json.map((obj) => ({
-        danceRole: dict[obj["Papel"]],
-        danceRolePreference: dict[obj["Preferência"]],
-        status: dict[obj["Inscrição"]],
-        classId,
-        userId: users.find((user) => user.email === obj.Email)!.id,
-      }));
-
-      const newEnrollments = await createEnrollments(enrollments);
-      setEnrollments([...newEnrollments]);
+    const dict = {
+      "Conduzido/Conduzida (quem é conduzido na dança)": "led",
+      "Condutor/Condutora (quem conduz a dança)": "leader",
     };
+
+    const workbook = read(await event.target.files[0].arrayBuffer());
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json: Array<object> = utils.sheet_to_json(sheet, { raw: false });
+    const cleanJson = json.map((obj) => {
+      return {
+        email: obj["Endereço de e-mail"],
+        full_name: obj["Nome completo"],
+        created_at: new Date(obj["Carimbo de data/hora"]).toISOString(),
+        role: dict[obj["Para qual função você gostaria de se inscrever?_1"]],
+      };
+    });
+    const emails = json.map((obj) => obj["Endereço de e-mail"]);
+    const users = await readUsers(emails);
+    const existingUsersEmails = users.map((user) => user.email);
+    const missingUsers = cleanJson.filter(
+      (user) => !existingUsersEmails.includes(user.email),
+    );
+
+    const createdUsers = await createUsersForXlsxImport(missingUsers);
+    const allUsers = [...users, ...createdUsers];
+
+    const enrollments: TEnrollmentInsert[] = cleanJson.map((obj) => {
+      const user = allUsers.find((user) => user.email === obj.email);
+      return {
+        classId,
+        userId: user!.id,
+        danceRole: obj.role,
+        danceRolePreference: obj.role,
+        createdAt: obj.created_at,
+      };
+    });
+
+    await createEnrollments(enrollments);
+    window.location.reload();
   }
 
   useEffect(() => {
@@ -483,7 +495,7 @@ export default function ClassesIdPage() {
               className="hidden"
               type={"file"}
               id="csvFileInput"
-              accept={".csv"}
+              accept={".xlsx"}
               title={"Importar CSV"}
               onChange={handleImportCsv}
             />
