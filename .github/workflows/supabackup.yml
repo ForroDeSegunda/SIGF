@@ -1,0 +1,47 @@
+name: Supa-backup
+
+on:
+  push:
+    branches: [backup]
+  pull_request:
+    branches: [backup]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *" # Runs every day at midnight
+jobs:
+  run_db_backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      supabase_db_url: ${{ secrets.SUPABASE_DB_URL }} # For example: postgresql://postgres:[YOUR-PASSWORD]@db.<ref>.supabase.co:5432/postgres
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Backup roles
+        run: supabase db dump --db-url "$supabase_db_url" -f roles.sql --role-only
+      - name: Backup schema
+        run: supabase db dump --db-url "$supabase_db_url" -f schema.sql
+      - name: Backup data
+        run: supabase db dump --db-url "$supabase_db_url" -f data.sql --data-only --use-copy
+      - name: Zip backup files
+        run: zip backup.zip roles.sql schema.sql data.sql
+
+      - name: Set Date Environment Variable
+        run: echo "DATE_VARIABLE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
+      - name: Upload a file to Google Drive
+        uses: willo32/google-drive-upload-action@v1
+        with:
+          target: ./backup.dump
+          credentials: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
+          # parent_folder_id: 1Oa_hOZt--x9A2kfoczt2p6B0CA0EJ_wH # Google Drive folder: backup_supabase
+          name: ${{ env.DATE_VARIABLE }}.dump
