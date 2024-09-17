@@ -1,4 +1,4 @@
-name: Supa-backup
+name: Database Backup
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
   schedule:
     - cron: "0 0 * * *" # Runs every day at midnight
 jobs:
-  run_db_backup:
+  backup:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -41,7 +41,7 @@ jobs:
       - name: Upload a file to Google Drive
         uses: willo32/google-drive-upload-action@v1
         with:
-          target: ./backup.dump
+          target: ./backup.zip
           credentials: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
           parent_folder_id: 1GrBV9VW2flX8budaWJhVs9rRVzDwxdLg # Google Drive folder: backup_supabase
           name: ${{ env.DATE_VARIABLE }}.dump
