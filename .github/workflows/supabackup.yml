@@ -49,7 +49,7 @@ jobs:
         run: zip backup.zip roles.sql schema.sql data.sql
 
       - name: Set Date Environment Variable
-        run: echo "DATE_VARIABLE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+        run: echo "DATE_VARIABLE=$(date +'%d-%m-%Y')" >> $GITHUB_ENV
 
       - name: Upload Backup
         run: rclone copyto backup.zip "remote:${{ env.DATE_VARIABLE }}.zip" -vv
