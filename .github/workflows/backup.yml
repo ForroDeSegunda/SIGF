@@ -1,30 +1,58 @@
-name: Backup
+name: Database Backup
 
 on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
   schedule:
-    - cron: '0 15 * * *'
+    - cron: "0 15 * * *"
 
 jobs:
   backup:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      supabase_db_url: ${{ secrets.SUPABASE_DB_URL }} # For example: postgresql://postgres:[YOUR-PASSWORD]@db.<ref>.supabase.co:5432/postgres
+
     steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Supabase
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Setup Rclone
+        uses: AnimMouse/setup-rclone@v1
+        with:
+          rclone_config: ${{ secrets.RCLONE_CONFIG }}
+
+      - name: Add Rclone Service Account File
+        uses: AnimMouse/setup-rclone/service-account-file@v1
+        with:
+          service_account_filename: service-account-file.json
+          service_account_file: ${{ secrets.RCLONE_SERVICE_ACCOUNT_FILE }}
+
+      - name: Backup Roles
+        run: supabase db dump --db-url "$supabase_db_url" -f roles.sql --role-only
+      - name: Backup Schema
+        run: supabase db dump --db-url "$supabase_db_url" -f schema.sql
+      - name: Backup Data
+        run: supabase db dump --db-url "$supabase_db_url" -f data.sql --data-only --use-copy
+      - name: Zip Backup Files
+        run: zip backup.zip roles.sql schema.sql data.sql
+
       - name: Set Date Environment Variable
-        run: echo "DATE_VARIABLE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+        run: echo "DATE_VARIABLE=$(date +'%d-%m-%Y')" >> $GITHUB_ENV
 
-      - name: Setup Postgres
-        uses: ankane/setup-postgres@v1
-        with:
-          postgres-version: 16
+      - name: Remove 30 Day Old Backups
+        run: rclone delete -vv --min-age 30d "remote:"
 
-      - name: Backup Supabase Database
-        run: |
-          pg_dump postgres://postgres.${{ secrets.DEV_SUPABASE_REFERENCE_ID }}:${{ secrets.DEV_SUPABASE_PASSWORD }}@aws-0-sa-east-1.pooler.supabase.com:6543/postgres --format=c > backup.dump
-          echo "Backup created at $(date)"
-
-      - name: Upload a file to Google Drive
-        uses: willo32/google-drive-upload-action@v1
-        with:
-          target: ./backup.dump
-          credentials: ${{ secrets.GOOGLE_DRIVE_CREDENTIALS }}
-          parent_folder_id: 1Oa_hOZt--x9A2kfoczt2p6B0CA0EJ_wH # Google Drive folder: backup_supabase
-          name: ${{ env.DATE_VARIABLE }}.dump
+      - name: Upload Backup
+        run: rclone copyto backup.zip "remote:${{ env.DATE_VARIABLE }}.zip" -vv
