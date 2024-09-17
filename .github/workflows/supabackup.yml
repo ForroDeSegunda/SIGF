@@ -52,7 +52,7 @@ jobs:
         run: echo "DATE_VARIABLE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Upload Backup
-        run: rclone copy backup.zip "remote:${{ env.DATE_VARIABLE }}.zip" -vv
+        run: rclone copyto backup.zip "remote:${{ env.DATE_VARIABLE }}.zip" -vv
 # - name: Upload a file to Google Drive
 #   uses: willo32/google-drive-upload-action@v1
 #   with:
