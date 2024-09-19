@@ -2,9 +2,9 @@ import { deleteClass } from "@/app/api/classes/service";
 import { useModal } from "@/app/components/MainModal";
 import { classesAtom } from "@/atoms/classesAtom";
 import { currentClassAtom } from "@/atoms/currentClassAtom";
-import { TClassRow } from "@/types/classTypes";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
+import { TClassRow } from "../types";
 
 export default function ButtonOptions(props: TClassRow) {
   const [classes, setClasses] = useRecoilState(classesAtom);

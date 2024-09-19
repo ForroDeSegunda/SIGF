@@ -5,12 +5,12 @@ import { currentPeriodAtom } from "@/atoms/currentPeriod";
 import { modalIdAtom, modalIsOpenAtom } from "@/atoms/modalAtom";
 import { periodsAtom } from "@/atoms/periodsAtom";
 import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
-import { TSemesterEnum } from "@/types/enum";
 import DatePicker from "react-datepicker";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
 import { readPeriods } from "../actions";
+import { TSemesterEnum } from "@/app/enumTypes";
 
 const Form = tw.form`flex-1 flex flex-col w-full justify-center gap-2 text-foreground`;
 const Label = tw.label`text-md`;

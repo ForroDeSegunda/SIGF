@@ -1,7 +1,7 @@
 "use server";
 
 import { useSupabaseServer } from "@/supabase/server";
-import { TThreadsRow } from "@/types/threadsTypes";
+import { TThreadsRow } from "./types";
 
 const server = await useSupabaseServer();
 

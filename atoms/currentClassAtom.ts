@@ -1,4 +1,4 @@
-import { TClassInsert } from "@/types/classTypes";
+import { TClassInsert } from "@/app/(authPages)/classes/types";
 import { atom } from "recoil";
 
 export const currentClassAtom = atom<TClassInsert>({

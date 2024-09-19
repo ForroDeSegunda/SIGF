@@ -1,9 +1,8 @@
 import { Database } from "@/database.types";
-import { TClassRow } from "@/types/classTypes";
 import axios from "axios";
 import { TClassAndPeriod } from "./[id]/route";
+import { TClassInsert, TClassRow } from "@/app/(authPages)/classes/types";
 
-export type TClassInsert = Database["public"]["Tables"]["classes"]["Insert"];
 export type TClassUpdate = Database["public"]["Tables"]["classes"]["Update"];
 
 export async function readClass(classId: string | string[]) {
