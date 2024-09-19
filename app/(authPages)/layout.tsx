@@ -11,7 +11,7 @@ import { readPeriods } from "../api/periods/service";
 import { readUserWithRole } from "../api/users/service";
 import MainModal from "../components/MainModal";
 import Navbar from "../components/Navbar";
-import SideBar from "../components/SideBar";
+import SideBar from "./components/Sidebar";
 
 const Main = tw.main`flex-bg-white w-full h-dvh flex flex-col`;
 const Container = tw.div`flex h-[calc(100dvh-4rem)]`;

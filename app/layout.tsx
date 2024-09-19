@@ -11,7 +11,7 @@ export const metadata = {
   description: "Sistema de Gerenciamento do Forró de Segunda",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;

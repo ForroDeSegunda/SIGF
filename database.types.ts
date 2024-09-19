@@ -234,6 +234,55 @@ export type Database = {
           },
         ]
       }
+      comments: {
+        Row: {
+          content: string
+          createdAt: string
+          id: string
+          parentCommentId: string | null
+          postId: string
+          userId: string
+        }
+        Insert: {
+          content: string
+          createdAt?: string
+          id?: string
+          parentCommentId?: string | null
+          postId: string
+          userId: string
+        }
+        Update: {
+          content?: string
+          createdAt?: string
+          id?: string
+          parentCommentId?: string | null
+          postId?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_parentCommentId_fkey"
+            columns: ["parentCommentId"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_postId_fkey"
+            columns: ["postId"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "user"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       enrollment: {
         Row: {
           classId: string
@@ -348,6 +397,74 @@ export type Database = {
         }
         Relationships: []
       }
+      posts: {
+        Row: {
+          content: string | null
+          createdAt: string
+          id: string
+          threadId: string | null
+          title: string
+          userId: string
+        }
+        Insert: {
+          content?: string | null
+          createdAt?: string
+          id?: string
+          threadId?: string | null
+          title: string
+          userId: string
+        }
+        Update: {
+          content?: string | null
+          createdAt?: string
+          id?: string
+          threadId?: string | null
+          title?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_authorId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "user"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_threadId_fkey"
+            columns: ["threadId"]
+            isOneToOne: false
+            referencedRelation: "threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      threads: {
+        Row: {
+          createdAt: string
+          id: string
+          userId: string
+        }
+        Insert: {
+          createdAt?: string
+          id: string
+          userId: string
+        }
+        Update: {
+          createdAt?: string
+          id?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "threads_creatorId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "user"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transaction: {
         Row: {
           amount: number
@@ -407,6 +524,55 @@ export type Database = {
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "users_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      votes: {
+        Row: {
+          commentId: string | null
+          createdAt: string
+          id: string
+          postId: string | null
+          userId: string
+          vote: Database["public"]["Enums"]["voteType"]
+        }
+        Insert: {
+          commentId?: string | null
+          createdAt?: string
+          id?: string
+          postId?: string | null
+          userId: string
+          vote: Database["public"]["Enums"]["voteType"]
+        }
+        Update: {
+          commentId?: string | null
+          createdAt?: string
+          id?: string
+          postId?: string | null
+          userId?: string
+          vote?: Database["public"]["Enums"]["voteType"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "votes_commentId_fkey"
+            columns: ["commentId"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_postId_fkey"
+            columns: ["postId"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "user"
             referencedColumns: ["id"]
           },
         ]
@@ -477,6 +643,7 @@ export type Database = {
         | "TO"
       transactionType: "income" | "expense"
       userRole: "student" | "teacher" | "admin"
+      voteType: "upVote" | "downVote"
     }
     CompositeTypes: {
       [_ in never]: never

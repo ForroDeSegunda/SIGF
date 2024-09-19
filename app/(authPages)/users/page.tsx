@@ -1,7 +1,7 @@
 "use client";
 
 import { createUser, readUsers, updateUser } from "@/app/api/users/service";
-import { TUserViewPlusRole, TUser } from "@/utils/db";
+import { TUser, TUserViewPlusRole } from "@/utils/db";
 import { studentRoleOptions } from "@/utils/humanize";
 import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef, GridApi } from "ag-grid-community";
