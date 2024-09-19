@@ -11,11 +11,7 @@ export const metadata = {
   description: "Sistema de Gerenciamento do Forró de Segunda",
 };
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout(p: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body
@@ -24,7 +20,7 @@ export default async function RootLayout({
       >
         <Toaster theme="light" richColors visibleToasts={2} />
         <RecoilWrapper>
-          <Suspense>{children}</Suspense>
+          <Suspense>{p.children}</Suspense>
         </RecoilWrapper>
       </body>
     </html>

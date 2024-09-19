@@ -3,21 +3,23 @@
 import { classesAtom } from "@/atoms/classesAtom";
 import { periodsAtom } from "@/atoms/periodsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
+import { TPeriodRow, TUserWithRole } from "@/utils/db";
 import { useSetRecoilState } from "recoil";
+import { TClassRow } from "./classes/types";
+import { threadsAtom } from "./threads/atom";
+import { TThreadsRow } from "./threads/types";
 
-export default function RecoilProvider(p: {
+export function Content(p: {
   children: React.ReactNode;
-  classes: any;
-  periods: any;
-  users: any;
+  user: TUserWithRole;
+  classes: TClassRow[];
+  periods: TPeriodRow[];
+  threads: TThreadsRow[];
 }) {
-  const setClasses = useSetRecoilState(classesAtom);
-  const setPeriods = useSetRecoilState(periodsAtom);
-  const setUsers = useSetRecoilState(usersAtom);
+  useSetRecoilState(usersAtom)(p.user);
+  useSetRecoilState(classesAtom)(p.classes);
+  useSetRecoilState(periodsAtom)(p.periods);
+  useSetRecoilState(threadsAtom)(p.threads);
 
-  setClasses(p.classes);
-  setPeriods(p.periods);
-  setUsers(p.users);
-
-  return <>{p.children}</>;
+  return <div className="flex flex-grow">{p.children}</div>;
 }

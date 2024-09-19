@@ -7,9 +7,12 @@ import {
   FaHourglassHalf,
   FaMessage,
   FaPeopleGroup,
+  FaRegMessage,
   FaUserGear,
 } from "react-icons/fa6";
 import { useRecoilValue } from "recoil";
+import { threadsAtom } from "../(authPages)/threads/atom";
+import { TThreadsRow } from "../(authPages)/threads/types";
 import SideBarButton from "./SideBarButton";
 
 export default function Sidebar() {
@@ -39,10 +42,12 @@ export default function Sidebar() {
       href: "/users",
     },
   ];
+  console.log("sidebarIsOpen", sidebarIsOpen);
+
   return (
     <aside
-      className={`bg-white shrink md:block w-52 min-w-32 border-gray-300 border-r overflow-hidden ${
-        sidebarIsOpen ? "block" : "hidden"
+      className={`bg-white shrink w-52 min-w-52 border-gray-300 border-r overflow-auto z-50 h-full ${
+        sidebarIsOpen ? "absolute md:relative" : "hidden md:block"
       }`}
     >
       {buttons.map((button, index) => {
@@ -56,15 +61,26 @@ export default function Sidebar() {
           />
         );
       })}
-      <ThreadsButton />
+      <ForumButton />
     </aside>
   );
 }
 
-function ThreadsButton() {
+function ForumButton() {
+  const threads = useRecoilValue(threadsAtom);
+
   return (
     <>
-      <SideBarButton text="Tópicos" icon={<FaMessage />} href="/threads" />
+      <SideBarButton text="Fórum" icon={<FaMessage />} href="/posts" />
+      <div className="flex flex-col ml-4 overflow-y-auto">
+        {threads.map((thread: TThreadsRow) => (
+          <SideBarButton
+            key={thread.id}
+            text={thread.id.charAt(0).toUpperCase() + thread.id.slice(1)}
+            icon={<FaRegMessage />}
+          />
+        ))}
+      </div>
     </>
   );
 }
