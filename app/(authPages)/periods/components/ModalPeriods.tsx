@@ -10,7 +10,7 @@ import DatePicker from "react-datepicker";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
-import { readPeriods } from "../../actions";
+import { readPeriods } from "../actions";
 
 const Form = tw.form`flex-1 flex flex-col w-full justify-center gap-2 text-foreground`;
 const Label = tw.label`text-md`;

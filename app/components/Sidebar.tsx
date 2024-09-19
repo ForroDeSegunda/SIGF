@@ -10,7 +10,7 @@ import {
   FaUserGear,
 } from "react-icons/fa6";
 import { useRecoilValue } from "recoil";
-import SideBarButton from "../../components/SideBarButton";
+import SideBarButton from "./SideBarButton";
 
 export default function Sidebar() {
   const user = useRecoilValue(usersAtom);

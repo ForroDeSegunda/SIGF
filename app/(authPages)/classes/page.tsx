@@ -22,7 +22,7 @@ import { FaBox, FaEye, FaEyeSlash, FaRotate } from "react-icons/fa6";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import ButtonEnrollment from "./components/ButtonEnrollment";
 import ButtonOptions from "./components/ButtonOptions";
-import { readClasses } from "../actions";
+import { readClasses } from "./actions";
 
 export default function ClassesPage() {
   const user = useRecoilValue(usersAtom);

@@ -5,12 +5,7 @@ import { periodsAtom } from "@/atoms/periodsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import { useSetRecoilState } from "recoil";
 
-export default function RecoilProvider({
-  children,
-  classes,
-  periods,
-  users,
-}: {
+export default function RecoilProvider(p: {
   children: React.ReactNode;
   classes: any;
   periods: any;
@@ -20,9 +15,9 @@ export default function RecoilProvider({
   const setPeriods = useSetRecoilState(periodsAtom);
   const setUsers = useSetRecoilState(usersAtom);
 
-  setClasses(classes);
-  setPeriods(periods);
-  setUsers(users);
+  setClasses(p.classes);
+  setPeriods(p.periods);
+  setUsers(p.users);
 
-  return <>{children}</>;
+  return <>{p.children}</>;
 }

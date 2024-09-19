@@ -1,9 +1,11 @@
 import tw from "tailwind-styled-components";
 import MainModal from "../components/MainModal";
 import Navbar from "../components/Navbar";
-import { readClasses, readPeriods, readUserWithRole } from "./actions";
+import Sidebar from "../components/Sidebar";
+import { readClasses } from "./classes/actions";
 import RecoilProvider from "./content";
-import Sidebar from "./components/Sidebar";
+import { readPeriods } from "./periods/actions";
+import { readUserWithRole } from "./users/actions";
 
 const Main = tw.main`flex-bg-white w-full h-dvh flex flex-col`;
 const Container = tw.div`flex h-[calc(100dvh-4rem)]`;

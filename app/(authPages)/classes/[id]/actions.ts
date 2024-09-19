@@ -15,13 +15,13 @@ export async function createUsersForXlsxImport(
 ): Promise<TUserViewPlusRole[]> {
   if (users.length === 0) return [];
 
-  const server = await useSupabaseServer();
-  const session = await server.auth.getSession();
+  const supabaseServer = await useSupabaseServer();
+  const session = await supabaseServer.auth.getSession();
 
   let createdUsers: TUserViewPlusRole[] = [];
 
   for (const user of users) {
-    const { data, error } = await server.auth.signUp({
+    const { data, error } = await supabaseServer.auth.signUp({
       email: user.email,
       password: createHash("sha256").update("password").digest("hex"),
     });
@@ -30,7 +30,7 @@ export async function createUsersForXlsxImport(
       continue;
     }
 
-    await server.auth.updateUser({
+    await supabaseServer.auth.updateUser({
       data: {
         full_name: user.full_name,
       },
@@ -47,10 +47,10 @@ export async function createUsersForXlsxImport(
     };
     createdUsers.push(newUser);
 
-    server.auth.resetPasswordForEmail(data.user?.email!);
+    supabaseServer.auth.resetPasswordForEmail(data.user?.email!);
   }
 
-  await server.auth.setSession({
+  await supabaseServer.auth.setSession({
     refresh_token: session.data.session?.refresh_token!,
     access_token: session.data.session?.access_token!,
   });
