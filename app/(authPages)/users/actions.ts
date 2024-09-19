@@ -35,9 +35,11 @@ export async function readUserWithRole() {
     throw publicUser.error;
   }
 
-  const userPlum = {
+  const publicUserData = publicUser.data[0];
+
+  const user = {
     ...privateUser.data.user,
-    userRole: publicUser.data[0].role,
+    userRole: publicUserData ? publicUserData.role : "student",
   };
-  return userPlum as TUserWithRole;
+  return user as TUserWithRole;
 }
