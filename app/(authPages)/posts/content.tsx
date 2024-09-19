@@ -9,12 +9,12 @@ export function PostsContent(p: { posts: TPostsRow[] }) {
 
   return (
     <div className="flex flex-col w-full m-4 bg-white border rounded-lg border-gray-300">
-      {posts.map((thread: TPostsRow) => (
-        <div className="flex flex-col w-full border-b p-4" key={thread.id}>
-          <Link className="font-bold" href={`/threads/${thread.threadId}`}>
-            t/{thread.threadId}
+      {posts.map((post: TPostsRow) => (
+        <div className="flex flex-col w-full border-b p-4" key={post.id}>
+          <Link className="font-bold" href={`/threads/${post.threadId}`}>
+            t/{post.threadId}
           </Link>
-          <h2 className="text-xl">{thread.title}</h2>
+          <h2 className="text-xl">{post.title}</h2>
         </div>
       ))}
     </div>

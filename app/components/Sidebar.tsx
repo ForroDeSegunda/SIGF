@@ -42,7 +42,6 @@ export default function Sidebar() {
       href: "/users",
     },
   ];
-  console.log("sidebarIsOpen", sidebarIsOpen);
 
   return (
     <aside
