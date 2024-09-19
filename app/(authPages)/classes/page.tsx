@@ -1,7 +1,6 @@
 "use client";
 
 import { TClasses } from "@/app/api/classes/[id]/route";
-import { readClasses } from "@/app/api/classes/service";
 import { readEnrollmentsByUser } from "@/app/api/enrollments/service";
 import { classesAtom, sortedClassesSelector } from "@/atoms/classesAtom";
 import { currentClassAtom } from "@/atoms/currentClassAtom";
@@ -23,6 +22,7 @@ import { FaBox, FaEye, FaEyeSlash, FaRotate } from "react-icons/fa6";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import ButtonEnrollment from "./components/ButtonEnrollment";
 import ButtonOptions from "./components/ButtonOptions";
+import { readClasses } from "../actions";
 
 export default function ClassesPage() {
   const user = useRecoilValue(usersAtom);

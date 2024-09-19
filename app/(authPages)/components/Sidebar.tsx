@@ -1,3 +1,5 @@
+"use client";
+
 import { sidebarMainAtom } from "@/atoms/sidebarsAtom";
 import { usersAtom } from "@/atoms/usersAtom";
 import {

@@ -12,7 +12,7 @@ export async function middleware(req: NextRequest) {
 
   updateServerSession(req);
 
-  const server = useSupabaseServer();
+  const server = await useSupabaseServer();
   const { data } = await server.auth.getSession();
 
   if (!data.session && !publicPathnames.includes(req.nextUrl.pathname)) {

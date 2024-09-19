@@ -19,15 +19,6 @@ export async function readPeriod(periodId: string | string[]) {
   }
 }
 
-export async function readPeriods() {
-  try {
-    const res = await axios.get("/api/periods");
-    return res.data;
-  } catch (error) {
-    throw error;
-  }
-}
-
 export async function createPeriods(period: TPeriodInsert[]) {
   try {
     const res = await axios.post("/api/periods", period);

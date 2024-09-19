@@ -20,7 +20,6 @@ export default function Calendar() {
   const [currentCalendar, setCurrentCalendar] = useState<TCalendar>(
     calendars[0],
   );
-
   useEffect(() => {
     async function handleLoadCalendars() {
       const calendars = await readCalendars();

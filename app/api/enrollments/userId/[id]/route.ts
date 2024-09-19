@@ -1,9 +1,10 @@
-import { supabaseClient } from "@/supabase/client";
+import { useSupabaseServer } from "@/supabase/server";
 import { TEnrollmentRow } from "@/utils/db";
 import { NextResponse } from "next/server";
 
 export async function GET(_: any, { params }: { params: { id: string } }) {
-  const { data, error } = await supabaseClient
+  const server = await useSupabaseServer();
+  const { data, error } = await server
     .from("enrollment")
     .select("*")
     .eq("userId", params.id);

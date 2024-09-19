@@ -1,29 +1,5 @@
-import { supabaseClient } from "@/supabase/client";
-import { TUser, TUserViewPlusRole, TUserWithRole } from "@/utils/db";
-import { User } from "@supabase/supabase-js";
+import { TUser, TUserViewPlusRole } from "@/utils/db";
 import axios from "axios";
-
-export async function readUserWithRole() {
-  const { data, error } = await supabaseClient.auth.getUser();
-
-  if (error) {
-    console.error("Error reading user session:", error);
-    throw error;
-  }
-
-  const userData: User = data.user;
-  try {
-    const res = await fetch(`/api/users/${data.user?.id}`);
-    const userRole: TUser = await res.json();
-
-    const userWithRole = { ...userData, userRole: userRole.role };
-
-    return userWithRole as TUserWithRole;
-  } catch (error) {
-    const userWithRole: TUserWithRole = { ...userData, userRole: "student" };
-    return userWithRole;
-  }
-}
 
 export async function readUsers(emails?: string[]) {
   const params = { emails };

@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
 
-  const supabase = useSupabaseServer();
+  const supabase = await useSupabaseServer();
   await supabase.auth.exchangeCodeForSession(code!);
 
   // URL to redirect to after sign in process completes

@@ -12,6 +12,6 @@ type TUser = {
 };
 
 export async function updateUser(user: TUser) {
-  const supabaseServer = useSupabaseServer();
-  return await supabaseServer.auth.updateUser(user);
+  const server = await useSupabaseServer();
+  return await server.auth.updateUser(user);
 }

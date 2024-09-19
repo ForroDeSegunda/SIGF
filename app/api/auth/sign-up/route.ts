@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   const requestUrl = new URL(request.url);
-  const supabaseServer = useSupabaseServer();
+  const supabaseServer = await useSupabaseServer();
 
   const { email, password, full_name } = await request.json();
   if (!email || !password || !full_name) {

@@ -3,7 +3,7 @@
 import { useSupabaseServer } from "@/supabase/server";
 import { TThreadsRow } from "@/types/threadsTypes";
 
-const server = useSupabaseServer();
+const server = await useSupabaseServer();
 
 export async function readThreads() {
   const { data, error } = await server.from("threads").select();

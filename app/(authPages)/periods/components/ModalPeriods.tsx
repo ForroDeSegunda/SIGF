@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  createPeriods,
-  readPeriods,
-  updatePeriod,
-} from "@/app/api/periods/service";
+import { createPeriods, updatePeriod } from "@/app/api/periods/service";
 import { currentPeriodAtom } from "@/atoms/currentPeriod";
 import { modalIdAtom, modalIsOpenAtom } from "@/atoms/modalAtom";
 import { periodsAtom } from "@/atoms/periodsAtom";
@@ -14,6 +10,7 @@ import DatePicker from "react-datepicker";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
+import { readPeriods } from "../../actions";
 
 const Form = tw.form`flex-1 flex flex-col w-full justify-center gap-2 text-foreground`;
 const Label = tw.label`text-md`;
