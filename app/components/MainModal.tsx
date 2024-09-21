@@ -15,8 +15,10 @@ import ModalClassDate from "../(authPages)/classes/[id]/attendance/components/Mo
 import ModalClassEnrollment from "../(authPages)/classes/components/ModalClassEnrollment";
 import ModalClasses from "../(authPages)/classes/components/ModalClasses";
 import ModalPeriods from "../(authPages)/periods/components/ModalPeriods";
+import { ModalPosts } from "../(authPages)/posts/components/ModalPosts";
 import { ModalConfirmation } from "./ModalConfirmation";
 import { ModalProfile } from "./ModalProfile";
+import { ModalThreads } from "../(authPages)/threads/components/ModalThreads";
 
 Modal.setAppElement("#__modal");
 
@@ -69,6 +71,8 @@ export default function MainModal() {
           classDate: <ModalClassDate />,
           classEnrollment: <ModalClassEnrollment />,
           profile: <ModalProfile />,
+          posts: <ModalPosts />,
+          threads: <ModalThreads />,
         }[modalOption]
       }
     </Modal>

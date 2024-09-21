@@ -1,11 +1,20 @@
 "use server";
 
 import { useSupabaseServer } from "@/supabase/server";
-import { TPostsRow } from "./types";
+import { TPostsInsert, TPostsRow } from "./types";
+
+const TABLE = "posts";
 
 export async function readPosts() {
   const server = await useSupabaseServer();
-  const { data, error } = await server.from("posts").select();
+  const { data, error } = await server.from(TABLE).select();
+  if (error) throw error;
+  return data as TPostsRow[];
+}
+
+export async function createPosts(posts: TPostsInsert[]) {
+  const server = await useSupabaseServer();
+  const { data, error } = await server.from(TABLE).insert(posts).select();
   if (error) throw error;
   return data as TPostsRow[];
 }

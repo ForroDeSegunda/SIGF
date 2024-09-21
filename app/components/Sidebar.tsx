@@ -77,6 +77,7 @@ function ForumButton() {
             key={thread.id}
             text={thread.id.charAt(0).toUpperCase() + thread.id.slice(1)}
             icon={<FaRegMessage />}
+            href={`/posts?thread=${thread.id}`}
           />
         ))}
       </div>

@@ -8,7 +8,9 @@ export type TModalOptions =
   | "periods"
   | "classDate"
   | "classEnrollment"
-  | "profile";
+  | "profile"
+  | "threads"
+  | "posts";
 
 export const modalOptionsAtom = atom<TModalOptions>({
   key: "modalOptionsAtom",

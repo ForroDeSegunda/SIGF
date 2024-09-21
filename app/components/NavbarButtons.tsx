@@ -11,9 +11,12 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import { useRecoilValue, useResetRecoilState } from "recoil";
+import tw from "tailwind-styled-components";
 import ButtonNewCalendar from "../(authPages)/calendar/components/ButtonNewCalendar";
 import GenerateClassDates from "../(authPages)/classes/[id]/attendance/components/CreateClassDates";
 import { useModal } from "./MainModal";
+
+const ProfileMenu = tw.div`absolute right-4 bg-white top-11 border rounded-[10px] p-4 flex flex-col items-center z-50 gap-4`;
 
 export function NavbarButtons() {
   const openModal = useModal();
@@ -27,6 +30,7 @@ export function NavbarButtons() {
   const windowWidth = useWindowWidth();
   const resetCurrentClass = useResetRecoilState(currentClassAtom);
   const resetCurrentPeriod = useResetRecoilState(currentPeriodAtom);
+  const [showModalOptions, setShowModalOptions] = useState(false);
 
   const classesIdRegex = new RegExp(
     /\/classes\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
@@ -189,6 +193,23 @@ export function NavbarButtons() {
         >
           {attendancePercentage} %
         </div>
+      </div>
+    );
+  } else if (pathName === "/posts") {
+    return (
+      <div className="flex gap-1 relative">
+        <button
+          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-l"
+          onClick={() => openModal("posts")}
+        >
+          Criar Publicação
+        </button>
+        <button
+          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-r"
+          onClick={() => openModal("threads")}
+        >
+          Criar Assunto
+        </button>
       </div>
     );
   }

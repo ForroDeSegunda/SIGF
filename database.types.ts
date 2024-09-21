@@ -402,7 +402,7 @@ export type Database = {
           content: string | null
           createdAt: string
           id: string
-          threadId: string | null
+          threadId: string
           title: string
           userId: string
         }
@@ -410,7 +410,7 @@ export type Database = {
           content?: string | null
           createdAt?: string
           id?: string
-          threadId?: string | null
+          threadId: string
           title: string
           userId: string
         }
@@ -418,7 +418,7 @@ export type Database = {
           content?: string | null
           createdAt?: string
           id?: string
-          threadId?: string | null
+          threadId?: string
           title?: string
           userId?: string
         }
