@@ -62,7 +62,10 @@ export function ThreadsContent() {
               onChange={(e) => setThreadName(e.target.value)}
             />
           ) : (
-            <Link className="text-xl font-bold" href={`/threads/${thread.id}`}>
+            <Link
+              className="text-xl font-bold"
+              href={`/posts?thread=${thread.id}`}
+            >
               t/{thread.id.charAt(0).toUpperCase() + thread.id.slice(1)}
             </Link>
           )}

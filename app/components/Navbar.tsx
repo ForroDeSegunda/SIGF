@@ -14,6 +14,16 @@ import LogoutButton from "./LogoutButton";
 import { useModal } from "./MainModal";
 import { NavbarButtons } from "./NavbarButtons";
 
+const Nav = tw.nav`border-b-[1px] border-gray-300 h-16 w-full flex items-center justify-between`;
+const LeftSection = tw.div`flex items-center pl-4 gap-4`;
+const LogoLink = tw(Link)`hidden sm:block font-bold`;
+const ProfileContainer = tw.div`flex gap-4 pr-4 relative`;
+const ProfileImage = tw.img`cursor-pointer rounded-full h-10 w-10`;
+const ProfileMenu = tw.div`absolute right-4 bg-white top-11 border rounded-[10px] p-4 flex flex-col items-center z-50 gap-4`;
+const ProfileMenuItem = tw.div``;
+const ProfileButtonGroup = tw.div`flex w-full justify-between gap-2`;
+const EditButton = tw.button`py-2 px-4 rounded-md bg-blue-500 hover:bg-blue-600 text-white`;
+
 export default function Navbar() {
   const openModal = useModal();
   const profileRef = useRef<HTMLImageElement>(null);
@@ -21,9 +31,8 @@ export default function Navbar() {
   const [sidebarIsOpen, setSidebarIsOpen] = useRecoilState(sidebarMainAtom);
   const [isProfileMenuVisible, setProfileMenuVisible] = useState(false);
   const router = useRouter();
-  const splitedPath = usePathname()
-    .split("/")
-    .filter((path) => path);
+  const path = usePathname();
+  const splitedPath = path.split("/").filter((path) => path);
 
   function handleClickOutside(event: MouseEvent) {
     if (
@@ -82,13 +91,3 @@ export default function Navbar() {
     </Nav>
   );
 }
-
-const Nav = tw.nav`border-b-[1px] border-gray-300 h-16 w-full flex items-center justify-between`;
-const LeftSection = tw.div`flex items-center pl-4 gap-4`;
-const LogoLink = tw(Link)`hidden sm:block font-bold`;
-const ProfileContainer = tw.div`flex gap-4 pr-4 relative`;
-const ProfileImage = tw.img`cursor-pointer rounded-full h-10 w-10`;
-const ProfileMenu = tw.div`absolute right-4 bg-white top-11 border rounded-[10px] p-4 flex flex-col items-center z-50 gap-4`;
-const ProfileMenuItem = tw.div``;
-const ProfileButtonGroup = tw.div`flex w-full justify-between gap-2`;
-const EditButton = tw.button`py-2 px-4 rounded-md bg-blue-500 hover:bg-blue-600 text-white`;

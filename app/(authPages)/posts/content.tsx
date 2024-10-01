@@ -39,7 +39,10 @@ export function PostsContent(p: { posts: TPostsRow[] }) {
             key={post.id}
           >
             <div className="flex flex-col mr-4">
-              <Link className="font-bold" href={`/threads/${post.threadId}`}>
+              <Link
+                className="font-bold"
+                href={`/posts?thread=${post.threadId}`}
+              >
                 t/{post.threadId}
               </Link>
               <Link className="text-xl" href={`/posts/${post.id}`}>
