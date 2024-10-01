@@ -42,5 +42,6 @@ export async function updateThread(id: string, newId: string) {
     .eq("id", id)
     .select();
   if (error) throw error;
-  return data as TThreadsRow;
+
+  return data as TThreadsRow[];
 }

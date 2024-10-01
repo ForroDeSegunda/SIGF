@@ -20,7 +20,6 @@ export function ThreadsContent() {
   const [isEditing, setIsEditing] = useState("");
   const [threadName, setThreadName] = useState("");
   const user = useRecoilValue(usersAtom);
-  console.log("user", user);
 
   function handleClickEdit(threadId: string) {
     if (isEditing === threadId) {
