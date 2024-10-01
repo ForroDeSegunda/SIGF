@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateServerSession } from "./supabase/middleware";
 import { useSupabaseServer } from "./supabase/server";
+import { createUser } from "./app/(authPages)/users/actions";
 
 const publicPathnames = ["/login", "/password"];
 
@@ -17,6 +18,17 @@ export async function middleware(req: NextRequest) {
 
   if (!data.session && !publicPathnames.includes(req.nextUrl.pathname)) {
     return NextResponse.redirect(`${reqUrl.origin}`);
+  }
+
+  const user = await server
+    .from("user")
+    .select("*")
+    .eq("id", data.session?.user.id);
+  if (user.data!.length === 0) {
+    createUser({
+      id: data.session?.user.id!,
+      role: "student",
+    });
   }
 
   return res;

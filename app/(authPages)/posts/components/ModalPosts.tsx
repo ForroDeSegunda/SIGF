@@ -1,14 +1,13 @@
+import { modalIsOpenAtom } from "@/atoms/modalAtom";
 import { usersAtom } from "@/atoms/usersAtom";
-import { useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { toast } from "sonner";
 import tw from "tailwind-styled-components";
 import { threadsAtom } from "../../threads/atom";
-import { modalIsOpenAtom } from "@/atoms/modalAtom";
 import { TThreadsRow } from "../../threads/types";
-import { TPostsInsert } from "../types";
 import { createPosts } from "../actions";
-import { toast } from "sonner";
 import { postsAtom } from "../atom";
+import { TPostsInsert } from "../types";
 
 const Form = tw.form`flex flex-col flex-1 w-full justify-center gap-2 text-foreground`;
 const Label = tw.label`text-md`;
@@ -39,7 +38,7 @@ export function ModalPosts() {
       const createdPosts = await createPosts([newPost]);
       setPosts([...posts, createdPosts[0]]);
     } catch (error) {
-      toast.error("Erro ao criar post");
+      toast.error("Erro ao criar publicação");
       return;
     }
     setIsModalOpen(false);

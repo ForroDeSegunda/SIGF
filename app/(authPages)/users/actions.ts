@@ -2,6 +2,7 @@
 
 import { useSupabaseServer } from "@/supabase/server";
 import { TUserWithRole } from "@/utils/db";
+import { TUserInsert, TUserRow } from "./types";
 
 type TUser = {
   email?: string;
@@ -11,6 +12,14 @@ type TUser = {
     avatar_url?: string;
   };
 };
+
+export async function createUser(user: TUserInsert) {
+  const server = await useSupabaseServer();
+  const { data, error } = await server.from("user").insert(user).select("*");
+
+  if (error) throw error;
+  return data as TUserRow[];
+}
 
 export async function updateUser(user: TUser) {
   const server = await useSupabaseServer();
