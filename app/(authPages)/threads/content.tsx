@@ -10,6 +10,7 @@ import { deleteThreads, updateThread } from "./actions";
 import { threadsAtom } from "./atom";
 import { TThreadsRow } from "./types";
 import { usersAtom } from "@/atoms/usersAtom";
+import { readPostsByThreadId, updatePosts } from "../posts/actions";
 
 const ActionButtons = tw.div`flex gap-4`;
 const Input = tw.input`border rounded-md px-4 py-2 w-full mr-4`;
@@ -37,6 +38,12 @@ export function ThreadsContent() {
   }
 
   async function handleUpdateThread(threadId: string) {
+    const posts = await readPostsByThreadId(threadId);
+    const newPosts = posts.map((post) => {
+      post.threadId = threadName.toLowerCase();
+      return post;
+    });
+
     const updatedThreads = await updateThread(
       threadId,
       threadName.toLowerCase(),
@@ -45,6 +52,8 @@ export function ThreadsContent() {
       if (thread.id === threadId) return updatedThreads[0];
       return thread;
     });
+
+    updatePosts(newPosts);
     setThreads(newThreads);
     setIsEditing("");
   }
@@ -66,7 +75,7 @@ export function ThreadsContent() {
               className="text-xl font-bold"
               href={`/posts?thread=${thread.id}`}
             >
-              t/{thread.id.charAt(0).toUpperCase() + thread.id.slice(1)}
+              {thread.id.charAt(0).toUpperCase() + thread.id.slice(1)}
             </Link>
           )}
           {user!.userRole !== "student" && (

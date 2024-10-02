@@ -23,9 +23,26 @@ export async function readPost(postId: string) {
   return data as TPostsRow;
 }
 
+export async function readPostsByThreadId(threadId: string) {
+  const server = await useSupabaseServer();
+  const { data, error } = await server
+    .from(TABLE)
+    .select()
+    .eq("threadId", threadId);
+  if (error) throw error;
+  return data as TPostsRow[];
+}
+
 export async function createPosts(posts: TPostsInsert[]) {
   const server = await useSupabaseServer();
   const { data, error } = await server.from(TABLE).insert(posts).select();
+  if (error) throw error;
+  return data as TPostsRow[];
+}
+
+export async function updatePosts(posts: TPostsRow[]) {
+  const server = await useSupabaseServer();
+  const { data, error } = await server.from(TABLE).upsert(posts).select();
   if (error) throw error;
   return data as TPostsRow[];
 }
