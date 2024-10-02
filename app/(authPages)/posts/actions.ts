@@ -12,6 +12,17 @@ export async function readPosts() {
   return data as TPostsRow[];
 }
 
+export async function readPost(postId: string) {
+  const server = await useSupabaseServer();
+  const { data, error } = await server
+    .from(TABLE)
+    .select()
+    .eq("id", postId)
+    .single();
+  if (error) throw error;
+  return data as TPostsRow;
+}
+
 export async function createPosts(posts: TPostsInsert[]) {
   const server = await useSupabaseServer();
   const { data, error } = await server.from(TABLE).insert(posts).select();

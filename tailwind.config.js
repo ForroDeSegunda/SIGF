@@ -5,6 +5,9 @@ export const content = [
 ];
 export const theme = {
   extend: {
+    screens: {
+      xs: "390px",
+    },
     colors: {
       background: "#ffffff",
       foreground: "#000000",
@@ -47,7 +50,6 @@ export const theme = {
         900: "#114b69",
         950: "#0b2f46",
       },
-
       btn: {
         background: "hsl(var(--btn-background))",
         background_hover: "hsl(var(--btn-background-hover))",

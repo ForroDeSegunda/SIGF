@@ -8,7 +8,7 @@ import { readUserWithRole } from "./users/actions";
 import { readThreads } from "./threads/actions";
 import { Content } from "./content";
 
-const Main = tw.main`flex-bg-white w-full h-dvh flex flex-col`;
+const Main = tw.main`flex-bg-white w-full h-dvh flex flex-col overflow-hidden`;
 const Container = tw.div`flex h-[calc(100dvh-4rem)]`;
 
 export default async function PagesLayout(props: {

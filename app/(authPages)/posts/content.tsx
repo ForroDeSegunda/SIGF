@@ -9,6 +9,7 @@ import { TPostsRow } from "./types";
 import { useModal } from "@/app/components/MainModal";
 import { FaTrash } from "react-icons/fa";
 import { deletePosts } from "./actions";
+import { timeAgo } from "@/utils/functions";
 
 export function PostsContent(p: { posts: TPostsRow[] }) {
   const openModal = useModal();
@@ -39,12 +40,15 @@ export function PostsContent(p: { posts: TPostsRow[] }) {
             key={post.id}
           >
             <div className="flex flex-col mr-4">
-              <Link
-                className="font-bold"
-                href={`/posts?thread=${post.threadId}`}
-              >
-                t/{post.threadId}
-              </Link>
+              <div className="flex gap-2">
+                <Link
+                  className="font-bold"
+                  href={`/posts?thread=${post.threadId}`}
+                >
+                  {post.threadId}
+                </Link>
+                <div className="text-gray-500">{timeAgo(post.createdAt)}</div>
+              </div>
               <Link className="text-xl" href={`/posts/${post.id}`}>
                 {post.title}
               </Link>

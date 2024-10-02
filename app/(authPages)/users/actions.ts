@@ -2,7 +2,7 @@
 
 import { useSupabaseServer } from "@/supabase/server";
 import { TUserWithRole } from "@/utils/db";
-import { TUserInsert, TUserRow } from "./types";
+import { TUserInsert, TUserRow, TUserViewRow } from "./types";
 
 type TUser = {
   email?: string;
@@ -24,6 +24,16 @@ export async function createUser(user: TUserInsert) {
 export async function updateUser(user: TUser) {
   const server = await useSupabaseServer();
   return await server.auth.updateUser(user);
+}
+
+export async function readUsersViewById(userIds: string[]) {
+  const server = await useSupabaseServer();
+  const { data, error } = await server
+    .from("users_view")
+    .select("*")
+    .in("id", userIds);
+  if (error) throw error;
+  return data as TUserViewRow[];
 }
 
 export async function readUserWithRole() {

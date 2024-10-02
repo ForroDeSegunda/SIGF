@@ -21,5 +21,5 @@ export function Content(p: {
   useSetRecoilState(periodsAtom)(p.periods);
   useSetRecoilState(threadsAtom)(p.threads);
 
-  return <div className="flex flex-grow">{p.children}</div>;
+  return <div className="flex flex-grow overflow-auto">{p.children}</div>;
 }
