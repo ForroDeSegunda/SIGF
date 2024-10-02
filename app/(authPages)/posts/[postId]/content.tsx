@@ -7,18 +7,25 @@ import { Comment } from "../components/Comment";
 import { TPostsRow } from "../types";
 import { TCommentsRow } from "./types";
 import { useState } from "react";
+import { timeAgo } from "@/utils/functions";
 
 const Container = tw.div`flex w-full m-4`;
 const Content = tw.div`flex flex-col w-full max-w-screen-lg mx-auto`;
 const Post = tw.div`flex flex-col gap-4 pb-4`;
 const PostTitle = tw.h1`text-2xl font-bold`;
 const PostDescription = tw.p`text-sm`;
+const Header = tw.button`flex gap-4 w-fit`;
+const HeaderText = tw.div`flex flex-col justify-between text-left`;
+const HeaderName = tw.div`text-sm font-bold`;
+const HeaderTime = tw.div`text-sm text-gray-500`;
+const ProfileImage = tw.img`rounded-full h-10 w-10`;
 
 export function PostIdContent(p: {
   post: TPostsRow;
   users: TUserViewRow[];
   comments: TCommentsRow[];
 }) {
+  const user = p.users.find((user) => user.id === p.post.userId);
   const [comments, setComments] = useState(() =>
     [...p.comments].sort(
       (a, b) =>
@@ -30,9 +37,17 @@ export function PostIdContent(p: {
     <Container>
       <Content>
         <Post>
+          <Header>
+            <ProfileImage src={user!.avatar_url!} />
+            <HeaderText>
+              <HeaderName>{user?.full_name}</HeaderName>
+              <HeaderTime>{timeAgo(p.post.createdAt)}</HeaderTime>
+            </HeaderText>
+          </Header>
           <PostTitle>{p.post.title}</PostTitle>
           <PostDescription>{p.post.content}</PostDescription>
           <ActionButtons
+            commentLevel={0}
             commentsAmount={comments.length}
             post={p.post}
             comments={comments}
@@ -40,16 +55,23 @@ export function PostIdContent(p: {
           />
         </Post>
 
-        {comments.map((comment) => (
-          <Comment
-            key={comment.id}
-            post={p.post}
-            users={p.users}
-            comment={comment}
-            comments={comments}
-            setComments={setComments}
-          />
-        ))}
+        {comments.map((comment) => {
+          if (comment.parentCommentId) return null;
+          return (
+            <Comment
+              commentLevel={0}
+              key={comment.id}
+              post={p.post}
+              users={p.users}
+              comment={comment}
+              comments={comments}
+              setComments={setComments}
+              childComments={comments.filter(
+                (c) => c.parentCommentId === comment.id,
+              )}
+            />
+          );
+        })}
       </Content>
     </Container>
   );

@@ -29,6 +29,7 @@ export function ActionButtons(p: {
   setComments: (comments: TCommentsRow[]) => void;
   comments: TCommentsRow[];
   post: TPostsRow;
+  commentLevel: number;
   comment?: TCommentsRow;
   commentsAmount?: number;
 }) {
@@ -47,6 +48,7 @@ export function ActionButtons(p: {
         content: newCommentText,
         postId: p.post.id,
         userId: user!.id,
+        parentCommentId: p.comment?.id || null,
       });
       toast.success("Comentário enviado com sucesso!");
 
@@ -112,10 +114,12 @@ export function ActionButtons(p: {
         <Button>
           <FaRegThumbsDown size={size} />
         </Button>
-        <Button onClick={() => setShowTextArea(!showTextArea)}>
-          <FaRegMessage size={size} />
-          <ButtonText>Responder</ButtonText>
-        </Button>
+        {p.commentLevel < 4 && (
+          <Button onClick={() => setShowTextArea(!showTextArea)}>
+            <FaRegMessage size={size} />
+            <ButtonText>Responder</ButtonText>
+          </Button>
+        )}
         {showTextArea ? (
           <Button onClick={handleCreateComment}>
             <FaRegPaperPlane size={size} />
