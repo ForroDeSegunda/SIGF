@@ -9,7 +9,7 @@ import { TCommentsRow } from "./types";
 import { useState } from "react";
 
 const Container = tw.div`flex w-full m-4`;
-const Content = tw.div`flex flex-col max-w-screen-lg mx-auto`;
+const Content = tw.div`flex flex-col w-full max-w-screen-lg mx-auto`;
 const Post = tw.div`flex flex-col gap-4 pb-4`;
 const PostTitle = tw.h1`text-2xl font-bold`;
 const PostDescription = tw.p`text-sm`;
