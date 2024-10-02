@@ -45,7 +45,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`flex shrink-0 w-52 min-w-52 border-gray-300 border-r overflow-auto z-50 h-full ${
+      className={`bg-white flex flex-col shrink-0 w-52 min-w-52 border-gray-300 border-r overflow-auto z-50 h-full ${
         sidebarIsOpen ? "absolute md:relative" : "hidden md:block"
       }`}
     >
