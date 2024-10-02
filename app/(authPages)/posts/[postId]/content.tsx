@@ -33,7 +33,7 @@ export function PostIdContent(p: {
           <PostTitle>{p.post.title}</PostTitle>
           <PostDescription>{p.post.content}</PostDescription>
           <ActionButtons
-            commentsAmount={9134}
+            commentsAmount={comments.length}
             post={p.post}
             comments={comments}
             setComments={setComments}

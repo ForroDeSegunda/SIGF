@@ -60,3 +60,15 @@ export async function deletePosts(posts: TPostsRow[]) {
   if (error) throw error;
   return data as TPostsRow[];
 }
+
+export async function deletePost(post: TPostsRow) {
+  const server = await useSupabaseServer();
+  const { data, error } = await server
+    .from(TABLE)
+    .delete()
+    .eq("id", post.id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as TPostsRow;
+}

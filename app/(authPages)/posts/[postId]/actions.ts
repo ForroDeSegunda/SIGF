@@ -25,3 +25,15 @@ export async function createComment(comment: TCommentsInsert) {
   if (error) throw error;
   return data as TCommentsRow;
 }
+
+export async function deleteComment(comment: TCommentsRow) {
+  const server = await useSupabaseServer();
+  const { data, error } = await server
+    .from(TABLE)
+    .delete()
+    .eq("id", comment.id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as TCommentsRow;
+}
