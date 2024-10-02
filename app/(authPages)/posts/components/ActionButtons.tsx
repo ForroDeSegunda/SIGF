@@ -102,12 +102,12 @@ export function ActionButtons(p: {
   return (
     <>
       <ButtonRow>
-        {p.commentsAmount && (
+        {p.commentsAmount ? (
           <Button>
             <FaRegComment size={size} />
             <ButtonText>{p.commentsAmount}</ButtonText>
           </Button>
-        )}
+        ) : null}
         <Button>
           <FaRegThumbsUp size={size} />
         </Button>
