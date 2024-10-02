@@ -26,6 +26,13 @@ export async function updateUser(user: TUser) {
   return await server.auth.updateUser(user);
 }
 
+export async function readUsersView() {
+  const server = await useSupabaseServer();
+  const { data, error } = await server.from("users_view").select("*");
+  if (error) throw error;
+  return data as TUserViewRow[];
+}
+
 export async function readUsersViewById(userIds: string[]) {
   const server = await useSupabaseServer();
   const { data, error } = await server
