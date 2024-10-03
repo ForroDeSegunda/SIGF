@@ -21,7 +21,7 @@ import {
   updateComment,
 } from "../[postId]/actions";
 import { TCommentsRow } from "../[postId]/types";
-import { deletePost } from "../actions";
+import { deletePost, updatePosts } from "../actions";
 import { postsAtom } from "../atom";
 import { TPostsRow } from "../types";
 
@@ -37,13 +37,14 @@ export function ActionButtons(p: {
   showTextArea: boolean;
   setShowTextArea: (show: boolean) => void;
   post: TPostsRow;
+  setPost: (post: TPostsRow) => void;
   commentLevel: number;
+  newCommentText: string;
+  setNewCommentText: (text: string) => void;
   comment?: TCommentsRow;
   commentsAmount?: number;
   showChildComments?: boolean;
   setShowChildComments?: (show: boolean) => void;
-  newCommentText: string;
-  setNewCommentText: (text: string) => void;
 }) {
   const size = 20;
   const router = useRouter();
@@ -61,11 +62,29 @@ export function ActionButtons(p: {
     if (p.comment) {
       if (p.showTextArea) handleUpdateComment();
       else if (showTextArea) handleCreateComment();
-      else console.log("caso de comentario nao avaliado");
+      else console.error("Caso de comentario nao avaliado");
     } else {
-      console.log("Aqui vai a logica do post");
+      handleUpdatePost();
     }
   }
+
+  async function handleUpdatePost() {
+    try {
+      const updatedPost = await updatePosts([
+        {
+          ...p.post,
+          content: p.newCommentText,
+        },
+      ]);
+      p.setPost(updatedPost[0]);
+      p.setShowTextArea(false);
+      toast.success("Post atualizado com sucesso!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao atualizar post!");
+    }
+  }
+
   async function handleUpdateComment() {
     try {
       const updatedComment = await updateComment({

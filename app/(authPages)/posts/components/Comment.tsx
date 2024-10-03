@@ -19,6 +19,7 @@ type TCommentProps = {
   commentLevel: number;
   users: TUserViewRow[];
   post: TPostsRow;
+  setPost: (post: TPostsRow) => void;
   comment: TCommentsRow;
   comments: TCommentsRow[];
   setComments: (comments: TCommentsRow[]) => void;
@@ -64,6 +65,7 @@ export function Comment(p: TCommentProps) {
         )}
         <ActionButtons
           post={p.post}
+          setPost={p.setPost}
           comment={p.comment}
           comments={p.comments}
           setComments={p.setComments}
@@ -84,6 +86,7 @@ export function Comment(p: TCommentProps) {
             commentLevel={p.commentLevel + 1}
             users={p.users}
             post={p.post}
+            setPost={p.setPost}
             comment={comment}
             comments={p.comments}
             setComments={p.setComments}
