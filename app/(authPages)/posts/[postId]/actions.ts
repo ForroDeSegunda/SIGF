@@ -26,6 +26,18 @@ export async function createComment(comment: TCommentsInsert) {
   return data as TCommentsRow;
 }
 
+export async function updateComment(comment: TCommentsRow) {
+  const server = await useSupabaseServer();
+  const { data, error } = await server
+    .from(TABLE)
+    .update(comment)
+    .eq("id", comment.id)
+    .select()
+    .single();
+  if (error) throw error;
+  return data as TCommentsRow;
+}
+
 export async function deleteComment(comment: TCommentsRow) {
   const server = await useSupabaseServer();
   const { data, error } = await server

@@ -4,7 +4,7 @@ import { TUserViewRow } from "../../users/types";
 import { TCommentsRow } from "../[postId]/types";
 import { TPostsRow } from "../types";
 import { ActionButtons } from "./ActionButtons";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Container = tw.div<TCommentProps>`flex flex-col gap-4 border-t py-4`;
 const Description = tw.p`text-sm`;
@@ -13,6 +13,7 @@ const HeaderText = tw.div`flex flex-col justify-between text-left`;
 const HeaderName = tw.div`text-sm font-bold`;
 const HeaderTime = tw.div`text-sm text-gray-500`;
 const ProfileImage = tw.img`rounded-full h-10 w-10`;
+const Textarea = tw.textarea`w-full h-auto p-3 border rounded border-gray-300 resize-none overflow-hidden`;
 
 type TCommentProps = {
   commentLevel: number;
@@ -28,6 +29,18 @@ type TCommentProps = {
 export function Comment(p: TCommentProps) {
   const commentUser = p.users.find((user) => user.id === p.comment.userId);
   const [showChildComments, setShowChildComments] = useState(true);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const [showTextArea, setShowTextArea] = useState(false);
+  const [newCommentText, setNewCommentText] = useState(p.comment.content);
+
+  function handleTextareaInput() {
+    if (!textareaRef.current) return;
+    textareaRef.current.style.height = "auto";
+    textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+  }
+  useEffect(() => {
+    if (showTextArea && textareaRef.current) handleTextareaInput();
+  }, [showTextArea]);
 
   return (
     <>
@@ -39,7 +52,16 @@ export function Comment(p: TCommentProps) {
             <HeaderTime>{timeAgo(p.comment.createdAt)}</HeaderTime>
           </HeaderText>
         </Header>
-        <Description>{p.comment.content}</Description>
+        {showTextArea ? (
+          <Textarea
+            ref={textareaRef}
+            value={newCommentText}
+            onInput={handleTextareaInput}
+            onChange={(e) => setNewCommentText(e.target.value)}
+          />
+        ) : (
+          <Description>{p.comment.content}</Description>
+        )}
         <ActionButtons
           post={p.post}
           comment={p.comment}
@@ -49,6 +71,10 @@ export function Comment(p: TCommentProps) {
           commentsAmount={p.childComments?.length}
           showChildComments={showChildComments}
           setShowChildComments={setShowChildComments}
+          showTextArea={showTextArea}
+          setShowTextArea={setShowTextArea}
+          newCommentText={newCommentText}
+          setNewCommentText={setNewCommentText}
         />
       </Container>
       {showChildComments &&

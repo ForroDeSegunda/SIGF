@@ -7,6 +7,7 @@ import {
   FaRegComment,
   FaRegMessage,
   FaRegPaperPlane,
+  FaRegPenToSquare,
   FaRegThumbsDown,
   FaRegThumbsUp,
   FaRegTrashCan,
@@ -14,7 +15,11 @@ import {
 import { useRecoilState, useRecoilValue } from "recoil";
 import { toast } from "sonner";
 import tw from "tailwind-styled-components";
-import { createComment, deleteComment } from "../[postId]/actions";
+import {
+  createComment,
+  deleteComment,
+  updateComment,
+} from "../[postId]/actions";
 import { TCommentsRow } from "../[postId]/types";
 import { deletePost } from "../actions";
 import { postsAtom } from "../atom";
@@ -27,31 +32,62 @@ const CommentCounter = tw.span`font-bold`;
 const Textarea = tw.textarea`w-full h-auto p-3 border rounded border-gray-300 resize-none overflow-hidden`;
 
 export function ActionButtons(p: {
-  setComments: (comments: TCommentsRow[]) => void;
   comments: TCommentsRow[];
+  setComments: (comments: TCommentsRow[]) => void;
+  showTextArea: boolean;
+  setShowTextArea: (show: boolean) => void;
   post: TPostsRow;
   commentLevel: number;
   comment?: TCommentsRow;
   commentsAmount?: number;
   showChildComments?: boolean;
   setShowChildComments?: (show: boolean) => void;
+  newCommentText: string;
+  setNewCommentText: (text: string) => void;
 }) {
   const size = 20;
   const router = useRouter();
   const openModal = useModal();
   const user = useRecoilValue(usersAtom);
   const [showTextArea, setShowTextArea] = useState(false);
-  const [newCommentText, setNewCommentText] = useState("");
+  const [newCommentText, setNewCommentText] = useState(p.comment?.content);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [posts, setPosts] = useRecoilState(postsAtom);
   const isPostOwner = user!.id === p.post.userId;
   const isCommentOwner = user!.id === p.comment?.userId;
   const isAdmin = user!.userRole === "admin";
 
+  async function handleSendButton() {
+    if (p.comment) {
+      if (p.showTextArea) handleUpdateComment();
+      else if (showTextArea) handleCreateComment();
+      else console.log("caso de comentario nao avaliado");
+    } else {
+      console.log("Aqui vai a logica do post");
+    }
+  }
+  async function handleUpdateComment() {
+    try {
+      const updatedComment = await updateComment({
+        ...p.comment!,
+        content: p.newCommentText,
+      });
+      p.setComments(
+        p.comments.map((comment) =>
+          comment.id === updatedComment.id ? updatedComment : comment,
+        ),
+      );
+      p.setShowTextArea(false);
+      toast.success("Comentário atualizado com sucesso!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao atualizar comentário!");
+    }
+  }
   async function handleCreateComment() {
     try {
       const newComment = await createComment({
-        content: newCommentText,
+        content: newCommentText || "",
         postId: p.post.id,
         userId: user!.id,
         parentCommentId: p.comment?.id || null,
@@ -135,8 +171,12 @@ export function ActionButtons(p: {
             </Button>
           </>
         )}
-        {showTextArea ? (
-          <Button onClick={handleCreateComment}>
+        <Button onClick={() => p.setShowTextArea(!p.showTextArea)}>
+          <FaRegPenToSquare size={size} />
+          <ButtonText className="hidden sm:block">Editar</ButtonText>
+        </Button>
+        {showTextArea || p.showTextArea ? (
+          <Button onClick={handleSendButton}>
             <FaRegPaperPlane size={size} />
             <ButtonText>Enviar</ButtonText>
           </Button>
@@ -153,7 +193,7 @@ export function ActionButtons(p: {
                 }
               >
                 <FaRegTrashCan size={size} />
-                <ButtonText>Excluir</ButtonText>
+                <ButtonText className="hidden sm:block">Excluir</ButtonText>
               </Button>
             ) : null}
           </>
