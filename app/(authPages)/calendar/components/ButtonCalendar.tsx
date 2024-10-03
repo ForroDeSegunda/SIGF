@@ -4,7 +4,7 @@ import {
   updateCalendar,
 } from "@/app/api/calendar/controller";
 import { useState } from "react";
-import { FaPen } from "react-icons/fa";
+import { FaRegPenToSquare } from "react-icons/fa6";
 
 export default function ButtonCalendar(props: {
   id: string;
@@ -59,7 +59,7 @@ export default function ButtonCalendar(props: {
       }
     >
       <div className="flex flex-row w-full gap-4">
-        <FaPen
+        <FaRegPenToSquare
           className="cursor-pointer"
           onClick={() => setIsEditing(!isEditing)}
         />

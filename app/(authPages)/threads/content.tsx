@@ -4,7 +4,12 @@ import { useModal } from "@/app/components/MainModal";
 import { usersAtom } from "@/atoms/usersAtom";
 import Link from "next/link";
 import { useState } from "react";
-import { FaCheck, FaPen, FaRegTrashCan, FaXmark } from "react-icons/fa6";
+import {
+  FaCheck,
+  FaRegPenToSquare,
+  FaRegTrashCan,
+  FaXmark,
+} from "react-icons/fa6";
 import { useRecoilState, useRecoilValue } from "recoil";
 import tw from "tailwind-styled-components";
 import { readPostsByThreadId, updatePosts } from "../posts/actions";
@@ -92,7 +97,7 @@ export function ThreadsContent() {
               ) : (
                 <>
                   <button onClick={() => handleClickEdit(thread.id)}>
-                    <FaPen size={19} />
+                    <FaRegPenToSquare size={20} />
                   </button>
                   <button
                     onClick={() =>

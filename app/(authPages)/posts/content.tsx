@@ -22,6 +22,7 @@ export function PostsContent(p: { posts: TPostsRow[] }) {
   const searchParams = useSearchParams();
   const thread = searchParams.get("thread");
   const openModal = useModal();
+  const isAdmin = user!.userRole === "admin";
   const posts = useMemo(() => {
     if (postsFromAtom.length === 0) {
       setPostsFromAtom(p.posts);
@@ -55,7 +56,7 @@ export function PostsContent(p: { posts: TPostsRow[] }) {
                 {post.title}
               </Link>
             </PostContent>
-            {user!.id === post.userId && (
+            {(isAdmin || user!.id === post.userId) && (
               <button
                 onClick={() =>
                   openModal("confirmation", post.id, () =>

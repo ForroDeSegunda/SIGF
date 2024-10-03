@@ -20,9 +20,10 @@ import { deletePost } from "../actions";
 import { postsAtom } from "../atom";
 import { TPostsRow } from "../types";
 
-const ButtonRow = tw.div`flex gap-5 xs:gap-6`;
+const ButtonRow = tw.div`flex gap-6`;
 const Button = tw.button`flex gap-2 items-center`;
-const ButtonText = tw.span`font-bold`;
+const ButtonText = tw.span`font-bold hidden sm:block`;
+const CommentCounter = tw.span`font-bold`;
 const Textarea = tw.textarea`w-full h-auto p-3 border rounded border-gray-300 resize-none overflow-hidden`;
 
 export function ActionButtons(p: {
@@ -115,21 +116,21 @@ export function ActionButtons(p: {
             }}
           >
             <FaRegComment size={size} />
-            <ButtonText>{p.commentsAmount}</ButtonText>
+            <CommentCounter>{p.commentsAmount}</CommentCounter>
           </Button>
         ) : null}
-        <Button>
-          <FaRegThumbsUp size={size} />
-        </Button>
-        <Button>
-          <FaRegThumbsDown size={size} />
-        </Button>
         {p.commentLevel < 4 && (
           <Button onClick={() => setShowTextArea(!showTextArea)}>
             <FaRegMessage size={size} />
             <ButtonText>Responder</ButtonText>
           </Button>
         )}
+        <Button>
+          <FaRegThumbsUp size={size} />
+        </Button>
+        <Button>
+          <FaRegThumbsDown size={size} />
+        </Button>
         {showTextArea ? (
           <Button onClick={handleCreateComment}>
             <FaRegPaperPlane size={size} />
