@@ -64,7 +64,9 @@ export function ActionButtons(p: {
       else if (showTextArea) handleCreateComment();
       else console.error("Caso de comentario nao avaliado");
     } else {
-      handleUpdatePost();
+      if (p.showTextArea) handleUpdatePost();
+      else if (showTextArea) handleCreateComment();
+      else console.error("Caso de post nao avaliado");
     }
   }
 
