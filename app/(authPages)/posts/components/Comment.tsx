@@ -4,6 +4,7 @@ import { TUserViewRow } from "../../users/types";
 import { TCommentsRow } from "../[postId]/types";
 import { TPostsRow } from "../types";
 import { ActionButtons } from "./ActionButtons";
+import { useState } from "react";
 
 const Container = tw.div<TCommentProps>`flex flex-col gap-4 border-t py-4`;
 const Description = tw.p`text-sm`;
@@ -26,6 +27,8 @@ type TCommentProps = {
 
 export function Comment(p: TCommentProps) {
   const commentUser = p.users.find((user) => user.id === p.comment.userId);
+  const [showChildComments, setShowChildComments] = useState(true);
+
   return (
     <>
       <Container {...p} style={{ marginLeft: `${20 * p.commentLevel}px` }}>
@@ -43,22 +46,26 @@ export function Comment(p: TCommentProps) {
           comments={p.comments}
           setComments={p.setComments}
           commentLevel={p.commentLevel}
+          commentsAmount={p.childComments?.length}
+          showChildComments={showChildComments}
+          setShowChildComments={setShowChildComments}
         />
       </Container>
-      {p.childComments?.map((comment) => (
-        <Comment
-          commentLevel={p.commentLevel + 1}
-          key={comment.id}
-          users={p.users}
-          post={p.post}
-          comment={comment}
-          comments={p.comments}
-          setComments={p.setComments}
-          childComments={p.comments.filter(
-            (c) => c.parentCommentId === comment.id,
-          )}
-        />
-      ))}
+      {showChildComments &&
+        p.childComments?.map((comment) => (
+          <Comment
+            key={comment.id}
+            commentLevel={p.commentLevel + 1}
+            users={p.users}
+            post={p.post}
+            comment={comment}
+            comments={p.comments}
+            setComments={p.setComments}
+            childComments={p.comments.filter(
+              (c) => c.parentCommentId === comment.id,
+            )}
+          />
+        ))}
     </>
   );
 }

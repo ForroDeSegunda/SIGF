@@ -32,6 +32,8 @@ export function ActionButtons(p: {
   commentLevel: number;
   comment?: TCommentsRow;
   commentsAmount?: number;
+  showChildComments?: boolean;
+  setShowChildComments?: (show: boolean) => void;
 }) {
   const size = 20;
   const router = useRouter();
@@ -106,7 +108,12 @@ export function ActionButtons(p: {
     <>
       <ButtonRow>
         {p.commentsAmount ? (
-          <Button>
+          <Button
+            onClick={() => {
+              if (p.setShowChildComments)
+                p.setShowChildComments(!p.showChildComments);
+            }}
+          >
             <FaRegComment size={size} />
             <ButtonText>{p.commentsAmount}</ButtonText>
           </Button>
