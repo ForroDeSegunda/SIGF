@@ -41,6 +41,9 @@ export function ActionButtons(p: {
   const [newCommentText, setNewCommentText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const [posts, setPosts] = useRecoilState(postsAtom);
+  const isPostOwner = user!.id === p.post.userId;
+  const isCommentOwner = user!.id === p.comment?.userId;
+  const isAdmin = user!.userRole === "admin";
 
   async function handleCreateComment() {
     try {
@@ -126,18 +129,22 @@ export function ActionButtons(p: {
             <ButtonText>Enviar</ButtonText>
           </Button>
         ) : (
-          <Button
-            onClick={() =>
-              openModal(
-                "confirmation",
-                p.post.id || p.comment?.id,
-                handleDeleteCommentOrPost,
-              )
-            }
-          >
-            <FaRegTrashCan size={size} />
-            <ButtonText>Excluir</ButtonText>
-          </Button>
+          <>
+            {isAdmin || isPostOwner || isCommentOwner ? (
+              <Button
+                onClick={() =>
+                  openModal(
+                    "confirmation",
+                    p.post.id || p.comment?.id,
+                    handleDeleteCommentOrPost,
+                  )
+                }
+              >
+                <FaRegTrashCan size={size} />
+                <ButtonText>Excluir</ButtonText>
+              </Button>
+            ) : null}
+          </>
         )}
       </ButtonRow>
       {showTextArea && (

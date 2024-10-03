@@ -1,13 +1,13 @@
 "use client";
 
+import { timeAgo } from "@/utils/functions";
+import { useState } from "react";
 import tw from "tailwind-styled-components";
 import { TUserViewRow } from "../../users/types";
 import { ActionButtons } from "../components/ActionButtons";
 import { Comment } from "../components/Comment";
 import { TPostsRow } from "../types";
 import { TCommentsRow } from "./types";
-import { useState } from "react";
-import { timeAgo } from "@/utils/functions";
 
 const Container = tw.div`flex w-full m-4`;
 const Content = tw.div`flex flex-col w-full max-w-screen-lg mx-auto`;
@@ -25,7 +25,7 @@ export function PostIdContent(p: {
   users: TUserViewRow[];
   comments: TCommentsRow[];
 }) {
-  const user = p.users.find((user) => user.id === p.post.userId);
+  const postUser = p.users.find((user) => user.id === p.post.userId);
   const [comments, setComments] = useState(() =>
     [...p.comments].sort(
       (a, b) =>
@@ -38,9 +38,9 @@ export function PostIdContent(p: {
       <Content>
         <Post>
           <Header>
-            <ProfileImage src={user!.avatar_url!} />
+            <ProfileImage src={postUser!.avatar_url!} />
             <HeaderText>
-              <HeaderName>{user?.full_name}</HeaderName>
+              <HeaderName>{postUser?.full_name}</HeaderName>
               <HeaderTime>{timeAgo(p.post.createdAt)}</HeaderTime>
             </HeaderText>
           </Header>

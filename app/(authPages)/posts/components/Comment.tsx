@@ -25,14 +25,14 @@ type TCommentProps = {
 };
 
 export function Comment(p: TCommentProps) {
-  const user = p.users.find((user) => user.id === p.comment.userId);
+  const commentUser = p.users.find((user) => user.id === p.comment.userId);
   return (
     <>
       <Container {...p} style={{ marginLeft: `${20 * p.commentLevel}px` }}>
         <Header>
-          <ProfileImage src={user!.avatar_url!} />
+          <ProfileImage src={commentUser!.avatar_url!} />
           <HeaderText>
-            <HeaderName>{user?.full_name}</HeaderName>
+            <HeaderName>{commentUser?.full_name}</HeaderName>
             <HeaderTime>{timeAgo(p.comment.createdAt)}</HeaderTime>
           </HeaderText>
         </Header>

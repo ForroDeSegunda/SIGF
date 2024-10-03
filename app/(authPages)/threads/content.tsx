@@ -1,16 +1,16 @@
 "use client";
 
 import { useModal } from "@/app/components/MainModal";
+import { usersAtom } from "@/atoms/usersAtom";
 import Link from "next/link";
 import { useState } from "react";
-import { FaCheck, FaPen, FaTrash, FaXmark } from "react-icons/fa6";
+import { FaCheck, FaPen, FaRegTrashCan, FaXmark } from "react-icons/fa6";
 import { useRecoilState, useRecoilValue } from "recoil";
 import tw from "tailwind-styled-components";
+import { readPostsByThreadId, updatePosts } from "../posts/actions";
 import { deleteThreads, updateThread } from "./actions";
 import { threadsAtom } from "./atom";
 import { TThreadsRow } from "./types";
-import { usersAtom } from "@/atoms/usersAtom";
-import { readPostsByThreadId, updatePosts } from "../posts/actions";
 
 const ActionButtons = tw.div`flex gap-4`;
 const Input = tw.input`border rounded-md px-4 py-2 w-full mr-4`;
@@ -83,16 +83,16 @@ export function ThreadsContent() {
               {isEditing === thread.id ? (
                 <>
                   <button onClick={() => handleUpdateThread(thread.id)}>
-                    <FaCheck className="fill-green-400" />
+                    <FaCheck className="fill-green-400" size={20} />
                   </button>
                   <button onClick={() => handleClickEdit(thread.id)}>
-                    <FaXmark className="fill-orange-400" />
+                    <FaXmark className="fill-orange-400" size={20} />
                   </button>
                 </>
               ) : (
                 <>
                   <button onClick={() => handleClickEdit(thread.id)}>
-                    <FaPen className="fill-blue-400" />
+                    <FaPen size={19} />
                   </button>
                   <button
                     onClick={() =>
@@ -101,7 +101,7 @@ export function ThreadsContent() {
                       )
                     }
                   >
-                    <FaTrash className="fill-orange-400" />
+                    <FaRegTrashCan size={20} />
                   </button>
                 </>
               )}

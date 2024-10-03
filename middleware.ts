@@ -6,27 +6,33 @@ import { createUser } from "./app/(authPages)/users/actions";
 const publicPathnames = ["/login", "/password"];
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
-  const reqUrl = new URL(req.url);
+  const server = await useSupabaseServer();
   const origin = `${req.headers.get("x-forwarded-proto")}://${req.headers.get("host")}`;
+  const reqUrl = new URL(req.url);
+  const res = NextResponse.next();
   res.headers.set("origin", origin);
 
   updateServerSession(req);
 
-  const server = await useSupabaseServer();
-  const { data } = await server.auth.getSession();
+  const authUser = await server.auth.getUser();
 
-  if (!data.session && !publicPathnames.includes(req.nextUrl.pathname)) {
+  if (authUser.error && !publicPathnames.includes(req.nextUrl.pathname)) {
     return NextResponse.redirect(`${reqUrl.origin}`);
   }
 
-  const user = await server
+  if (authUser.error) {
+    return NextResponse.redirect(
+      `${reqUrl.origin}/login?error=${authUser.error.message}`,
+    );
+  }
+
+  const foundUser = await server
     .from("user")
     .select("*")
-    .eq("id", data.session?.user.id);
-  if (user.data!.length === 0) {
+    .eq("id", authUser.data.user.id);
+  if (foundUser.data!.length === 0) {
     createUser({
-      id: data.session?.user.id!,
+      id: authUser.data.user.id,
       role: "student",
     });
   }
