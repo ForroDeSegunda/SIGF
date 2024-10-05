@@ -28,7 +28,7 @@ export default function Sidebar() {
       icon: <FaCalendar />,
       href: "/calendar",
     },
-    {
+    isAdmin && {
       text: "Fluxo de Caixa",
       icon: <FaMoneyBillTransfer />,
       href: "/cashflow",
