@@ -1,5 +1,4 @@
 "use client";
-
 import { createUser, readUsers, updateUser } from "@/app/api/users/service";
 import { TUser, TUserViewPlusRole } from "@/utils/db";
 import { studentRoleOptions } from "@/utils/humanize";

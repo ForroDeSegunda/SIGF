@@ -14,6 +14,7 @@ import { useRecoilValue, useResetRecoilState } from "recoil";
 import ButtonNewCalendar from "../(authPages)/calendar/components/ButtonNewCalendar";
 import GenerateClassDates from "../(authPages)/classes/[id]/attendance/components/CreateClassDates";
 import { useModal } from "./MainModal";
+import { cashflowBalanceAtom } from "../(authPages)/cashflow/atom";
 
 export function NavbarButtons() {
   const openModal = useModal();
@@ -27,6 +28,7 @@ export function NavbarButtons() {
   const windowWidth = useWindowWidth();
   const resetCurrentClass = useResetRecoilState(currentClassAtom);
   const resetCurrentPeriod = useResetRecoilState(currentPeriodAtom);
+  const cashflowBalance = useRecoilValue(cashflowBalanceAtom);
 
   const classesIdRegex = new RegExp(
     /\/classes\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
@@ -226,6 +228,23 @@ export function NavbarButtons() {
           Publicações
         </Link>
       </div>
+    );
+  } else if (pathName === "/cashflow" && userRole === "admin") {
+    return (
+      <button
+        className={`flex gap-2 text-white py-2 px-4 rounded 
+        ${cashflowBalance < 0 ? "bg-orange-500 hover:bg-orange-600" : "bg-green-500 hover:bg-green-600"}`}
+        onClick={() => openModal("cashflow")}
+      >
+        Balanço:
+        <span className="font-bold">
+          {new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+            minimumFractionDigits: 2,
+          }).format(cashflowBalance / 100)}
+        </span>
+      </button>
     );
   }
 

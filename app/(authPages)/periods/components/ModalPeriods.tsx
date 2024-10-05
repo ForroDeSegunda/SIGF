@@ -1,5 +1,4 @@
 "use client";
-
 import { createPeriods, updatePeriod } from "@/app/api/periods/service";
 import { currentPeriodAtom } from "@/atoms/currentPeriod";
 import { modalIdAtom, modalIsOpenAtom } from "@/atoms/modalAtom";
