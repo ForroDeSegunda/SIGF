@@ -8,7 +8,12 @@ import {
 } from "@/atoms/modalAtom";
 import { showMobileOptionsAtom } from "@/atoms/showMobileOptionsAtom";
 import Modal from "react-modal";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import {
+  useRecoilState,
+  useRecoilValue,
+  useResetRecoilState,
+  useSetRecoilState,
+} from "recoil";
 import ModalCalendar from "../(authPages)/calendar/components/ModalCalendar";
 import { ModalCashflow } from "../(authPages)/cashflow/components/ModalCashflow";
 import ModalClassDate from "../(authPages)/classes/[id]/attendance/components/ModalClassDate";
@@ -19,6 +24,7 @@ import { ModalPosts } from "../(authPages)/posts/components/ModalPosts";
 import { ModalThreads } from "../(authPages)/threads/components/ModalThreads";
 import { ModalConfirmation } from "./ModalConfirmation";
 import { ModalProfile } from "./ModalProfile";
+import { currentTransactionAtom } from "../(authPages)/cashflow/atom";
 
 Modal.setAppElement("#__modal");
 
@@ -59,6 +65,8 @@ export default function MainModal() {
   const [isModalOpen, setIsModalOpen] = useRecoilState(modalIsOpenAtom);
   const modalOption = useRecoilValue(modalOptionsAtom);
   const setShowMobileOptions = useSetRecoilState(showMobileOptionsAtom);
+  // TODO: Fix this reset current transaction
+  const resetCurrentTransaction = useResetRecoilState(currentTransactionAtom);
 
   return (
     <Modal
@@ -66,6 +74,7 @@ export default function MainModal() {
       onRequestClose={() => {
         setShowMobileOptions(false);
         setIsModalOpen(false);
+        resetCurrentTransaction();
       }}
       style={{
         content: {

@@ -10,3 +10,8 @@ export const transactionsAtom = atom<TTransactionRow[]>({
   key: "transactionsAtom",
   default: [],
 });
+
+export const currentTransactionAtom = atom<TTransactionRow | null>({
+  key: "currentTransactionAtom",
+  default: undefined,
+});

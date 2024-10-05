@@ -1,21 +1,33 @@
 "use client";
+import { useModal } from "@/app/components/MainModal";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
+import { FaRegPenToSquare, FaRegTrashCan } from "react-icons/fa6";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { cashflowBalanceAtom, transactionsAtom } from "./atom";
-import { TTransactionRow } from "./types";
-import { FaRegPenToSquare, FaRegTrashCan, FaTrash } from "react-icons/fa6";
-import { deleteTransaction } from "./actions";
 import { toast } from "sonner";
+import { deleteTransaction } from "./actions";
+import {
+  cashflowBalanceAtom,
+  currentTransactionAtom,
+  transactionsAtom,
+} from "./atom";
+import { TTransactionRow } from "./types";
 
 export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
-  const setBalance = useSetRecoilState(cashflowBalanceAtom);
+  const openModal = useModal();
+  const setCashflowBalance = useSetRecoilState(cashflowBalanceAtom);
   const [transactions, setTransactions] = useRecoilState(transactionsAtom);
+  const setCurrentTransaction = useSetRecoilState(currentTransactionAtom);
 
   useMemo(() => setTransactions(p.transactions), [p.transactions]);
   useMemo(
-    () => setBalance(transactions.reduce((acc, t) => acc + t.amount, 0)),
+    () =>
+      setCashflowBalance(
+        transactions.reduce((acc, t) => {
+          return t.type === "income" ? acc + t.amount : acc - t.amount;
+        }, 0),
+      ),
     [transactions],
   );
 
@@ -31,14 +43,24 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
           currency: "BRL",
           minimumFractionDigits: 2,
         }).format(value / 100),
-      cellRenderer: (p: any) => (
-        <span
-          className="font-bold"
-          style={p.value < 0 ? { color: "#f4771b" } : { color: "#9bbe2e" }}
-        >
-          {p.valueFormatted}
-        </span>
-      ),
+      cellRenderer: (p: {
+        value: number;
+        data: TTransactionRow;
+        valueFormatted: string;
+      }) => {
+        return (
+          <span
+            className="font-bold"
+            style={
+              p.data.type === "expense"
+                ? { color: "#f4771b" }
+                : { color: "#9bbe2e" }
+            }
+          >
+            {p.valueFormatted}
+          </span>
+        );
+      },
     },
     {
       field: "date",
@@ -56,7 +78,12 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
       cellRenderer: (p: { data: TTransactionRow }) => {
         return (
           <div className="flex gap-2 justify-between items-center pt-2">
-            <button onClick={() => console.log("p", p)}>
+            <button
+              onClick={() => {
+                setCurrentTransaction(p.data);
+                openModal("cashflow");
+              }}
+            >
               <FaRegPenToSquare size={20} />
             </button>
             <button onClick={() => handleDeleteTransaction(p.data)}>
