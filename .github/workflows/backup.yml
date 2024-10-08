@@ -22,7 +22,7 @@ jobs:
       - name: Setup Supabase
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 1.200.3
 
       - name: Setup Rclone
         uses: AnimMouse/setup-rclone@v1
