@@ -172,7 +172,7 @@ export default function AttendancePage() {
         className="text-blue-500"
         onClick={() => gridRef.current?.api.exportDataAsCsv()}
       >
-        Baixar CSV
+        Exportar CSV
       </button>
     </div>
   );

@@ -1,5 +1,4 @@
 "use client";
-
 import { TClasses } from "@/app/api/classes/[id]/route";
 import { readEnrollmentsByUser } from "@/app/api/enrollments/service";
 import { classesAtom, sortedClassesSelector } from "@/atoms/classesAtom";
@@ -20,9 +19,9 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaBox, FaEye, FaEyeSlash, FaRotate } from "react-icons/fa6";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { readClasses } from "./actions";
 import ButtonEnrollment from "./components/ButtonEnrollment";
 import ButtonOptions from "./components/ButtonOptions";
-import { readClasses } from "./actions";
 
 export default function ClassesPage() {
   const user = useRecoilValue(usersAtom);
@@ -242,7 +241,7 @@ export default function ClassesPage() {
 
   async function handleSetClasses() {
     const classes = await readClasses();
-    if (user?.userRole === "admin") setClasses(classes);
+    if (user?.userRole === "admin" || "teacher") setClasses(classes);
     else setClasses(classes.filter((c) => c.status === "open"));
   }
 

@@ -23,7 +23,7 @@ export async function readEnrollmentsByClassId(classId: string) {
       row.createdAt = new Date(row.createdAt);
       return row;
     });
-    return new_res_data;
+    return new_res_data as TEnrollmentRow[];
   } catch (error) {
     console.error("Error fetching enrollments:", error);
     throw error;

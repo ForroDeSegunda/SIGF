@@ -1,14 +1,38 @@
 "use server";
-
 import { useSupabaseServer } from "@/supabase/server";
 import { TUserViewPlusRole } from "@/utils/db";
 import { createHash } from "crypto";
+import { TAttendanceRow } from "./types";
+import { TClassDatesRow } from "../types";
 
 export type TUserCreate = {
   email: string;
   full_name: string;
   created_at: string;
 };
+
+export async function readAttendancesByClassDates(
+  classDates: TClassDatesRow[],
+) {
+  const server = await useSupabaseServer();
+  const classDatesIds = classDates.map((classDate) => classDate.id);
+  const { data, error } = await server
+    .from("attendance")
+    .select("*")
+    .in("classDateId", classDatesIds);
+  if (error) throw error;
+  return data as TAttendanceRow[];
+}
+
+export async function updateAttendances(attendances: TAttendanceRow[]) {
+  const server = await useSupabaseServer();
+  const { data, error } = await server
+    .from("attendance")
+    .upsert(attendances)
+    .select("*");
+  if (error) throw error;
+  return data as TAttendanceRow[];
+}
 
 export async function createUsersForXlsxImport(
   users: TUserCreate[],

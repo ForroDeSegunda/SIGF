@@ -159,7 +159,10 @@ export function NavbarButtons() {
         )}
       </div>
     );
-  } else if (pathName.match(attendanceRegex) && userRole === "admin") {
+  } else if (
+    pathName.match(attendanceRegex) &&
+    (userRole === "admin" || "teacher")
+  ) {
     return <GenerateClassDates />;
   } else if (pathName.includes("/userAttendance")) {
     const totalRegistered = attendances.filter(

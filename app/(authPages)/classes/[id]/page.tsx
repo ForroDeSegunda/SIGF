@@ -1,5 +1,4 @@
 "use client";
-
 import {
   createAttendances,
   deleteAttendances,
@@ -418,23 +417,22 @@ export default function ClassesIdPage() {
     event.preventDefault();
     if (!event.target.files) return console.error("No file selected");
 
-    const dict = {
-      "Conduzido/Conduzida (quem é conduzido na dança)": "led",
-      "Condutor/Condutora (quem conduz a dança)": "leader",
-    };
+    toast.info("Importando inscrições...");
 
     const workbook = read(await event.target.files[0].arrayBuffer());
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const json: Array<object> = utils.sheet_to_json(sheet, { raw: false });
     const cleanJson = json.map((obj) => {
       return {
-        email: obj["Endereço de e-mail"],
-        full_name: obj["Nome completo"],
-        created_at: new Date(obj["Carimbo de data/hora"]).toISOString(),
-        role: dict[obj["Para qual função você gostaria de se inscrever?_1"]],
+        email: obj["email"],
+        full_name: obj["nome"],
+        created_at: new Date(obj["data"]).toISOString(),
+        role: String(obj["papel"]).toLowerCase().includes("conduzido")
+          ? "led"
+          : "leader",
       };
     });
-    const emails = json.map((obj) => obj["Endereço de e-mail"]);
+    const emails = json.map((obj) => obj["email"]);
     const users = await readUsers(emails);
     const existingUsersEmails = users.map((user) => user.email);
     const missingUsers = cleanJson.filter(
@@ -446,16 +444,19 @@ export default function ClassesIdPage() {
 
     const enrollments: TEnrollmentInsert[] = cleanJson.map((obj) => {
       const user = allUsers.find((user) => user.email === obj.email);
+      const danceRole = obj.role as "led" | "leader";
       return {
-        classId,
         userId: user!.id,
-        danceRole: obj.role,
-        danceRolePreference: obj.role,
+        classId,
+        danceRole,
+        danceRolePreference: danceRole,
         createdAt: obj.created_at,
+        status: "approved",
       };
     });
 
     await createEnrollments(enrollments);
+    toast.success("Inscrições importadas com sucesso");
     window.location.reload();
   }
 
@@ -470,9 +471,7 @@ export default function ClassesIdPage() {
         ref={gridRef}
         rowData={enrollments}
         overlayNoRowsTemplate="ㅤ"
-        className={
-          user?.userRole === "admin" ? "w-full px-4 pt-4" : "w-full p-4"
-        }
+        className="w-full px-4 pt-4"
         columnDefs={
           windowWidth < 550
             ? user?.userRole === "admin"
@@ -484,10 +483,10 @@ export default function ClassesIdPage() {
         }
       />
 
-      {user?.userRole === "admin" &&
+      {(user?.userRole === "admin" || "teacher") &&
         (enrollments.length > 0 ? (
           <button className="text-blue-500 font-bold" onClick={exportToCsv}>
-            Baixar CSV
+            Exportar inscrições XSLX
           </button>
         ) : (
           <form className="flex justify-center">
@@ -496,14 +495,13 @@ export default function ClassesIdPage() {
               type={"file"}
               id="csvFileInput"
               accept={".xlsx"}
-              title={"Importar CSV"}
               onChange={handleImportCsv}
             />
             <label
               htmlFor="csvFileInput"
               className="text-green-500 font-bold cursor-pointer"
             >
-              Importar CSV
+              Importar Inscrições XSLX
             </label>
           </form>
         ))}

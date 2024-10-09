@@ -43,6 +43,16 @@ export async function readUsersViewById(userIds: string[]) {
   return data as TUserViewRow[];
 }
 
+export async function readUsersViewByEmail(emails: string[]) {
+  const server = await useSupabaseServer();
+  const { data, error } = await server
+    .from("users_view")
+    .select("*")
+    .in("email", emails);
+  if (error) throw error;
+  return data as TUserViewRow[];
+}
+
 export async function readUserWithRole() {
   const server = await useSupabaseServer();
   const privateUser = await server.auth.getUser();
