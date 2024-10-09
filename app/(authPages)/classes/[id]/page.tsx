@@ -423,10 +423,14 @@ export default function ClassesIdPage() {
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const json: Array<object> = utils.sheet_to_json(sheet, { raw: false });
     const cleanJson = json.map((obj) => {
+      const createdDate = new Date(obj["data"]);
       return {
         email: obj["email"],
         full_name: obj["nome"],
-        created_at: new Date(obj["data"]).toISOString(),
+        created_at:
+          createdDate instanceof Date && !isNaN(createdDate.getTime())
+            ? new Date(obj["data"]).toISOString()
+            : new Date().toISOString(),
         role: String(obj["papel"]).toLowerCase().includes("conduzido")
           ? "led"
           : "leader",
@@ -486,7 +490,7 @@ export default function ClassesIdPage() {
       {(user?.userRole === "admin" || "teacher") &&
         (enrollments.length > 0 ? (
           <button className="text-blue-500 font-bold" onClick={exportToCsv}>
-            Exportar inscrições XSLX
+            Exportar inscrições
           </button>
         ) : (
           <form className="flex justify-center">
@@ -501,7 +505,7 @@ export default function ClassesIdPage() {
               htmlFor="csvFileInput"
               className="text-green-500 font-bold cursor-pointer"
             >
-              Importar Inscrições XSLX
+              Importar Inscrições
             </label>
           </form>
         ))}
