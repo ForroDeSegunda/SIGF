@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { read, utils, writeFile } from "xlsx";
 import { readClassDatesByClassId } from "../../actions";
 import { readAttendancesByClassDates, updateAttendances } from "../actions";
+import { TEnrollmentRow } from "@/utils/db";
 
 export interface IClassDatesRow {
   id: string;
@@ -214,7 +215,7 @@ export default function AttendancePage() {
 
     const toExport = users.map((user) => {
       const role = enrollments.find(
-        (enrollment) => enrollment.userId === user.id,
+        (enrollment: TEnrollmentRow) => enrollment.userId === user.id,
       )?.danceRolePreference;
       const obj = {
         Nome: user.full_name,
