@@ -415,53 +415,62 @@ export default function ClassesIdPage() {
 
   async function handleImportCsv(event: ChangeEvent<HTMLInputElement>) {
     event.preventDefault();
-    if (!event.target.files) return console.error("No file selected");
+    if (!event.target.files) {
+      console.error("No file selected");
+      toast.error("Nenhum arquivo selecionado");
+      return;
+    }
 
-    toast.info("Importando inscrições...");
+    try {
+      toast.info("Importando inscrições...");
 
-    const workbook = read(await event.target.files[0].arrayBuffer());
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const json: Array<object> = utils.sheet_to_json(sheet, { raw: false });
-    const cleanJson = json.map((obj) => {
-      const createdDate = new Date(obj["data"]);
-      return {
-        email: obj["email"],
-        full_name: obj["nome"],
-        created_at:
-          createdDate instanceof Date && !isNaN(createdDate.getTime())
-            ? new Date(obj["data"]).toISOString()
-            : new Date().toISOString(),
-        role: String(obj["papel"]).toLowerCase().includes("conduzido")
-          ? "led"
-          : "leader",
-      };
-    });
-    const emails = json.map((obj) => obj["email"]);
-    const users = await readUsers(emails);
-    const existingUsersEmails = users.map((user) => user.email);
-    const missingUsers = cleanJson.filter(
-      (user) => !existingUsersEmails.includes(user.email),
-    );
+      const workbook = read(await event.target.files[0].arrayBuffer());
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const json: Array<object> = utils.sheet_to_json(sheet, { raw: false });
+      const cleanJson = json.map((obj) => {
+        const createdDate = new Date(obj["data"]);
+        return {
+          email: obj["email"],
+          full_name: obj["nome"],
+          created_at:
+            createdDate instanceof Date && !isNaN(createdDate.getTime())
+              ? new Date(obj["data"]).toISOString()
+              : new Date().toISOString(),
+          role: String(obj["papel"]).toLowerCase().includes("conduzido")
+            ? "led"
+            : "leader",
+        };
+      });
+      const emails = json.map((obj) => obj["email"].trim());
+      const users = await readUsers(emails);
+      const existingUsersEmails = users.map((user) => user.email);
+      const missingUsers = cleanJson.filter(
+        (user) => !existingUsersEmails.includes(user.email),
+      );
 
-    const createdUsers = await createUsersForXlsxImport(missingUsers);
-    const allUsers = [...users, ...createdUsers];
+      const createdUsers = await createUsersForXlsxImport(missingUsers);
+      const allUsers = [...users, ...createdUsers];
 
-    const enrollments: TEnrollmentInsert[] = cleanJson.map((obj) => {
-      const user = allUsers.find((user) => user.email === obj.email);
-      const danceRole = obj.role as "led" | "leader";
-      return {
-        userId: user!.id,
-        classId,
-        danceRole,
-        danceRolePreference: danceRole,
-        createdAt: obj.created_at,
-        status: "approved",
-      };
-    });
+      const enrollments: TEnrollmentInsert[] = cleanJson.map((obj) => {
+        const user = allUsers.find((user) => user.email === obj.email);
+        const danceRole = obj.role as "led" | "leader";
+        return {
+          userId: user!.id,
+          classId,
+          danceRole,
+          danceRolePreference: danceRole,
+          createdAt: obj.created_at,
+          status: "approved",
+        };
+      });
 
-    await createEnrollments(enrollments);
-    toast.success("Inscrições importadas com sucesso");
-    window.location.reload();
+      await createEnrollments(enrollments);
+      toast.success("Inscrições importadas com sucesso");
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao importar inscrições");
+    }
   }
 
   useEffect(() => {
