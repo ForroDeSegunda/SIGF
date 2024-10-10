@@ -417,20 +417,19 @@ export default function ClassesIdPage() {
     event.preventDefault();
     if (!event.target.files) {
       console.error("No file selected");
-      toast.error("Nenhum arquivo selecionado");
+      toast.info("Nenhum arquivo selecionado");
       return;
     }
 
     try {
       toast.info("Importando inscrições...");
-
       const workbook = read(await event.target.files[0].arrayBuffer());
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const json: Array<object> = utils.sheet_to_json(sheet, { raw: false });
       const cleanJson = json.map((obj) => {
         const createdDate = new Date(obj["data"]);
         return {
-          email: obj["email"],
+          email: obj["email"].trim().toLowerCase(),
           full_name: obj["nome"],
           created_at:
             createdDate instanceof Date && !isNaN(createdDate.getTime())
@@ -441,13 +440,12 @@ export default function ClassesIdPage() {
             : "leader",
         };
       });
-      const emails = json.map((obj) => obj["email"].trim());
+      const emails = json.map((obj) => obj["email"].trim().toLowerCase());
       const users = await readUsers(emails);
       const existingUsersEmails = users.map((user) => user.email);
       const missingUsers = cleanJson.filter(
         (user) => !existingUsersEmails.includes(user.email),
       );
-
       const createdUsers = await createUsersForXlsxImport(missingUsers);
       const allUsers = [...users, ...createdUsers];
 
