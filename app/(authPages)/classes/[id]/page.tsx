@@ -124,7 +124,10 @@ export default function ClassesIdPage() {
         return (
           <div className="flex flex-col w-full">
             <button className="flex justify-between w-full" onClick={resizeRow}>
-              <span className="font-bold">{p.data.users_view.full_name}</span>
+              <span className="font-bold">
+                {p.data.users_view.full_name ||
+                  p.data.users_view.email.split("@")[0]}
+              </span>
               <span>{new Date(p.data.createdAt).toLocaleString("pt-BR")}</span>
             </button>
 
@@ -163,7 +166,10 @@ export default function ClassesIdPage() {
         return (
           <div className="flex flex-col w-full">
             <button className="flex justify-between w-full" onClick={resizeRow}>
-              <span className="font-bold">{p.data.users_view.full_name}</span>
+              <span className="font-bold">
+                {p.data.users_view.full_name ||
+                  p.data.users_view.email.split("@")[0]}
+              </span>
               <span>{new Date(p.data.createdAt).toLocaleString("pt-BR")}</span>
             </button>
 

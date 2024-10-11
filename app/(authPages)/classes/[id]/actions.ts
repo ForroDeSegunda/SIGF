@@ -57,12 +57,6 @@ export async function createUsersForXlsxImport(
         return null;
       }
 
-      await supabaseServer.auth.updateUser({
-        data: {
-          full_name: user.full_name,
-        },
-      });
-
       const newUser: TUserViewPlusRole = {
         id: data.user?.id!,
         email: data.user?.email!,

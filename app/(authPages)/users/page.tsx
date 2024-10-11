@@ -53,7 +53,7 @@ export default function UsersPage() {
     return (
       <div className="flex flex-col w-full h-full justify-start">
         <button className="flex w-full" onClick={resizeRow}>
-          {data.full_name}
+          {data.full_name || data.email}
         </button>
         <div className="border-t border-x rounded-t w-full flex gap-2 bg-gray-100 px-2">
           <span className="font-bold">Email:</span>

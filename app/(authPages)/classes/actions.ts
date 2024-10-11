@@ -22,3 +22,15 @@ export async function readClassDatesByClassId(classId: string) {
 
   return sortedData as TClassDatesRow[];
 }
+
+export async function deleteClass(classId: string) {
+  const server = await useSupabaseServer();
+  const { data, error } = await server
+    .from("classes")
+    .delete()
+    .eq("id", classId)
+    .select("*")
+    .single();
+  if (error) throw error;
+  return data as TClassDatesRow;
+}
