@@ -6,7 +6,9 @@ import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef, GridApi } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useState } from "react";
+import tw from "tailwind-styled-components";
 
+const Select = tw.select`rounded-md px-4 py-2 bg-inherit border mb-2`;
 export default function UsersPage() {
   const [users, setUsers] = useState<TUserViewPlusRole[]>([]);
   const windowWidth = useWindowWidth();
@@ -21,10 +23,11 @@ export default function UsersPage() {
       valueFormatter: ({ value }) => studentRoleOptions[value],
     },
     {
+      field: "user.role",
       headerName: "Mudar Cargo",
-      minWidth: 150,
-      cellRenderer: actionCellRenderer,
+      minWidth: 120,
       flex: 1,
+      cellRenderer: actionCellRenderer,
     },
   ];
 
@@ -65,7 +68,7 @@ export default function UsersPage() {
         </div>
         <div className="border-b border-x rounded-b w-full flex gap-2 bg-gray-100 px-2">
           <span className="font-bold">Mudar Cargo:</span>
-          {actionCellRenderer({ data })}
+          {actionCellRenderer({ data, value: data.user.role })}
         </div>
       </div>
     );
@@ -106,77 +109,20 @@ export default function UsersPage() {
     setUsers(newUsers);
   }
 
-  function actionCellRenderer({ data }: { data: TUserViewPlusRole }) {
-    function BtnStudent() {
-      return (
-        <button
-          className="text-green-500 hover:text-green-600 font-bold"
-          onClick={() => handleChangeRole(data, "student")}
-        >
-          Aluno
-        </button>
-      );
-    }
-    function BtnTeacher() {
-      return (
-        <button
-          className="text-blue-500 hover:text-blue-600 font-bold"
-          onClick={() => handleChangeRole(data, "teacher")}
-        >
-          Professor
-        </button>
-      );
-    }
-    function BtnAdmin() {
-      return (
-        <button
-          className="text-orange-500 hover:text-orange-600 font-bold"
-          onClick={() => handleChangeRole(data, "admin")}
-        >
-          Admin
-        </button>
-      );
-    }
-    function BtnDirector() {
-      return (
-        <button
-          className="text-orange-500 hover:text-orange-600 font-bold"
-          onClick={() => handleChangeRole(data, "director")}
-        >
-          Admin
-        </button>
-      );
-    }
-
-    if (data.user.role === "student") {
-      return (
-        <div className="flex gap-2 w-full">
-          <BtnTeacher />
-          <BtnAdmin />
-        </div>
-      );
-    } else if (data.user.role === "teacher") {
-      return (
-        <div className="flex gap-2 w-full">
-          <BtnStudent />
-          <BtnAdmin />
-        </div>
-      );
-    } else if (data.user.role === "admin") {
-      return (
-        <div className="flex gap-2 w-full">
-          <BtnStudent />
-          <BtnTeacher />
-        </div>
-      );
-    }
-
+  function actionCellRenderer({ data, value }) {
     return (
-      <div className="flex gap-2 w-full">
-        <BtnStudent />
-        <BtnTeacher />
-        <BtnAdmin />
-      </div>
+      <Select
+        name="classState"
+        defaultValue={value}
+        onChange={(e) =>
+          handleChangeRole(data, e.target.value as TUser["role"])
+        }
+      >
+        <option value="student">Aluno</option>
+        <option value="teacher">Professor</option>
+        <option value="director">Diretor</option>
+        <option value="admin">Admin</option>
+      </Select>
     );
   }
 

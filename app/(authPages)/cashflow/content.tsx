@@ -42,6 +42,7 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
       field: "amount",
       headerName: "Valor",
       flex: 1,
+      minWidth: 100,
       sortIndex: 1,
       sortable: true,
       valueFormatter: ({ value }) =>
@@ -72,6 +73,7 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
     {
       field: "date",
       sortIndex: 0,
+      minWidth: 100,
       flex: 1,
       sort: "desc",
       headerName: "Data",

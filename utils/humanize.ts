@@ -66,4 +66,5 @@ export const studentRoleOptions = {
   student: "Aluno",
   teacher: "Professor",
   admin: "Admin",
+  director: "Diretor",
 };
