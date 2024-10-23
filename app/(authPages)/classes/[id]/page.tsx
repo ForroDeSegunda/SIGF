@@ -6,7 +6,6 @@ import {
 } from "@/app/api/attendance/service";
 import { readClassDates } from "@/app/api/classDates/service";
 import {
-  createEnrollments,
   readEnrollmentsByClassId,
   updateEnrollment,
 } from "@/app/api/enrollments/service";
@@ -35,6 +34,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 import { read, utils } from "xlsx";
 import { createUsersForXlsxImport } from "./actions";
+import { createEnrollments } from "../actions";
 
 export default function ClassesIdPage() {
   const gridRef = useRef<AgGridReact>(null);

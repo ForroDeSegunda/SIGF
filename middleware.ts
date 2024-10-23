@@ -4,7 +4,8 @@ import { updateServerSession } from "./supabase/middleware";
 import { useSupabaseServer } from "./supabase/server";
 
 const publicPathnames = ["/login", "/password"];
-const adminPathnames = ["/users", "/cashflow", "/periods"];
+const directorPathnames = ["/users", "/periods"];
+const adminPathnames = ["/cashflow", ...directorPathnames];
 
 export async function middleware(req: NextRequest) {
   const server = await useSupabaseServer();
@@ -17,11 +18,16 @@ export async function middleware(req: NextRequest) {
   res.headers.set("origin", origin);
   updateServerSession(req);
 
-  if (
-    authUser.error ||
-    (userRole.userRole !== "admin" &&
-      adminPathnames.includes(req.nextUrl.pathname)) ||
-    (authUser.error && !publicPathnames.includes(req.nextUrl.pathname))
+  if (authUser.error) {
+    return NextResponse.redirect(`${reqUrl.origin}/login`);
+  } else if (
+    directorPathnames.includes(req.nextUrl.pathname) &&
+    userRole.userRole !== "director"
+  ) {
+    return NextResponse.redirect(`${reqUrl.origin}`);
+  } else if (
+    adminPathnames.includes(req.nextUrl.pathname) &&
+    userRole.userRole !== "admin"
   ) {
     return NextResponse.redirect(`${reqUrl.origin}`);
   }

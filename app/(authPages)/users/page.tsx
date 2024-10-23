@@ -137,6 +137,16 @@ export default function UsersPage() {
         </button>
       );
     }
+    function BtnDirector() {
+      return (
+        <button
+          className="text-orange-500 hover:text-orange-600 font-bold"
+          onClick={() => handleChangeRole(data, "director")}
+        >
+          Admin
+        </button>
+      );
+    }
 
     if (data.user.role === "student") {
       return (

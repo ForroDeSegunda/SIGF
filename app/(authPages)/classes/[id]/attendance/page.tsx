@@ -152,53 +152,58 @@ export default function AttendancePage() {
     event.preventDefault();
     if (!event.target.files) return console.error("No file selected");
 
-    const workbook = read(await event.target.files[0].arrayBuffer());
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    const jsonWithHeaders: Array<object> = utils.sheet_to_json(sheet, {
-      header: 1,
-      raw: false,
-      defval: "Não registrado",
-    });
-    const json = jsonWithHeaders.slice(1);
-    const emails = json.map((row) => String(row[1]).trim());
-    const users = await readUsersViewByEmail(emails);
-    const classDates = await readClassDatesByClassId(classId as string);
-    const attendances = await readAttendancesByClassDates(classDates);
+    try {
+      const workbook = read(await event.target.files[0].arrayBuffer());
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonWithHeaders: Array<object> = utils.sheet_to_json(sheet, {
+        header: 1,
+        raw: false,
+        defval: "Não registrado",
+      });
+      const json = jsonWithHeaders.slice(1);
+      const emails = json.map((row) => String(row[1]).trim());
+      const users = await readUsersViewByEmail(emails);
+      const classDates = await readClassDatesByClassId(classId as string);
+      const attendances = await readAttendancesByClassDates(classDates);
 
-    const userIdToPresences = users.reduce((acc, user: TUserViewRow) => {
-      const dehumanizedPresencesOptions = {
-        presente: "present",
-        falta: "absent",
-        justificado: "justified",
-        "não registrado": "notRegistered",
-      };
-      const foundPresences = json.find(
-        (row) => String(row[1]).trim() === user.email?.trim(),
-      );
-      if (Array.isArray(foundPresences)) {
-        const presences = foundPresences.slice(2);
-        const dehumanizedPresences = presences.map(
-          (presence) => dehumanizedPresencesOptions[presence.toLowerCase()],
+      const userIdToPresences = users.reduce((acc, user: TUserViewRow) => {
+        const dehumanizedPresencesOptions = {
+          presente: "present",
+          falta: "absent",
+          justificado: "justified",
+          "não registrado": "notRegistered",
+        };
+        const foundPresences = json.find(
+          (row) => String(row[1]).trim() === user.email?.trim(),
         );
-        acc[user.id!] = dehumanizedPresences;
-      } else throw new Error("Array expected");
-      return acc;
-    }, {});
+        if (Array.isArray(foundPresences)) {
+          const presences = foundPresences.slice(2);
+          const dehumanizedPresences = presences.map(
+            (presence) => dehumanizedPresencesOptions[presence.toLowerCase()],
+          );
+          acc[user.id!] = dehumanizedPresences;
+        } else throw new Error("Array expected");
+        return acc;
+      }, {});
 
-    const updatedAttendances = attendances.map((attendance) => {
-      const presenceArray = userIdToPresences[attendance.userId];
-      const classDateIndex = classDates.findIndex(
-        (classDate) => classDate.id === attendance.classDateId,
-      );
+      const updatedAttendances = attendances.map((attendance) => {
+        const presenceArray = userIdToPresences[attendance.userId];
+        const classDateIndex = classDates.findIndex(
+          (classDate) => classDate.id === attendance.classDateId,
+        );
 
-      return {
-        ...attendance,
-        presence: presenceArray[classDateIndex],
-      };
-    });
+        return {
+          ...attendance,
+          presence: presenceArray[classDateIndex],
+        };
+      });
 
-    await updateAttendances(updatedAttendances);
-    toast.success("Presenças importadas com sucesso!");
+      await updateAttendances(updatedAttendances);
+      toast.success("Presenças importadas com sucesso!");
+    } catch (error) {
+      console.error("Error importing attendances:", error);
+      throw error;
+    }
   }
 
   async function handleExportCsv() {
