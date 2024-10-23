@@ -14,6 +14,7 @@ import {
 } from "./atom";
 import { TTransactionRow } from "./types";
 import { usersAtom } from "@/atoms/usersAtom";
+import { useWindowWidth } from "@react-hook/window-size";
 
 export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
   const openModal = useModal();
@@ -21,8 +22,9 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
   const [transactions, setTransactions] = useRecoilState(transactionsAtom);
   const setCurrentTransaction = useSetRecoilState(currentTransactionAtom);
   const user = useRecoilValue(usersAtom);
+  const windowWidth = useWindowWidth();
   const isAdmin = user?.userRole === "admin";
-  const isDirector = isAdmin || user?.userRole === "director";
+  // const isDirector = isAdmin || user?.userRole === "director";
 
   useMemo(() => setTransactions(p.transactions), [p.transactions]);
   useMemo(
@@ -35,7 +37,7 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
     [transactions],
   );
 
-  const columnDefs: ColDef<TTransactionRow>[] = [
+  const colDefs: ColDef<TTransactionRow>[] = [
     {
       field: "amount",
       headerName: "Valor",
@@ -79,8 +81,8 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
     },
     { field: "description", headerName: "Descrição", flex: 2 },
   ];
-  const adminColumnDefs = [
-    ...columnDefs,
+  const adminColDefs = [
+    ...colDefs,
     {
       headerName: "",
       width: 75,
@@ -104,6 +106,62 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
     },
   ];
 
+  const colDefsMobile: ColDef<TTransactionRow>[] = [
+    {
+      field: "date",
+      sortIndex: 0,
+      flex: 1,
+      sort: "desc",
+      headerName: "Valor | Data | Descrição",
+      sortable: true,
+      valueFormatter: ({ value }) =>
+        new Date(value).toLocaleDateString("pt-BR"),
+      cellRenderer: (p: any) => {
+        const data: TTransactionRow = p.node.data;
+        return (
+          <>
+            <div className="flex justify-between">
+              <span
+                className="font-bold"
+                style={
+                  data.type === "expense"
+                    ? { color: "#f4771b" }
+                    : { color: "#9bbe2e" }
+                }
+              >
+                {new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                  minimumFractionDigits: 2,
+                }).format(data.amount / 100)}
+              </span>
+              <span>{new Date(data.date).toLocaleDateString("pt-BR")}</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>{data.description}</span>
+              {isAdmin && (
+                <div className="flex gap-2 justify-between items-center">
+                  <button
+                    onClick={() => {
+                      setCurrentTransaction(data);
+                      openModal("cashflow");
+                    }}
+                  >
+                    <FaRegPenToSquare size={20} />
+                  </button>
+                  <button onClick={() => handleDeleteTransaction(data)}>
+                    <FaRegTrashCan size={20} />
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        );
+      },
+    },
+  ];
+
   async function handleDeleteTransaction(transaction: TTransactionRow) {
     try {
       const deletedTransaction = await deleteTransaction(transaction);
@@ -121,7 +179,10 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
     <AgGridReact
       className="w-full p-4"
       rowData={transactions}
-      columnDefs={isAdmin ? adminColumnDefs : columnDefs}
+      rowHeight={windowWidth < 600 ? 84 : 42}
+      columnDefs={
+        windowWidth > 600 ? (isAdmin ? adminColDefs : colDefs) : colDefsMobile
+      }
       overlayNoRowsTemplate="ㅤ"
     />
   );
