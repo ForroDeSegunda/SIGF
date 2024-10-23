@@ -29,6 +29,9 @@ export function NavbarButtons() {
   const resetCurrentClass = useResetRecoilState(currentClassAtom);
   const resetCurrentPeriod = useResetRecoilState(currentPeriodAtom);
   const cashflowBalance = useRecoilValue(cashflowBalanceAtom);
+  const isAdmin = user?.userRole === "admin";
+  const isDirector = isAdmin || user?.userRole === "director";
+  const isTeacher = isDirector || user?.userRole === "teacher";
 
   const classesIdRegex = new RegExp(
     /\/classes\/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
@@ -64,7 +67,7 @@ export function NavbarButtons() {
             Minhas presenças
           </Link>
         )}
-        {(userRole === "admin" || userRole === "teacher") && (
+        {isDirector && (
           <Link
             className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
             href={`${pathName}/attendance`}
@@ -76,7 +79,7 @@ export function NavbarButtons() {
     );
   }
 
-  if (pathName === "/periods" && userRole === "admin") {
+  if (pathName === "/periods" && isDirector) {
     return (
       <>
         <button
@@ -90,9 +93,9 @@ export function NavbarButtons() {
         </button>
       </>
     );
-  } else if (pathName === "/calendar" && userRole === "admin") {
+  } else if (pathName === "/calendar" && isDirector) {
     return <ButtonNewCalendar />;
-  } else if (pathName === "/classes" && userRole === "admin") {
+  } else if (pathName === "/classes" && isDirector) {
     return (
       <>
         <button
@@ -109,7 +112,7 @@ export function NavbarButtons() {
   } else if (pathName.match(classesIdRegex)) {
     return (
       <div className={"flex " + (windowWidth < 350 ? "gap-1" : "gap-4")}>
-        {(userRole === "admin" || userRole === "teacher") && (
+        {isDirector && (
           <div
             className={
               enrollmentCount.leader >= enrollmentCount.half
@@ -143,7 +146,7 @@ export function NavbarButtons() {
         ) : (
           <ActionButtons />
         )}
-        {(userRole === "admin" || userRole === "teacher") && (
+        {isDirector && (
           <div
             className={
               enrollmentCount.led >= enrollmentCount.half
@@ -159,10 +162,7 @@ export function NavbarButtons() {
         )}
       </div>
     );
-  } else if (
-    pathName.match(attendanceRegex) &&
-    (userRole === "admin" || "teacher")
-  ) {
+  } else if (pathName.match(attendanceRegex) && isDirector) {
     return <GenerateClassDates />;
   } else if (pathName.includes("/userAttendance")) {
     const totalRegistered = attendances.filter(
@@ -232,7 +232,7 @@ export function NavbarButtons() {
         </Link>
       </div>
     );
-  } else if (pathName === "/cashflow" && userRole === "admin") {
+  } else if (pathName === "/cashflow" && isAdmin) {
     return (
       <button
         className={`flex gap-2 text-white py-2 px-4 rounded 

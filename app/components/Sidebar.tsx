@@ -16,6 +16,7 @@ export default function Sidebar() {
   const user = useRecoilValue(usersAtom);
   const sidebarIsOpen = useRecoilValue(sidebarMainAtom);
   const isAdmin = user?.userRole === "admin";
+  const isDirector = isAdmin || user?.userRole === "director";
 
   const buttons = [
     {
@@ -28,17 +29,17 @@ export default function Sidebar() {
       icon: <FaCalendar />,
       href: "/calendar",
     },
-    isAdmin && {
+    isDirector && {
       text: "Fluxo de Caixa",
       icon: <FaMoneyBillTransfer />,
       href: "/cashflow",
     },
-    isAdmin && {
+    isDirector && {
       text: "Períodos",
       icon: <FaHourglassHalf />,
       href: "/periods",
     },
-    isAdmin && {
+    isDirector && {
       text: "Usuários",
       icon: <FaUserGear />,
       href: "/users",

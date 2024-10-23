@@ -4,31 +4,27 @@ import { updateServerSession } from "./supabase/middleware";
 import { useSupabaseServer } from "./supabase/server";
 
 const publicPathnames = ["/login", "/password"];
-const directorPathnames = ["/users", "/periods"];
-const adminPathnames = ["/cashflow", ...directorPathnames];
+const adminPathnames = ["/users", "/periods", "/cashflow"];
 
 export async function middleware(req: NextRequest) {
-  const server = await useSupabaseServer();
+  const res = NextResponse.next();
+  const reqUrl = new URL(req.url);
   const origin = `${req.headers.get("x-forwarded-proto")}://${req.headers.get("host")}`;
+  res.headers.set("origin", origin);
+
+  if (publicPathnames.includes(req.nextUrl.pathname)) return res;
+
+  const server = await useSupabaseServer();
   const authUser = await server.auth.getUser();
   const userRole = await readUserWithRole();
-  const reqUrl = new URL(req.url);
-  const res = NextResponse.next();
+  const isAdmin = userRole?.userRole === "admin";
+  const isDirector = isAdmin || userRole?.userRole === "director";
 
-  res.headers.set("origin", origin);
   updateServerSession(req);
 
   if (authUser.error) {
     return NextResponse.redirect(`${reqUrl.origin}/login`);
-  } else if (
-    directorPathnames.includes(req.nextUrl.pathname) &&
-    userRole.userRole !== "director"
-  ) {
-    return NextResponse.redirect(`${reqUrl.origin}`);
-  } else if (
-    adminPathnames.includes(req.nextUrl.pathname) &&
-    userRole.userRole !== "admin"
-  ) {
+  } else if (adminPathnames.includes(req.nextUrl.pathname) && !isDirector) {
     return NextResponse.redirect(`${reqUrl.origin}`);
   }
 
@@ -56,6 +52,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * Feel free to modify this pattern to include more paths.
      */
-    "/((?!_next/static|_next/image|favicon.ico|login|api/auth/sign-in-google|api/auth|$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|login|icon.png|api/auth/sign-in-google|api/auth|$).*)",
   ],
 };
