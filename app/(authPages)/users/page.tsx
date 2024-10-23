@@ -6,6 +6,7 @@ import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef, GridApi } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import tw from "tailwind-styled-components";
 
 const Select = tw.select`rounded-md px-4 py-2 bg-inherit border mb-2`;
@@ -78,35 +79,42 @@ export default function UsersPage() {
     userData: TUserViewPlusRole,
     newRole: TUser["role"],
   ) {
-    if (userData.user.created_at === "never") {
-      const createdUser = await createUser([
-        {
-          id: userData.id,
-          role: newRole,
-        },
-      ]);
+    toast.info("Atualizando cargo...");
+    try {
+      if (userData.user.created_at === "never") {
+        const createdUser = await createUser([
+          {
+            id: userData.id,
+            role: newRole,
+          },
+        ]);
 
+        const newUsers = users.map((user) => {
+          if (user.user && user.id === createdUser.id) {
+            user.user = createdUser;
+          }
+          return user;
+        });
+        setUsers(newUsers);
+        return;
+      }
+
+      const updatedUser = await updateUser({
+        id: userData.id,
+        role: newRole,
+      });
       const newUsers = users.map((user) => {
-        if (user.user && user.id === createdUser.id) {
-          user.user = createdUser;
+        if (user.user && user.id === updatedUser.id) {
+          user.user = updatedUser;
         }
         return user;
       });
       setUsers(newUsers);
-      return;
+      toast.success("Cargo atualizado com sucesso!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao atualizar cargo");
     }
-
-    const updatedUser = await updateUser({
-      id: userData.id,
-      role: newRole,
-    });
-    const newUsers = users.map((user) => {
-      if (user.user && user.id === updatedUser.id) {
-        user.user = updatedUser;
-      }
-      return user;
-    });
-    setUsers(newUsers);
   }
 
   function actionCellRenderer({ data, value }) {
