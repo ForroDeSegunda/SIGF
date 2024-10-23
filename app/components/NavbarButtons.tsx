@@ -232,10 +232,11 @@ export function NavbarButtons() {
         </Link>
       </div>
     );
-  } else if (pathName === "/cashflow" && isAdmin) {
-    return (
-      <button
-        className={`flex gap-2 text-white py-2 px-4 rounded 
+  } else if (pathName === "/cashflow") {
+    if (isAdmin) {
+      return (
+        <button
+          className={`flex gap-2 text-white py-2 px-4 rounded 
         ${
           cashflowBalance === 0
             ? "bg-blue-500 hover:bg-blue-600"
@@ -243,18 +244,41 @@ export function NavbarButtons() {
               ? "bg-green-500 hover:bg-green-600"
               : "bg-orange-500 hover:bg-orange-600"
         }`}
-        onClick={() => openModal("cashflow")}
-      >
-        Balanço:
-        <span className="font-bold">
-          {new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-            minimumFractionDigits: 2,
-          }).format(cashflowBalance / 100)}
-        </span>
-      </button>
-    );
+          onClick={() => openModal("cashflow")}
+        >
+          Balanço:
+          <span className="font-bold">
+            {new Intl.NumberFormat("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+              minimumFractionDigits: 2,
+            }).format(cashflowBalance / 100)}
+          </span>
+        </button>
+      );
+    } else if (isDirector) {
+      return (
+        <div
+          className={`flex gap-2 text-white py-2 px-4 rounded 
+        ${
+          cashflowBalance === 0
+            ? "bg-blue-500 hover:bg-blue-600"
+            : cashflowBalance > 0
+              ? "bg-green-500 hover:bg-green-600"
+              : "bg-orange-500 hover:bg-orange-600"
+        }`}
+        >
+          Balanço:
+          <span className="font-bold">
+            {new Intl.NumberFormat("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+              minimumFractionDigits: 2,
+            }).format(cashflowBalance / 100)}
+          </span>
+        </div>
+      );
+    }
   }
 
   return;

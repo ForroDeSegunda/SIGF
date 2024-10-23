@@ -4,7 +4,7 @@ import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import { FaRegPenToSquare, FaRegTrashCan } from "react-icons/fa6";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import { toast } from "sonner";
 import { deleteTransaction } from "./actions";
 import {
@@ -13,12 +13,16 @@ import {
   transactionsAtom,
 } from "./atom";
 import { TTransactionRow } from "./types";
+import { usersAtom } from "@/atoms/usersAtom";
 
 export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
   const openModal = useModal();
   const setCashflowBalance = useSetRecoilState(cashflowBalanceAtom);
   const [transactions, setTransactions] = useRecoilState(transactionsAtom);
   const setCurrentTransaction = useSetRecoilState(currentTransactionAtom);
+  const user = useRecoilValue(usersAtom);
+  const isAdmin = user?.userRole === "admin";
+  const isDirector = isAdmin || user?.userRole === "director";
 
   useMemo(() => setTransactions(p.transactions), [p.transactions]);
   useMemo(
@@ -35,6 +39,7 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
     {
       field: "amount",
       headerName: "Valor",
+      flex: 1,
       sortIndex: 1,
       sortable: true,
       valueFormatter: ({ value }) =>
@@ -65,6 +70,7 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
     {
       field: "date",
       sortIndex: 0,
+      flex: 1,
       sort: "desc",
       headerName: "Data",
       sortable: true,
@@ -72,6 +78,9 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
         new Date(value).toLocaleDateString("pt-BR"),
     },
     { field: "description", headerName: "Descrição", flex: 2 },
+  ];
+  const adminColumnDefs = [
+    ...columnDefs,
     {
       headerName: "",
       width: 75,
@@ -112,7 +121,7 @@ export function CashFlowContent(p: { transactions: TTransactionRow[] }) {
     <AgGridReact
       className="w-full p-4"
       rowData={transactions}
-      columnDefs={columnDefs}
+      columnDefs={isAdmin ? adminColumnDefs : columnDefs}
       overlayNoRowsTemplate="ㅤ"
     />
   );
