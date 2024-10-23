@@ -262,10 +262,10 @@ export function NavbarButtons() {
           className={`flex gap-2 text-white py-2 px-4 rounded 
         ${
           cashflowBalance === 0
-            ? "bg-blue-500 hover:bg-blue-600"
+            ? "bg-blue-500"
             : cashflowBalance > 0
-              ? "bg-green-500 hover:bg-green-600"
-              : "bg-orange-500 hover:bg-orange-600"
+              ? "bg-green-500"
+              : "bg-orange-500"
         }`}
         >
           Balanço:
