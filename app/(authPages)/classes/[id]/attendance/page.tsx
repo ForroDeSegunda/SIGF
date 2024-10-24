@@ -200,7 +200,7 @@ export default function AttendancePage() {
         };
       });
 
-      await updateAttendances(updatedAttendances);
+      updateAttendances(updatedAttendances);
       toast.success("Presenças importadas com sucesso!");
     } catch (error) {
       console.error("Error importing attendances:", error);
