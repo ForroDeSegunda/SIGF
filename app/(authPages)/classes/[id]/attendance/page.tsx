@@ -194,7 +194,9 @@ export default function AttendancePage() {
 
         return {
           ...attendance,
-          presence: presenceArray[classDateIndex],
+          presence: presenceArray
+            ? presenceArray[classDateIndex]
+            : "notRegistered",
         };
       });
 

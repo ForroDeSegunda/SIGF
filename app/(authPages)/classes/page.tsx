@@ -32,6 +32,8 @@ export default function ClassesPage() {
   const setClasses = useSetRecoilState(classesAtom);
   const sortedClasses = useRecoilValue(sortedClassesSelector);
   const windowWidth = useWindowWidth();
+  const isAdmin = user?.userRole === "admin";
+  const isDirector = isAdmin || user?.userRole === "director";
 
   const columnDefsBase: ColDef<TClasses>[] = [
     {
@@ -241,12 +243,12 @@ export default function ClassesPage() {
 
   async function handleSetClasses() {
     const classes = await readClasses();
-    if (user?.userRole === "admin" || "teacher") setClasses(classes);
+    if (isDirector) setClasses(classes);
     else setClasses(classes.filter((c) => c.status === "open"));
   }
 
   function handleColumnDefs() {
-    if (user?.userRole === "admin") {
+    if (isDirector) {
       return windowWidth < 550 ? columnDefsAdminMobile : columnDefsAdmin;
     }
     return windowWidth < 550 ? columnDefsMobile : columnDefs;
