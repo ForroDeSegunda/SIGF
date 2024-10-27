@@ -29,7 +29,7 @@ export async function updateUser(user: TUser) {
 
 export async function updateUserWithoutName(users: TUserViewUpdate[]) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const serviceRole = process.env.SUPABASE_SERVICE_ROLE!;
+  const serviceRole = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
   const server = createClient(supabaseUrl, serviceRole, {
     auth: {

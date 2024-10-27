@@ -2,16 +2,16 @@
 import {
   readUsersViewByEmail,
   readUsersViewById,
-  updateUserView,
   updateUserWithoutName,
 } from "@/app/(authPages)/users/actions";
-import { TUserViewRow, TUserViewUpdate } from "@/app/(authPages)/users/types";
+import { TUserViewRow } from "@/app/(authPages)/users/types";
 import { deleteClassDate, readClassDates } from "@/app/api/classDates/service";
 import { readClass } from "@/app/api/classes/service";
 import { readEnrollmentsByClassId } from "@/app/api/enrollments/service";
 import { useModal } from "@/app/components/MainModal";
 import { classDatesAtom } from "@/atoms/classDatesAtom";
 import { usersAtom } from "@/atoms/usersAtom";
+import { TEnrollmentRow } from "@/utils/db";
 import { danceRoleOptions, presenceOptions } from "@/utils/humanize";
 import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef } from "ag-grid-community";
@@ -23,7 +23,6 @@ import { toast } from "sonner";
 import { read, utils, writeFile } from "xlsx";
 import { readClassDatesByClassId } from "../../actions";
 import { readAttendancesByClassDates, updateAttendances } from "../actions";
-import { TEnrollmentRow } from "@/utils/db";
 
 export interface IClassDatesRow {
   id: string;
