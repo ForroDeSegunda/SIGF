@@ -159,6 +159,7 @@ export default function AttendancePage() {
       const jsonWithHeaders: Array<object> = utils.sheet_to_json(sheet, {
         header: 1,
         raw: false,
+        defval: "Não registrado",
         blankrows: false,
       });
       const json = jsonWithHeaders.slice(1);
