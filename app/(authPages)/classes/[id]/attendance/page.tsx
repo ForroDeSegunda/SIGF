@@ -2,8 +2,10 @@
 import {
   readUsersViewByEmail,
   readUsersViewById,
+  updateUserView,
+  updateUserWithoutName,
 } from "@/app/(authPages)/users/actions";
-import { TUserViewRow } from "@/app/(authPages)/users/types";
+import { TUserViewRow, TUserViewUpdate } from "@/app/(authPages)/users/types";
 import { deleteClassDate, readClassDates } from "@/app/api/classDates/service";
 import { readClass } from "@/app/api/classes/service";
 import { readEnrollmentsByClassId } from "@/app/api/enrollments/service";
@@ -158,11 +160,29 @@ export default function AttendancePage() {
       const jsonWithHeaders: Array<object> = utils.sheet_to_json(sheet, {
         header: 1,
         raw: false,
-        defval: "Não registrado",
+        blankrows: false,
       });
       const json = jsonWithHeaders.slice(1);
       const emails = json.map((row) => String(row[1]).trim());
+      const usersFullName = json.map((row) => ({
+        email: String(row[1]).trim(),
+        full_name: String(row[0]).trim() as never,
+      }));
+
       const users = await readUsersViewByEmail(emails);
+      const usersToUpdate = users.map((user) => {
+        if (user.full_name === null) {
+          return {
+            ...user,
+            full_name: usersFullName.find((u) => u.email === user.email)
+              ?.full_name,
+          };
+        }
+        return user;
+      });
+
+      updateUserWithoutName(usersToUpdate as never);
+
       const classDates = await readClassDatesByClassId(classId as string);
       const attendances = await readAttendancesByClassDates(classDates);
 

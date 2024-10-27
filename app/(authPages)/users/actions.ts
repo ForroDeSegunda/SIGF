@@ -2,7 +2,8 @@
 
 import { useSupabaseServer } from "@/supabase/server";
 import { TUserWithRole } from "@/utils/db";
-import { TUserInsert, TUserRow, TUserViewRow } from "./types";
+import { TUserInsert, TUserRow, TUserViewRow, TUserViewUpdate } from "./types";
+import { createClient } from "@supabase/supabase-js";
 
 type TUser = {
   email?: string;
@@ -24,6 +25,30 @@ export async function createUser(user: TUserInsert) {
 export async function updateUser(user: TUser) {
   const server = await useSupabaseServer();
   return await server.auth.updateUser(user);
+}
+
+export async function updateUserWithoutName(users: TUserViewUpdate[]) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceRole = process.env.SUPABASE_SERVICE_ROLE!;
+
+  const server = createClient(supabaseUrl, serviceRole, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  });
+
+  try {
+    for (const user of users) {
+      server.auth.admin.updateUserById(user.id!, {
+        user_metadata: {
+          full_name: user.full_name,
+        },
+      });
+    }
+  } catch (error) {
+    throw error;
+  }
 }
 
 export async function readUsersView() {

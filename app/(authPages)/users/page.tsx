@@ -16,7 +16,12 @@ export default function UsersPage() {
 
   const columnDefs: ColDef<TUserViewPlusRole>[] = [
     { field: "full_name", headerName: "Nome", flex: 1, filter: true },
-    { field: "email", headerName: "Email", flex: 1 },
+    {
+      field: "email",
+      headerName: "Email",
+      flex: 1,
+      filter: true,
+    },
     {
       field: "user.role",
       headerName: "Cargo",
