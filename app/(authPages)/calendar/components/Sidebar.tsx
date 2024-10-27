@@ -13,8 +13,10 @@ export default function Sidebar(props: { children: React.ReactNode }) {
   const user = useRecoilValue(usersAtom);
   const windowWidth = useWindowWidth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const isAdmin = user?.userRole === "admin";
+  const isDirector = isAdmin || user?.userRole === "director";
 
-  if (user?.userRole !== "admin") return null;
+  if (!isDirector) return null;
 
   return (
     <>

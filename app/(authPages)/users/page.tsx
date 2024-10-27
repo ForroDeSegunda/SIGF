@@ -10,27 +10,22 @@ import { toast } from "sonner";
 import tw from "tailwind-styled-components";
 
 const Select = tw.select`rounded-md px-4 py-2 bg-inherit border mb-2`;
+
 export default function UsersPage() {
   const [users, setUsers] = useState<TUserViewPlusRole[]>([]);
   const windowWidth = useWindowWidth();
 
   const columnDefs: ColDef<TUserViewPlusRole>[] = [
-    { field: "full_name", headerName: "Nome", flex: 1, filter: true },
+    { field: "full_name", headerName: "Nome", flex: 2, filter: true },
     {
       field: "email",
       headerName: "Email",
-      flex: 1,
+      flex: 2,
       filter: true,
     },
     {
       field: "user.role",
       headerName: "Cargo",
-      flex: 1,
-      valueFormatter: ({ value }) => studentRoleOptions[value],
-    },
-    {
-      field: "user.role",
-      headerName: "Mudar Cargo",
       minWidth: 120,
       flex: 1,
       cellRenderer: actionCellRenderer,
