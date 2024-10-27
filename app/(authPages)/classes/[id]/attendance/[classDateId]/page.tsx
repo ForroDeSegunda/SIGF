@@ -2,10 +2,15 @@
 
 import { Database } from "@/database.types";
 import { presenceOptions } from "@/utils/humanize";
+import { useWindowWidth } from "@react-hook/window-size";
 import { ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import tw from "tailwind-styled-components";
+
+const Select = tw.select`rounded-md px-4 py-2 bg-inherit border mb-2 w-32 font-bold`;
 
 export interface IClassDatesRow {
   id: string;
@@ -30,90 +35,82 @@ export default function AttendancePage() {
   const params = useParams();
   const gridRef = useRef<AgGridReact>(null);
   const classDateId = params.classDateId;
-
   const [rowData, setRowData] = useState<IClassDatesRow[]>([]);
-  const columnDefs: ColDef<IClassDatesRow>[] = [
+  const windowWidth = useWindowWidth();
+
+  const mobileColumnDefs: ColDef<IClassDatesRow>[] = [
     {
       field: "users_view.full_name",
       headerName: "Nome",
-      flex: 1,
+      flex: 3,
       filter: true,
     },
-    { field: "users_view.email", headerName: "Email", flex: 1 },
     {
       field: "presence",
       headerName: "Presença",
       flex: 1,
+      minWidth: 149,
       valueFormatter: ({ value }) => presenceOptions[value],
+      cellRenderer: actionsCellRenderer,
     },
-    { headerName: "Ações", flex: 1, cellRenderer: actionsCellRenderer },
+  ];
+  const columnDefs: ColDef<IClassDatesRow>[] = [
+    {
+      field: "users_view.full_name",
+      headerName: "Nome",
+      flex: 2,
+      filter: true,
+    },
+    { field: "users_view.email", headerName: "Email", flex: 2 },
+    {
+      field: "presence",
+      headerName: "Presença",
+      flex: 1,
+      minWidth: 149,
+      valueFormatter: ({ value }) => presenceOptions[value],
+      cellRenderer: actionsCellRenderer,
+    },
   ];
 
-  function actionsCellRenderer(params: any) {
-    const data: IClassDatesRow = params.data;
-
-    function PresentButton() {
-      return (
-        <button
-          className="text-green-500 hover:text-green-600 font-bold"
-          onClick={() => updateAttendance(data.id, "present")}
-        >
-          Presente
-        </button>
-      );
-    }
-
-    function AbsentButton() {
-      return (
-        <button
-          className="text-orange-500 hover:text-orange-600 font-bold"
-          onClick={() => updateAttendance(data.id, "absent")}
-        >
-          Ausente
-        </button>
-      );
-    }
-
-    function JustifiedButton() {
-      return (
-        <button
-          className="text-blue-500 hover:text-blue-600 font-bold"
-          onClick={() => updateAttendance(data.id, "justified")}
-        >
-          Justificada
-        </button>
-      );
-    }
-
-    if (data.presence === "justified") {
-      return (
-        <div className="flex gap-4">
-          <PresentButton />
-          <AbsentButton />
-        </div>
-      );
-    } else if (data.presence === "present") {
-      return (
-        <div className="flex gap-4">
-          <AbsentButton />
-          <JustifiedButton />
-        </div>
-      );
-    } else if (data.presence === "absent") {
-      return (
-        <div className="flex gap-4">
-          <PresentButton />
-          <JustifiedButton />
-        </div>
-      );
+  function actionsCellRenderer({ data, value }) {
+    let color = "#6B7280";
+    switch (value) {
+      case "absent":
+        color = "#f4771b";
+        break;
+      case "present":
+        color = "#9bbe2e";
+        break;
+      case "justified":
+        color = "#19a6de";
+        break;
     }
 
     return (
-      <div className="flex gap-4">
-        <PresentButton />
-        <AbsentButton />
-        <JustifiedButton />
-      </div>
+      <Select
+        style={{ color }}
+        name="classState"
+        defaultValue={value}
+        onChange={(e) =>
+          updateAttendance(
+            data.id,
+            e.target.value as Database["public"]["Enums"]["presenceEnum"],
+          )
+        }
+      >
+        <option className="text-gray-500 font-bold" value="notRegistered">
+          Não Registrado
+        </option>
+        <option className="text-orange-500 font-bold" value="absent">
+          Ausente
+        </option>
+        <option className="text-green-500 font-bold" value="present">
+          Presente
+        </option>
+        <option className="text-blue-500 font-bold" value="justified">
+          Justificada
+        </option>
+      </Select>
     );
   }
 
@@ -137,9 +134,11 @@ export default function AttendancePage() {
 
       setRowData(new_row_data);
 
+      toast.success("Presença atualizada!");
       return data;
     } catch (error) {
       console.error("Error updating attendance:", error);
+      toast.error("Erro ao atualizar presença");
     }
   }
 
@@ -164,7 +163,7 @@ export default function AttendancePage() {
         ref={gridRef}
         className="w-full px-4 pt-4"
         rowData={rowData}
-        columnDefs={columnDefs}
+        columnDefs={windowWidth < 768 ? mobileColumnDefs : columnDefs}
         overlayNoRowsTemplate="ㅤ"
       />
 
