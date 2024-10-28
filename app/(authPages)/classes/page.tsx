@@ -38,9 +38,18 @@ export default function ClassesPage() {
 
   const columnDefsBase: ColDef<TClasses>[] = [
     {
+      headerName: "Status",
+      field: "status",
+      minWidth: 120,
+      flex: 2,
+      sort: "desc",
+      valueFormatter: ({ value }) => classStatusOptions[value],
+    },
+    {
       headerName: "Dias de Aula",
       field: "weekDays",
       flex: 1,
+      minWidth: 90,
       valueFormatter: ({ value }) =>
         value
           .split(",")
@@ -54,6 +63,7 @@ export default function ClassesPage() {
     {
       headerName: "Inscrição",
       flex: 1,
+      minWidth: 94,
       cellRenderer: (p: any) => <ButtonEnrollment id={p.data.id} />,
     },
   ];
@@ -62,7 +72,7 @@ export default function ClassesPage() {
     {
       headerName: "Nome",
       field: "name",
-      flex: 1,
+      flex: 3,
       cellRenderer: (p: any) => (
         <Link
           className="font-bold flex items-center gap-2"
@@ -73,16 +83,11 @@ export default function ClassesPage() {
         </Link>
       ),
     },
-    {
-      headerName: "Status",
-      field: "status",
-      sort: "desc",
-      valueFormatter: ({ value }) => classStatusOptions[value],
-    },
     ...columnDefsBase,
     {
       headerName: "Ações",
       flex: 1,
+      minWidth: 120,
       cellRenderer: (p: any) => <ButtonOptions {...p.data} />,
     },
   ];
@@ -101,7 +106,7 @@ export default function ClassesPage() {
     {
       headerName: "Nome",
       field: "name",
-      flex: 1,
+      flex: 3,
       cellRenderer: (p: any) => (
         <Link
           className="font-bold"
@@ -117,7 +122,7 @@ export default function ClassesPage() {
 
   const columnDefsMobile: ColDef<TClasses>[] = [
     {
-      headerName: "Nome",
+      headerName: "Status | Nome | Dias de Aula",
       field: "name",
       flex: 1,
       cellRenderer: renderRowMobile,
@@ -204,6 +209,21 @@ export default function ClassesPage() {
       setShowOptions(true);
     }
 
+    function handleStatusIcon(
+      status: Database["public"]["Enums"]["classStatus"],
+    ) {
+      switch (status) {
+        case "open":
+          return <FaEye className="fill-green-500" />;
+        case "hidden":
+          return <FaEyeSlash className="fill-orange-500" />;
+        case "ongoing":
+          return <FaRotate className="fill-blue-500" />;
+        case "archived":
+          return <FaBox className="fill-gray-500" />;
+      }
+    }
+
     return (
       <div className="flex flex-col justify-start">
         <div
@@ -211,6 +231,7 @@ export default function ClassesPage() {
           onClick={resizeRow}
         >
           <div className="font-bold flex items-center gap-2">
+            {handleStatusIcon(props.data.status)}
             {props.data.name}
           </div>
           <div>
