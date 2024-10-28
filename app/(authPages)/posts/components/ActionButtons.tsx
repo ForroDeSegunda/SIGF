@@ -57,6 +57,7 @@ export function ActionButtons(p: {
   const isPostOwner = user!.id === p.post.userId;
   const isCommentOwner = user!.id === p.comment?.userId;
   const isAdmin = user!.userRole === "admin";
+  const isDirector = isAdmin || user!.userRole === "director";
 
   async function handleSendButton() {
     if (p.comment) {
@@ -203,7 +204,7 @@ export function ActionButtons(p: {
           </Button>
         ) : (
           <>
-            {isAdmin || isPostOwner || isCommentOwner ? (
+            {isDirector || isPostOwner || isCommentOwner ? (
               <Button
                 onClick={() =>
                   openModal(
