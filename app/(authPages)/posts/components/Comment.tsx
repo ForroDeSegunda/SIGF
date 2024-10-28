@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 
 const Container = tw.div<TCommentProps>`flex flex-col gap-4 border-t py-4`;
 const Description = tw.pre`text-sm font-sans text-sm whitespace-pre-wrap`;
-const Header = tw.button`flex gap-4 w-fit`;
+const Header = tw.div`flex gap-4 w-fit`;
 const HeaderText = tw.div`flex flex-col justify-between text-left`;
 const HeaderName = tw.div`text-sm font-bold`;
 const HeaderTime = tw.div`text-sm text-gray-500`;
