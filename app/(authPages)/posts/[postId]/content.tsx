@@ -14,7 +14,7 @@ const Container = tw.div`flex w-full m-4`;
 const Content = tw.div`flex flex-col w-full max-w-screen-lg mx-auto`;
 const Post = tw.div`flex flex-col gap-4 pb-4`;
 const PostTitle = tw.h1`text-2xl font-bold`;
-const PostDescription = tw.p`text-sm`;
+const Description = tw.pre`text-sm font-sans text-base whitespace-pre-wrap`;
 const Header = tw.button`flex gap-4 w-fit`;
 const HeaderText = tw.div`flex flex-col justify-between text-left`;
 const HeaderName = tw.div`text-sm font-bold`;
@@ -67,7 +67,7 @@ export function PostIdContent(p: {
               onChange={(e) => setNewCommentText(e.target.value)}
             />
           ) : (
-            <PostDescription>{post.content}</PostDescription>
+            <Description>{post.content}</Description>
           )}
           <ActionButtons
             post={post}
