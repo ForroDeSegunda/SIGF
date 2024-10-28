@@ -34,6 +34,7 @@ export default function ClassesPage() {
   const windowWidth = useWindowWidth();
   const isAdmin = user?.userRole === "admin";
   const isDirector = isAdmin || user?.userRole === "director";
+  const isTeacher = isDirector || user?.userRole === "teacher";
 
   const columnDefsBase: ColDef<TClasses>[] = [
     {
@@ -243,7 +244,7 @@ export default function ClassesPage() {
 
   async function handleSetClasses() {
     const classes = await readClasses();
-    if (isDirector) setClasses(classes);
+    if (isTeacher) setClasses(classes);
     else setClasses(classes.filter((c) => c.status === "open"));
   }
 
