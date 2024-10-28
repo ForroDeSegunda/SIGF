@@ -45,7 +45,7 @@ jobs:
         run: zip backup.zip roles.sql schema.sql data.sql
 
       - name: Set Date Environment Variable
-        run: echo "DATE_VARIABLE=$(date +'%m-%d-%Y')" >> $GITHUB_ENV
+        run: echo "DATE_VARIABLE=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Remove 30 Day Old Backups
         run: rclone delete -vv --min-age 30d "remote:"
